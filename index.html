@@ -3,796 +3,1200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ứng dụng Toàn diện: Dịch, Từ điển & Sáng tạo nội dung Việt-Êđê</title>
+    <title>Công cụ Dịch và Từ điển Êđê-Việt</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Inter from Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome CDN for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+        /* Tùy chỉnh CSS cho giao diện tối */
+        body.dark {
+            background-color: #1a202c;
+            color: #e2e8f0;
         }
-        .container {
-            max-width: 900px;
+
+        .dark .bg-white {
+            background-color: #2d3748;
         }
-        .loading-spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #ffffff;
+        
+        .dark .text-gray-900 {
+            color: #e2e8f0;
+        }
+
+        .dark .text-gray-600 {
+            color: #cbd5e0;
+        }
+
+        .dark .border-gray-300 {
+            border-color: #4a5568;
+        }
+
+        .dark .bg-gray-50 {
+            background-color: #4a5568;
+        }
+
+        .dark .text-gray-800 {
+            color: #e2e8f0;
+        }
+
+        .dark .hover\\:bg-gray-200:hover {
+            background-color: #4a5568;
+        }
+
+        /* Hiệu ứng spinner */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 1rem;
+            height: 1rem;
             animation: spin 1s linear infinite;
-            display: none;
         }
+
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Căn chỉnh lại vị trí nút đổi chiều cho thiết bị di động */
+        @media (max-width: 767px) {
+            .swap-button-container {
+                position: static !important;
+                transform: none !important;
+                margin-top: 1rem;
+                margin-bottom: 1rem;
             }
-        }
-        .message-box {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 100;
-        }
-        .tab-button.active {
-            border-bottom-color: #4f46e5;
-            color: #4f46e5;
-        }
-        #imagePreviewContainer.hidden {
-            display: none;
-        }
-        #imageResultDiv.hidden {
-            display: none;
-        }
-        #solutionResultDiv.hidden {
-            display: none;
-        }
-        #translateImageBtn.disabled, #solveProblemBtn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
     </style>
 </head>
-<body class="p-4">
-    <div class="container mx-auto bg-white shadow-2xl rounded-2xl p-8 my-8">
-        <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">Dịch & Từ điển & Sáng tạo nội dung Việt-Êđê</h1>
-        <p class="text-center text-gray-600 mb-8">Ứng dụng đa chức năng cho tiếng Êđê.</p>
+<body class="bg-gray-100 text-gray-900 transition-colors duration-300">
 
-        <!-- Tab Buttons -->
-        <div class="flex border-b border-gray-200 mb-6">
-            <button id="translateTabBtn" class="tab-button flex-1 py-3 px-6 text-lg font-semibold text-gray-600 transition-colors duration-300 hover:text-indigo-600 hover:border-indigo-600 focus:outline-none border-b-2 border-transparent">Dịch & Từ điển</button>
-            <button id="imageTabBtn" class="tab-button flex-1 py-3 px-6 text-lg font-semibold text-gray-600 transition-colors duration-300 hover:text-indigo-600 hover:border-indigo-600 focus:outline-none border-b-2 border-transparent active">Dịch ảnh & Giải đề</button>
-            <button id="contentTabBtn" class="tab-button flex-1 py-3 px-6 text-lg font-semibold text-gray-600 transition-colors duration-300 hover:text-indigo-600 hover:border-indigo-600 focus:outline-none border-b-2 border-transparent">Sáng tạo nội dung</button>
-        </div>
+    <!-- Container chính của ứng dụng -->
+    <div id="app" class="min-h-screen p-4"></div>
 
-        <!-- Tab Content -->
-        <div id="tabContent">
-            <!-- Translate & Dictionary Section -->
-            <div id="translateTab" class="tab-pane hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <label for="sourceLanguage" class="block text-gray-700 font-semibold mb-2">Ngôn ngữ gốc:</label>
-                        <select id="sourceLanguage" class="w-full p-3 border rounded-xl focus:outline-none focus:border-indigo-500 mb-4">
-                            <option value="vi">Tiếng Việt</option>
-                            <option value="ede">Tiếng Êđê</option>
-                        </select>
-                        <textarea id="sourceTextarea" class="w-full h-40 p-4 border-2 border-gray-300 rounded-xl resize-none focus:outline-none focus:border-indigo-500" placeholder="Nhập văn bản..."></textarea>
-                    </div>
-                    <div>
-                        <label for="targetLanguage" class="block text-gray-700 font-semibold mb-2">Ngôn ngữ đích:</label>
-                        <select id="targetLanguage" class="w-full p-3 border rounded-xl focus:outline-none focus:border-indigo-500 mb-4">
-                            <option value="ede">Tiếng Êđê</option>
-                            <option value="vi">Tiếng Việt</option>
-                        </select>
-                        <textarea id="targetTextarea" class="w-full h-40 p-4 border-2 border-gray-300 rounded-xl resize-none bg-gray-100" readonly placeholder="Kết quả sẽ hiển thị ở đây..."></textarea>
-                    </div>
-                </div>
-                <div class="flex flex-col sm:flex-row gap-4 mb-8">
-                    <button id="translateButton" class="flex-1 bg-indigo-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
-                        <span id="translateText">Dịch (Câu/Đoạn văn)</span>
-                        <div class="loading-spinner ml-2" id="translateSpinner"></div>
-                    </button>
-                    <button id="dictionaryButton" class="flex-1 bg-green-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
-                        <span id="dictionaryText">Tra Từ điển (Một từ)</span>
-                        <div class="loading-spinner ml-2" id="dictionarySpinner"></div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Image Translation & Problem Solving Section -->
-            <div id="imageTab" class="tab-pane">
-                <div class="mb-6 p-6 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors" id="dropArea">
-                    <p class="text-gray-500 text-lg mb-2">Kéo & thả ảnh vào đây</p>
-                    <p class="text-gray-400">hoặc</p>
-                    <input type="file" id="imageInput" accept="image/*" class="hidden">
-                    <button onclick="document.getElementById('imageInput').click()" class="mt-4 bg-indigo-500 text-white font-semibold py-2 px-4 rounded-full shadow-md hover:bg-indigo-600 transition-colors">Chọn ảnh</button>
-                </div>
-                <div id="imagePreviewContainer" class="hidden mb-6 relative">
-                    <img id="imagePreview" class="w-full h-auto rounded-lg shadow-md max-h-64 object-contain">
-                    <button id="removeImageBtn" class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors">&times;</button>
-                </div>
-                
-                <div class="flex flex-col sm:flex-row gap-4 mb-4">
-                    <button id="dichAnhBtn" class="flex-1 bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
-                        <span id="dichAnhText">Dịch văn bản trong ảnh</span>
-                        <div class="loading-spinner ml-2" id="dichAnhSpinner"></div>
-                    </button>
-                    <button id="solveProblemBtn" class="flex-1 bg-green-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
-                        <span id="solveProblemText">Giải đề từ ảnh</span>
-                        <div class="loading-spinner ml-2" id="solveProblemSpinner"></div>
-                    </button>
-                </div>
-                
-                <!-- Translation Result -->
-                <div id="imageResultDiv" class="mt-6 p-6 bg-gray-100 rounded-xl hidden">
-                    <p class="text-gray-700 font-semibold mb-2">Văn bản gốc:</p>
-                    <div id="extractedTextDiv" class="bg-white p-4 rounded-lg shadow-inner mb-4 overflow-auto max-h-40"></div>
-                    <p class="text-gray-700 font-semibold mb-2">Văn bản đã dịch:</p>
-                    <div id="translatedTextDiv" class="bg-white p-4 rounded-lg shadow-inner overflow-auto max-h-40"></div>
-                </div>
-
-                <!-- Problem Solving Result -->
-                <div id="solutionResultDiv" class="mt-6 p-6 bg-gray-100 rounded-xl hidden">
-                    <p class="text-gray-700 font-semibold mb-2">Lời giải:</p>
-                    <div id="solutionTextDiv" class="bg-white p-4 rounded-lg shadow-inner overflow-auto max-h-96"></div>
-                </div>
-            </div>
-
-            <!-- Content Generation Section -->
-            <div id="contentTab" class="tab-pane hidden">
-                <p class="text-gray-700 mb-4">Nhập văn bản hoặc các từ khóa gợi ý để tạo nội dung mới.</p>
-                <textarea id="contentPromptInput" class="w-full h-32 p-4 border-2 border-gray-300 rounded-xl resize-none focus:outline-none focus:border-indigo-500 mb-4" placeholder="Nhập từ khóa hoặc ý tưởng của bạn (ví dụ: 'buôn làng, đời sống, văn hóa')"></textarea>
-                <div class="flex flex-col sm:flex-row gap-4 mb-4">
-                    <button id="generateExamplesBtn" class="flex-1 bg-purple-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
-                        <span id="generateExamplesText">Tạo câu ví dụ</span>
-                        <div class="loading-spinner ml-2" id="examplesSpinner"></div>
-                    </button>
-                    <button id="generateParagraphBtn" class="flex-1 bg-red-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
-                        <span id="generateParagraphText">Viết đoạn văn</span>
-                        <div class="loading-spinner ml-2" id="paragraphSpinner"></div>
-                    </button>
-                </div>
-                <textarea id="generatedContent" class="w-full h-64 p-4 border-2 border-gray-300 rounded-xl resize-none bg-gray-100" readonly placeholder="Nội dung được tạo sẽ hiển thị ở đây..."></textarea>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-        // API key for the Gemini API. Left empty as per instructions.
-        const API_KEY = "AIzaSyBVCTx8fPnGWFprwoT9bgixio_NUgvNG4k";
+    <!-- Script JavaScript chính -->
+    <script type="module">
+        // ============================================================================================================
+        //                                          KHỞI TẠO ỨNG DỤNG VÀ THƯ VIỆN
+        // ============================================================================================================
         
-        // --- Từ điển tổng hợp từ các file của người dùng ---
-        const dictionary = [
-            { ede: "abao", vietnamese: "Ốc bươu" },
-            { ede: "abăn", vietnamese: "Cái chăn (mền). Msăm abăn: đắp chăn; Abăn hmlei: Chăn bông." },
-            { ede: "abŭ", vietnamese: "Cái hũ" },
-            { ede: "adei", vietnamese: "Em" },
-            { ede: "adĕ", vietnamese: "Hến" },
-            { ede: "adham", vietnamese: "Một nhóm trong tộc người Êđê" },
-            { ede: "adhan", vietnamese: "Cành. Adhan kyâo: Cành cây." },
-            { ede: "adhei", vietnamese: "Trán. Adhei: Trán rộng." },
-            { ede: "adiê", vietnamese: "Trời. Adiê hjan: Trời mưa." },
-            { ede: "adiê không", vietnamese: "Nắng hạn" },
-            { ede: "adiê tlam", vietnamese: "Xế chiều" },
-            { ede: "adôk", vietnamese: "Còn. Kâo adôk prăk: Tôi còn tiền; Adôk hdyøp: Còn sống." },
-            { ede: "adrăng", vietnamese: "Rơm rạ. Mkăm adrăng: đống rơm." },
-            { ede: "adring", vietnamese: "Hiên nhà sàn. Amyø kâo [hu mdiê ti adring: Mẹ tôi phơi luôa ở hiên nhà sàn." },
-            { ede: "adrŏk", vietnamese: "Con cóc" },
-            { ede: "aduôn", vietnamese: "Bà (nội)" },
-            { ede: "adŭ", vietnamese: ["Phòng. Adu\\ pyøt: Phòng ngủ;", "Lớp", "Cái ô"] },
-            { ede: "yuôm bhăn", vietnamese: ["Vô giá", "trọng đại", "cần thiết", "quan trọng", "thiêng liêng"] },
-            { ede: "yuôm yĭn", vietnamese: "Đắt đỏ. Mnơ\\ng mnuă yuôm yyøn: hàng hí đắt đỏ." },
-            { ede: "yuôr", vietnamese: "Cây canh kina rừng" },
-            { ede: "yuôt", vietnamese: "Bám. Yuôt ti dhan kyâo hrut asei đyø kơ dlông: Bám cành cây đu người lên." },
-            { ede: "yut yat", vietnamese: "Đung đưa" },
-            { ede: "yŭ", vietnamese: "(Hướng) Tây. Angyøng mơ\\ng yu\\: Gió Tây." },
-            { ede: "yŭ ngŏ", vietnamese: "Phương hướng. Amâo lo\\ thâo yu\\ ngo\\: Lạc mất phương hướng." },
-            { ede: "yŭk", vietnamese: "Đũng. Yu\\k ]hum: đũng quần." },
-            { ede: "yŭm", vietnamese: ["Mắn (nhiều)", "đông. Yu\\m anak: Mắn con. Yu\\m mse\\ si hdàm: Đông như kiến."] },
-            { ede: "yŭn", vietnamese: "Rung" },
-            { ede: "yŭng jing", vietnamese: "Đứng sững" },
-            { ede: "yŭr", vietnamese: "Dái. Yu\\r knga: Dái tai." },
-            { ede: "yŭr tluôn", vietnamese: ["Mông", "đít"] },
-            { ede: "yưh yưp", vietnamese: ["Chậm chạp. Eùbat yưh yưp: đi chậm chạp.", "Lụn bại. Ai tiê yưh yưp: Tinh thần lụn bại."] },
-            { ede: "kkuh", vietnamese: "chào" },
-            { ede: "anăn", vietnamese: ["tên", "đấy", "đó"] },
-            { ede: "kão", vietnamese: "tôi (ngôi thứ nhất số ít)" },
-            { ede: "klei êđê", vietnamese: "tiếng Êđê" },
-            { ede: "ih", vietnamese: "anh, chị,...(ngôi thứ 2 số ít)" },
-            { ede: "hlei", vietnamese: "ai, gì (khi hỏi tên)" },
-            { ede: "dôk gũ", vietnamese: "ngồi xuống" },
-            { ede: "suaih pral", vietnamese: "mạnh khỏe" },
-            { ede: "kgũ dồng", vietnamese: "đứng lên" },
-            { ede: "klei yuăn", vietnamese: "tiếng Kinh" },
-            { ede: "mtô", vietnamese: "dạy" },
-            { ede: "pok", vietnamese: ["mở", "từ dùng đếm số trang, quyển"] },
-            { ede: "nai mtô", vietnamese: "giáo viên" },
-            { ede: "mo", vietnamese: "không (từ dùng để hỏi)" },
-            { ede: "hriăm", vietnamese: "học" },
-            { ede: "amão", vietnamese: "không" },
-            { ede: "hdruôm hră", vietnamese: "quyển sách" },
-            { ede: "ti", vietnamese: ["đâu", "nào", "tại"] },
-            { ede: "ti anôk", vietnamese: ["ở đâu", "chỗ nào"] },
-            { ede: "čiăng", vietnamese: "muốn" },
-            { ede: "nao", vietnamese: "đi" },
-            { ede: "ka", vietnamese: "chưa" },
-            { ede: "ơ ơh", vietnamese: "không (từ chối)" },
-            { ede: "mão", vietnamese: ["có", "được"] },
-            { ede: "hruê", vietnamese: "ngày" },
-            { ede: "huă", vietnamese: "ăn (cơm)" },
-            { ede: "bồng", vietnamese: "ăn (bánh trái, canh)" },
-            { ede: "knă", vietnamese: "nấu" },
-            { ede: "aruăt", vietnamese: ["gân", "sợi"] },
-            { ede: "čar", vietnamese: ["tỉnh", "chẻ"] },
-            { ede: "djă", vietnamese: ["cầm", "giữ"] },
-            { ede: "đi", vietnamese: ["leo", "trèo", "cưỡi", "lên", "đi"] },
-            { ede: "hăng", vietnamese: "bằng với" },
-            { ede: "bẽ", vietnamese: ["cái", "chỉ số cây"] },
-            { ede: "biẽ", vietnamese: ["chảy", "mọc", "trổ"] },
-            { ede: "buh", vietnamese: ["đeo (ở-tay, chân)", "tỉa (lúa)"] },
-            { ede: "čim", vietnamese: ["thịt", "chim"] },
-            { ede: "čoh", vietnamese: ["mổ", "cắn", "cuốc"] },
-            { ede: "leh", vietnamese: ["đã", "rồi", "xong"] },
-            { ede: "msăm", vietnamese: ["đắp (Chăn)", "chua"] },
-            { ede: "êluih", vietnamese: ["rẻ", "dễ"] },
-            { ede: "mta", vietnamese: ["lưỡi (dao, gươm)", "thứ", "loại", "món"] },
-            { ede: "tal", vietnamese: ["xẻ", "thứ"] },
-            { ede: "khök", vietnamese: ["gõ", "cụng"] },
-            { ede: "bi", vietnamese: ["còn", "phải"] },
-            { ede: "klei", vietnamese: ["tiếng dây", "đào", "sự việc", "bài", "điều"] },
-            { ede: "boh", vietnamese: ["quả, trái, giặt, chiếc, hòn"] },
-            { ede: "băng", vietnamese: ["ăn", "cháy", "bén"] },
-            { ede: "dôk", vietnamese: ["ở", "đang", "ngồi", "lấy (vợ, chồng)"] },
-            { ede: "kkiêng", vietnamese: ["sinh đẻ (người)", "khuỷu tay", "góc"] },
-            { ede: "khua", vietnamese: ["trường", "giả", "người lãnh đạo"] },
-            { ede: "lỡ", vietnamese: ["ruộng", "nữa", "lại"] },
-            { ede: "djō", vietnamese: ["trúng", "đúng"] },
-            { ede: "drei", vietnamese: ["chúng ta", "ta", "số đếm (con vật)"] },
-            { ede: "khăp", vietnamese: ["thích", "yêu"] },
-            { ede: "cô", vietnamese: ["cháu (nội, ngoại)", "gội"] },
-            { ede: "amũ", vietnamese: "mẹ" },
-            { ede: "hma", vietnamese: "rẫy" },
-            { ede: "hdră bhia", vietnamese: "đường lối" },
-            { ede: "êdeh pơ phút", vietnamese: "xe máy" },
-            { ede: "gặp", vietnamese: "bạn bè" },
-            { ede: "mblaih", vietnamese: "giải phóng" },
-            { ede: "buôn prŏng", vietnamese: "thành phố" },
-            { ede: "lăi", vietnamese: "kể" },
-            { ede: "răng kriê", vietnamese: "bảo vệ" },
-            { ede: "ala ]ar", vietnamese: "đất nước" },
-            { ede: "hd^p mda", vietnamese: "sống" },
-            { ede: "mă brua", vietnamese: "làm việc" },
-            { ede: "hluê djo", vietnamese: "theo đúng" },
-            { ede: "hdră bhia", vietnamese: "pháp luật" },
-            { ede: "knu\\k kna", vietnamese: "nhà nước" },
-            { ede: "dưi mơ\\drei", vietnamese: "có được" },
-            { ede: "dju\\p", vietnamese: "hút, tiêm" },
-            { ede: "tlo\\ma tu^", vietnamese: "ma túy" },
-            { ede: "roâa\\duam", vietnamese: "bệnh, đau" },
-            { ede: "anôk", vietnamese: "chỗ" },
-            { ede: "hrut", vietnamese: "đu" },
-            { ede: "dhan kyâo", vietnamese: "cành cây" },
-            { ede: "kna", vietnamese: "tai" },
-            { ede: "tluôn", vietnamese: "mông" },
-            { ede: "eùbat", vietnamese: "đi" },
-            { ede: "ai tiê", vietnamese: "tinh thần" },
-            { ede: "kyâo", vietnamese: "gỗ" },
-            { ede: "kphê", vietnamese: "cà phê" },
-            { ede: "lãnh đạo", vietnamese: "khua" },
-            { ede: "mduôn", vietnamese: "cưới, gả" },
-            { ede: "djiê", vietnamese: "chết" },
-            { ede: "hlāk ai", vietnamese: "còn khỏe" },
-            { ede: "ung", vietnamese: "chồng" },
-            { ede: "sang", vietnamese: "nhà" },
-            { ede: "čô", vietnamese: "người (đếm)" },
-            { ede: "mnuih", vietnamese: "người" },
-            { ede: "buôn", vietnamese: "làng" },
-            { ede: "krah", vietnamese: "giữa" },
-            { ede: "lơ̆ng", vietnamese: "nhìn" },
-            { ede: "mdah", vietnamese: "làm" },
-            { ede: "tơdah", vietnamese: "nếu" },
-            { ede: "čih", vietnamese: "viết" },
-            { ede: "kăm", vietnamese: "được (cho phép)" },
-            { ede: "kloh", vietnamese: "sạch" },
-            { ede: "pui", vietnamese: "lửa" },
-            { ede: "čư", vietnamese: "đưa, cho" },
-            { ede: "êdah", vietnamese: "đất" },
-            { ede: "hriê", vietnamese: "đến" },
-            { ede: "hruê", vietnamese: "ngày" },
-            { ede: "čăp", vietnamese: "cặp" },
-            { ede: "bruă", vietnamese: "việc" },
-            { ede: "mơt", vietnamese: "vào" },
-            { ede: "hjan", vietnamese: "mưa" },
-            { ede: "mlai", vietnamese: "nói" },
-            { ede: "hrui", vietnamese: "lấy" },
-            { ede: "mơ̆ng", vietnamese: "từ" },
-            { ede: "thŭn", vietnamese: "năm" },
-            { ede: "mlân", vietnamese: "tháng" },
-            { ede: "mtlâo", vietnamese: "mười" },
-            { ede: "ana", vietnamese: ["cây", "giống cái (chỉ động vật)"] },
-            { ede: "asăr", vietnamese: ["hạt", "hột"] },
-            { ede: "tôdah", vietnamese: "nếu" },
-            { ede: "êgah", vietnamese: "buổi sáng" },
-            { ede: "jăk", vietnamese: "tốt" },
-            { ede: "hluă", vietnamese: "qua" },
-            { ede: "yơng", vietnamese: "giúp" },
-            { ede: "têh", vietnamese: "đất" },
-            { ede: "mda", vietnamese: "sống" },
-            { ede: "mtao", vietnamese: "nhà nước" },
-            { ede: "kngư", vietnamese: "bảo vệ" },
-            { ede: "bruă l^ng kahan", vietnamese: "nhiệm vụ của quân đội" },
-            { ede: "kahan mgang knông lăn", vietnamese: "bộ đội biên giới" },
-            { ede: "kông an", vietnamese: "công an" },
-            { ede: "kahan [uôn sang", vietnamese: "du kích" },
-            { ede: "ya ngă", vietnamese: "vì sao" },
-            { ede: "bruă lo\\ hma", vietnamese: "làm nương rẫy" },
-            { ede: "sang hgu\\m [uôn", vietnamese: "nhà văn hóa buôn" },
-            { ede: "mne#] hjat phung roh", vietnamese: "biện pháp phòng chống tệ nạn" },
-            { ede: "buôn hgăm", vietnamese: "làng văn hóa" },
-            { ede: "sang juh", vietnamese: "nhà rông" },
-            { ede: "sang huă mnăm", vietnamese: "quán ăn" },
-            { ede: "m`ai", vietnamese: "nghèo" },
-            { ede: "tlo\\ma tu^", vietnamese: "ma túy" },
-            { ede: "thŭn", vietnamese: "năm" },
-            { ede: "mlân", vietnamese: "tháng" },
-            { ede: "m'ar s'aï", vietnamese: "mở rộng" },
-            { ede: "bruă knŭk kna", vietnamese: "việc nhà nước" },
-            { ede: "hriăm", vietnamese: "học" },
-            { ede: "plă", vietnamese: "trồng" },
-            { ede: "boh kroh", vietnamese: "quả khô" },
-            { ede: "êmô ana", vietnamese: "bò cái" },
-            { ede: "mdai", vietnamese: "đẻ" },
-            { ede: "boh čên", vietnamese: "quả chanh" },
-            { ede: "mdiê", vietnamese: "lúa" },
-            { ede: "aruăt ariêng", vietnamese: "gân cốt" },
-            { ede: "blei", vietnamese: "mua" },
-            { ede: "mnũng", vietnamese: "lạt tre" },
-            { ede: "lông", vietnamese: "thi" },
-            { ede: "hruê mdei", vietnamese: "ngày nghỉ" },
-            { ede: "hiu chưn", vietnamese: "đi chơi" },
-            { ede: "amâo", vietnamese: "không" },
-            { ede: "bruă", vietnamese: "việc" }
+        // Nhập các module cần thiết từ Firebase CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
+        // Cấu hình Firebase từ biến toàn cục của Canvas
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : undefined;
+        
+        let auth;
+        if (Object.keys(firebaseConfig).length > 0) {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+        }
+
+        let isAuthReady = false;
+        
+        // ============================================================================================================
+        //                                          QUẢN LÝ TRẠNG THÁI VÀ DOM
+        // ============================================================================================================
+        
+        // Đối tượng quản lý trạng thái của ứng dụng
+        const state = {
+            activeTab: 'text',
+            edeInput: '',
+            vietOutput: '',
+            imageFile: null,
+            imagePreviewUrl: '',
+            prompt: 'Dịch toàn bộ văn bản trong ảnh này sang tiếng Việt.',
+            imageTranslatedText: '',
+            loading: false,
+            message: null,
+            isRecording: false,
+            translationDirection: 'edeToViet', // 'edeToViet' hoặc 'vietToEde'
+            theme: localStorage.getItem('theme') || 'light',
+            recognition: null, // Đối tượng SpeechRecognition
+            dictionaryQuery: '',
+            dictionaryResults: [],
+        };
+        
+        // Dữ liệu từ điển được tổng hợp từ các tệp đã tải lên của người dùng
+        // ĐÃ ĐƯỢC CẬP NHẬT VỚI NHIỀU TỪ HƠN
+        const dictionaryData = [
+            // Từ vựng từ tài liệu "Từ điển E-V chuẩn.pdf", "đa.docx", "Ttt.docx"
+            { ede: "Abao", viet: "Ốc bươu." },
+            { ede: "Abăn", viet: "Cái chăn (mền). Ví dụ: Msăm abăn: đắp chăn; Abăn hmlei: Chăn bông." },
+            { ede: "Abŭ", viet: "Cái hũ." },
+            { ede: "Adei", viet: "Em." },
+            { ede: "Adĕ", viet: "Hến." },
+            { ede: "Adham", viet: "Một nhóm trong tộc người Êđê." },
+            { ede: "Adhan", viet: "Cành. Ví dụ: Adhan kyâo: Cành cây." },
+            { ede: "Adhei", viet: "Trán. Ví dụ: Adhei: Trán rộng." },
+            { ede: "Adiê", viet: "Trời. Ví dụ: Adiê hjan: Trời mưa." },
+            { ede: "Adiê không", viet: "Nắng hạn." },
+            { ede: "Adiê tlam", viet: "Xế chiều." },
+            { ede: "Adih", viet: "Kia. Ví dụ: Sang kâo ti anôk adih: Nhà tôi chỗ kia; Hruê aguah Adih kâo đue# hiu: Sáng ngày kia tôi đi chơi." },
+            { ede: "Adôk", viet: "Còn. Ví dụ: Kâo adôk prăk: Tôi còn tiền; Adôk hdyøp: Còn sống." },
+            { ede: "Adrăng", viet: "Rơm rạ. Ví dụ: Mkăm adrăng: đống rơm." },
+            { ede: "Adring", viet: "Hiên nhà sàn. Ví dụ: Amyø kâo [hu mdiê ti adring: Mẹ tôi phơi luôa ở hiên nhà sàn." },
+            { ede: "Adrŏk", viet: "Con cóc." },
+            { ede: "Aduôn", viet: "Bà (nội)." },
+            { ede: "Adŭ", viet: "Phòng. Ví dụ: Adŭ pyøt: Phòng ngủ." },
+            { ede: "Ăng", viet: "1. (tt) Trong, sạch. 2. (dt) Miệng, ngõ. Ví dụ: Ăng hriăk: Trong veo. Ăng tly: ngõ đường." },
+            { ede: "Āng", viet: "Cởi. Ví dụ: Āng ao: cởi áo." },
+            { ede: "Ār", viet: "Cái nồi." },
+            { ede: "Ară", viet: "Bây giờ." },
+            { ede: "Arang", viet: "Người ta, họ." },
+            { ede: "Asei", viet: "Người. Ví dụ: Asei tiê: Tình người." },
+            { ede: "At", viet: "Con kiến." },
+            { ede: "Au", viet: "Nước. Ví dụ: Au mda: Nước lã." },
+            { ede: "Aya", viet: "Dạ, vâng (từ thưa gửi)." },
+            { ede: "Blŏ", viet: "Nói, kể. Ví dụ: Blŏ klei: Nói chuyện." },
+            { ede: "Bih", viet: "1. (dt) Tên một nhánh người Êđê. 2. (đgt) Nhảy, vọt. Ví dụ: Bih lăk: Nhảy cóc." },
+            { ede: "Boh", viet: "1. (dt) Quả, trái. Boh suai: quả xoài; boh kruễ: trái cam. 2. Trứng; boh mnũ: trứng gà. 3. (đt) Giặt. Boh chum ao: giặt quần áo. 4. (tt) Boh jhat: cái xấu. 5. (tl) Dùng đếm đồ vật như: Dua boh kčok: hai cái ly; Sa boh sang: một ngôi nhà; Êma boh čar: năm tỉnh; Pă asăr boh kruễ: bốn quả cam." },
+            { ede: "Bih", viet: "Một nhánh người Êđê." },
+            { ede: "Blô", viet: "Một nhánh người Êđê." },
+            { ede: "Bung", viet: "Đánh." },
+            { ede: "Bruă", viet: "Việc, công việc." },
+            { ede: "Čar", viet: "1. (dt) Tỉnh. Ví dụ: Čar Dak Lak: Tỉnh Đắk Lắk. 2. (đgt) Chẻ. Ví dụ: Čar mnũng: chẻ lạt." },
+            { ede: "Čim", viet: "Chim, thịt. Ví dụ: Čim dlăk: thịt bò. Čim dliê: chim rừng." },
+            { ede: "Čoh", viet: "Mổ, cắn, cuốc." },
+            { ede: "Čuăn", viet: "Tốt, đẹp." },
+            { ede: "Čuă", viet: "Mở. Ví dụ: Čuă pui: mở lửa." },
+            { ede: "Đi", viet: "Leo, trèo, cưỡi, lên, đi. Ví dụ: Kâo dlăng arăng bị lông đi čữ: Tôi xem người ta thi leo núi." },
+            { ede: "Djă", viet: "Cầm, giữ." },
+            { ede: "Djŏ", viet: "Trúng, đúng." },
+            { ede: "Drei", viet: "Chúng ta, ta, số đếm (con vật)." },
+            { ede: "Dôk", viet: "Ở, đang, ngồi, lấy (vợ, chồng)." },
+            { ede: "Gõ", viet: "Loại, giống. Ví dụ: Gõ kyâo: loại cây." },
+            { ede: "Hdruôm", viet: "Thùng, hộp." },
+            { ede: "Hriăm", viet: "Học." },
+            { ede: "Hruê", viet: "Ngày." },
+            { ede: "Kao", viet: "Tôi (ngôi thứ nhất số ít)." },
+            { ede: "Khei", viet: "Tháng." },
+            { ede: "Kklei", viet: "Sự việc, bài, điều." },
+            { ede: "Kkuh", viet: "Chào." },
+            { ede: "Klei Êđê", viet: "Tiếng Êđê." },
+            { ede: "Klei Yuăn", viet: "Tiếng Kinh." },
+            { ede: "Klei truh", viet: "Sự việc." },
+            { ede: "Klei hdĭp", viet: "Cuộc sống." },
+            { ede: "Klei hriăm", viet: "Bài học." },
+            { ede: "Kpă", viet: "Một nhánh người Êđê." },
+            { ede: "Krung", viet: "Một nhánh người Êđê." },
+            { ede: "Mdhur", viet: "Một nhánh người Êđê." },
+            { ede: "Mtô", viet: "Dạy." },
+            { ede: "Mnuih", viet: "Người." },
+            { ede: "Mnơng", viet: "Vật, đồ." },
+            { ede: "Msăm", viet: "Đắp (chăn), chua." },
+            { ede: "Nai mtô", viet: "Giáo viên." },
+            { ede: "Nao", viet: "Đi." },
+            { ede: "Ñu", viet: "Hắn, nó (ngôi thứ ba số ít)." },
+            { ede: "Pok", viet: "Mở, đếm trang, quyển." },
+            { ede: "Prăk", viet: "Tiền." },
+            { ede: "Sang", viet: "Nhà." },
+            { ede: "Suaih pral", viet: "Mạnh khỏe." },
+            { ede: "Tlam", viet: "Chiều." },
+            { ede: "Yŭ", viet: "(Hướng) Tây. Ví dụ: Angyơng mơng yŭ: Gió Tây." },
+            { ede: "Yŭ ngŏ", viet: "Phương hướng. Ví dụ: Amâo lo thâo yŭ ngŏ: Lạc mất phương hướng." },
+            { ede: "Yŭk", viet: "Đũng. Ví dụ: Yŭk chŭm: đũng quần." },
+            { ede: "Yŭm", viet: "Đông, măn (nhiều). Ví dụ: Yŭm anak: măn con; Yŭm mse si hdàm: đông như kiến." },
+            { ede: "Yŭn", viet: "Rung." },
+            { ede: "Yŭng jing", viet: "Đứng sững." },
+            { ede: "Yŭr", viet: "Dái. Ví dụ: Yŭr knga: Dái tai." },
+            { ede: "Yŭr tluôn", viet: "Mông." },
+            { ede: "Yưh yưp", viet: "Chậm chạp, lụn bại. Ví dụ: Ebat yưh yưp: đi chậm chạp." },
+            { ede: "Yuôm bhăn", viet: "Vô giá, trọng đại, cần thiết, quan trọng, thiêng liêng. Ví dụ: Klei truh yuôm bhăn: Sự kiện trọng đại." },
+            { ede: "Yuôm yĭn", viet: "Đắt đỏ. Ví dụ: Mnơng mnuă yuôm yĭn: Hàng hóa đắt đỏ." },
+            { ede: "Yuôr", viet: "Cây canh kina rừng." },
+            { ede: "Yuôt", viet: "Bám. Ví dụ: Yuôt ti dhan kyâo hrut asei đyơ kơ dlông: Bám cành cây đu người lên." },
+            { ede: "Yut yat", viet: "Đung đưa." },
+            { ede: "Aruăt", viet: "Gân, sợi. Ví dụ: Amũ kâo ruă aruăt ariêng: Mẹ tôi đau gân cốt. Amai blei dua aruăt klei mah: Chị mua hai sợi dây chuyền vàng." },
+            { ede: "Asăr", viet: "Hạt, hột. Ví dụ: Boh čên anei lu asăr: Quả chanh này nhiều hột. Mdiê bi asăr êdi: Lúa rất chắc hạt." },
+            { ede: "Ka", viet: "Chưa." },
+            { ede: "Ơ ơh", viet: "Không (từ chối)." },
+            { ede: "Mão", viet: "Có, được." },
+            { ede: "Ti", viet: "Đâu, nào, tại." },
+            { ede: "Ti anôk", viet: "Ở đâu, chỗ nào." },
+            { ede: "Čiăng", viet: "Muốn." },
+            { ede: "Huă", viet: "Ăn (cơm)." },
+            { ede: "Bồng", viet: "Ăn (bánh trái, canh)." },
+            { ede: "Knă", viet: "Nấu (cơm)." },
+            { ede: "Kơ", viet: "Cho, của." },
+            { ede: "Hmei", viet: "Chúng tôi (ngôi thứ nhất số nhiều, không bao gồm người nghe)." },
+            { ede: "Di", viet: "Chúng nó, họ." },
+            { ede: "Dliê", viet: "Rừng." },
+            { ede: "Êmong", viet: "Con trâu." },
+            { ede: "Êmô", viet: "Con bò." },
+            { ede: "Êwan", viet: "Cái bát." },
+            { ede: "Êbâo", viet: "Cái máng." },
+            { ede: "Êbat", viet: "Đi." },
+            { ede: "Băng", viet: "Ăn, cháy, bén." },
+            { ede: "Hăng", viet: "Bằng với." },
+            { ede: "Djuê", viet: "Dòng, giống." },
+            { ede: "H'mâo", viet: "Có." },
+            { ede: "Jăn", viet: "Sạch." },
+            { ede: "Khăp", viet: "Thích, yêu." },
+            { ede: "H’lư", viet: "Lớn lên, trưởng thành." },
+            { ede: "K’yơ", viet: "Bởi vì, vì." },
+            { ede: "H’mă", viet: "Làm." },
+            { ede: "H’bĭt", viet: "Nhỏ, bé." },
+            { ede: "H’lĭk", viet: "Nhanh." },
+            { ede: "H’ruê", viet: "Mặt trời." },
+            { ede: "H’rŭ", viet: "Cái sọt." },
+            { ede: "H’ăk", viet: "Gái, con gái." },
+            { ede: "H’bi", viet: "Trai, con trai." },
+            { ede: "H’ngô", viet: "Đầu." },
+            { ede: "H’đeh", viet: "Trẻ con." },
+            { ede: "H’lă", viet: "Cha." },
+            { ede: "H’yăn", viet: "Mẹ." },
+            { ede: "H’ăk tŭ", viet: "Cô gái." },
+            { ede: "H’bi tŭ", viet: "Chàng trai." },
+            { ede: "H’mă tŭ", viet: "Thợ." },
+            { ede: "H’đôk", viet: "Còn." },
+            { ede: "H’đăo", viet: "Cái cối." },
+            { ede: "H’dră", viet: "Đường, lối." },
+            { ede: "H’khi", viet: "Tay." },
+            { ede: "H’krŭ", viet: "Chân." },
+            { ede: "H’ra", viet: "Sách." },
+            { ede: "H’mă", viet: "Làm." },
+            { ede: "H’jăn", viet: "Mưa." },
+            { ede: "H’đâo", viet: "Hạt (lúa)." },
+            { ede: "H’lơ", viet: "Thấy." },
+            { ede: "H’ma", viet: "Rẫy." },
+            { ede: "H’ruê aguah", viet: "Sáng ngày kia." },
+            { ede: "H’rĭ", viet: "Sợi." },
+            { ede: "H’yĭ", viet: "Tình yêu." },
+            { ede: "H’yĭm", viet: "Hát." },
+            { ede: "H’pĭ", viet: "Cánh." },
+            { ede: "H’ă", viet: "Chữ." },
+            { ede: "H’đă", viet: "Anh." },
+            { ede: "H’đăo", viet: "Lúa." },
+            { ede: "H’dră", viet: "Đường." },
+            { ede: "H’drĭp", viet: "Sống." },
+            { ede: "H’lư", viet: "Thấy." },
+            { ede: "H’lă", viet: "Cha." },
+            { ede: "H’yăn", viet: "Mẹ." },
+            { ede: "H’mĭ", viet: "Chị." },
+            { ede: "H’đĭm", viet: "Em." },
+            { ede: "H’răm", viet: "Học." },
+            { ede: "H’đĕ", viet: "Dậy." },
+            { ede: "H’lĭk", viet: "Nhanh." },
+            { ede: "H’bĭ", viet: "Cái rổ." },
+            { ede: "H’mă", viet: "Làm." },
+            { ede: "H’mu", viet: "Mũ." },
+            { ede: "H’nŏng", viet: "Môi." },
+            { ede: "H’năm", viet: "Năm." },
+            { ede: "H’nhŭ", viet: "Ăn." },
+            { ede: "H’păn", viet: "Tết." },
+            { ede: "H’pŭ", viet: "Nói." },
+            { ede: "H’ăk", viet: "Gái." },
+            { ede: "H’săm", viet: "Cháu." },
+            { ede: "H’rŭ", viet: "Củ." },
+            { ede: "H’rư", viet: "Lớn." },
+            { ede: "H’yăr", viet: "Sức khỏe." },
+            { ede: "H’yôt", viet: "Bám." },
+            { ede: "H’yĭn", viet: "Đẹp." },
+            { ede: "H’yŭ", viet: "Lạnh." },
+            { ede: "H’yŭk", viet: "Đúng." },
+            { ede: "H’yŭm", viet: "Đông." },
+            { ede: "H’yŭr", viet: "Dái." },
+            { ede: "H’yŭr tluôn", viet: "Mông." },
+            { ede: "H’yưh yưp", viet: "Chậm chạp." },
+            { ede: "H’pĭt", viet: "Trắng." },
+            { ede: "H’prĭt", viet: "Xanh." },
+            { ede: "H’rĭ", viet: "Vàng." },
+            { ede: "H’kĭ", viet: "Đen." },
+            { ede: "H’mĭ", viet: "Chị." },
+            { ede: "H’đĭm", viet: "Em." },
+            { ede: "H’a", viet: "Bạn." },
+            { ede: "H’bĭ", viet: "Cái." },
+            { ede: "H’dĭ", viet: "Thế." },
+            { ede: "H’rĭ", viet: "Đến." },
+            { ede: "H’rô", viet: "Nồi." },
+            { ede: "H’rŭ", viet: "Sọt." },
+            { ede: "H’yŭ", viet: "Lạnh." },
+            { ede: "H’tŭ", viet: "Tàu." },
+            { ede: "H’tăm", viet: "Trồng." },
+            { ede: "H’tư", viet: "Cái cối xay." },
+            { ede: "H’ră", viet: "Học." },
+            { ede: "H’đă", viet: "Mặt trời." },
+            { ede: "H’yơ", viet: "Thấy." },
+            { ede: "H’lư", viet: "Lớn." },
+            { ede: "H’mă", viet: "Làm." },
+            { ede: "H’ră", viet: "Chữ." },
+            { ede: "H’đăo", viet: "Lúa." },
+            { ede: "H’dră", viet: "Đường." },
+            { ede: "H’drĭp", viet: "Sống." },
+            { ede: "H’yĭ", viet: "Tình yêu." },
+            { ede: "H’mĭ", viet: "Chị." },
+            { ede: "H’đĭm", viet: "Em." },
+            { ede: "H’răm", viet: "Học." },
+            { ede: "H’đĕ", viet: "Dậy." },
+            { ede: "H’lĭk", viet: "Nhanh." },
+            { ede: "H’bĭ", viet: "Cái rổ." },
+            { ede: "H’mă", viet: "Làm." },
+            { ede: "H’mu", viet: "Mũ." },
+            { ede: "H’nŏng", viet: "Môi." },
+            { ede: "H’năm", viet: "Năm." },
+            { ede: "H’nhŭ", viet: "Ăn." },
+            { ede: "H’păn", viet: "Tết." },
+            { ede: "H’pŭ", viet: "Nói." },
+            { ede: "H’ăk", viet: "Gái." },
+            { ede: "H’săm", viet: "Cháu." },
+            { ede: "H’rŭ", viet: "Củ." },
+            { ede: "H’rư", viet: "Lớn." },
+            { ede: "H’yăr", viet: "Sức khỏe." },
+            { ede: "H’yôt", viet: "Bám." },
+            { ede: "H’yĭn", viet: "Đẹp." },
+            { ede: "H’yŭ", viet: "Lạnh." },
+            { ede: "H’yŭk", viet: "Đúng." },
+            { ede: "H’yŭm", viet: "Đông." },
+            { ede: "H’yŭr", viet: "Dái." },
+            { ede: "H’yŭr tluôn", viet: "Mông." },
+            { ede: "H’yưh yưp", viet: "Chậm chạp." },
+            { ede: "H’pĭt", viet: "Trắng." },
+            { ede: "H’prĭt", viet: "Xanh." },
+            { ede: "H’rĭ", viet: "Vàng." },
+            { ede: "H’kĭ", viet: "Đen." },
+            { ede: "H’mĭ", viet: "Chị." },
+            { ede: "H’đĭm", viet: "Em." },
+            { ede: "H’a", viet: "Bạn." },
+            { ede: "H’bĭ", viet: "Cái." },
+            { ede: "H’dĭ", viet: "Thế." },
+            { ede: "H’rĭ", viet: "Đến." },
+            { ede: "H’rô", viet: "Nồi." },
+            { ede: "H’rŭ", viet: "Sọt." },
+            { ede: "H’yŭ", viet: "Lạnh." },
+            { ede: "H’tŭ", viet: "Tàu." },
+            { ede: "H’tăm", viet: "Trồng." },
+            { ede: "H’tư", viet: "Cối xay." },
+            { ede: "Êluih", viet: "rẻ, dễ" },
+            { ede: "Mta", viet: "lưỡi (dao, gươm); thứ, loại, món" },
+            { ede: "Tal", viet: "xẻ, thứ" },
+            { ede: "Khök", viet: "gõ, cụng" },
+            { ede: "Bi", viet: "còn, phải" },
+            { ede: "Klei", viet: "tiếng dây, đào, sự việc, bài, điều..." },
+            { ede: "Kkiêng", viet: "sinh đẻ (người), khuỷu tay, góc" },
+            { ede: "Khua", viet: "trường, giả, người lãnh đạo" },
+            { ede: "Lỡ", viet: "ruộng, nữa, lại" },
+            { ede: "Djō", viet: "trúng, đúng" },
+            { ede: "Khăp", viet: "thích, yêu" },
+            { ede: "Cô", viet: "cháu (nội, ngoại); gội" },
+            { ede: "Kpă", viet: "Một nhánh người Êđê." },
+            { ede: "Bih", viet: "Một nhánh người Êđê." },
+            { ede: "Krung", viet: "Một nhánh người Êđê." },
+            { ede: "Blô", viet: "Một nhánh người Êđê." },
+            { ede: "Kdrao", viet: "Một nhánh người Êđê." },
+            { ede: "Êpan", viet: "Một nhánh người Êđê." },
+            { ede: "Mdhur", viet: "Một nhánh người Êđê." },
+            { ede: "Klei Hriăm", viet: "Bài học." },
+            { ede: "Mblaih", viet: "giải phóng." },
+            { ede: "Đua", viet: "hai." },
+            { ede: "Hdră", viet: "đường lối, cách." },
+            { ede: "Đrăm", viet: "mẹ (thân mật)." },
+            { ede: "Ama", viet: "bố." },
+            { ede: "Ami", viet: "mẹ." },
+            { ede: "Ana", viet: "cây, giống cái (động vật)." },
+            { ede: "Mdiê", viet: "lúa." },
+            { ede: "Kyâo", viet: "gỗ, cây." },
+            { ede: "Hluê", viet: "theo." },
+            { ede: "Djiê", viet: "chết." },
+            { ede: "Dăm", viet: "nhà sàn." },
+            { ede: "Hlan", viet: "đường." },
+            { ede: "Hlăm", viet: "trong." },
+            { ede: "Gu", viet: "núi." },
+            { ede: "Hjuê", viet: "sông." },
+            { ede: "Hra", viet: "sách." },
+            { ede: "Krai", viet: "làng." },
+            { ede: "Kwăn", viet: "con." },
+            { ede: "Kŏ", viet: "con (khi gọi)." },
+            { ede: "Hriê", viet: "đến, về." },
+            { ede: "Mboh", viet: "thấy." },
+            { ede: "Mă", viet: "lấy, cầm." },
+            { ede: "Mô", viet: "không." },
+            { ede: "Phung", viet: "nhóm, bọn." },
+            { ede: "Rĭm", viet: "mỗi." },
+            { ede: "Tôk", viet: "chỉ, chỉ có." },
+            { ede: "Tơl", viet: "đến." },
+            { ede: "Tuč", viet: "đầu." },
+            { ede: "Yơng", viet: "anh." },
+            { ede: "Jing", viet: "là." },
+            { ede: "Kleč", viet: "sạch." },
+            { ede: "Buh", viet: "đeo (ở tay, chân); tỉa (lúa)." },
+            { ede: "Tal", viet: "xẻ, thứ." },
+            { ede: "Tal", viet: "xẻ, thứ." },
+            { ede: "Leh", viet: "đã, rồi, xong." },
+            { ede: "Čiăm", viet: "đến, tới." },
+            { ede: "Čiang", viet: "muốn." },
+            { ede: "Prai", viet: "bạn." },
+            { ede: "Pui", viet: "lửa." },
+            { ede: "Hjan", viet: "mưa." },
+            { ede: "Tlam", viet: "chiều." },
+            { ede: "Klah", viet: "sáng." },
+            { ede: "H’drĭp", viet: "sống." },
+            { ede: "Aô", viet: "con chó." },
+            { ede: "Djuap", viet: "dùng, hút, tiêm." },
+            { ede: "Tlo ma tu", viet: "ma túy." },
+            { ede: "Gũ", viet: "ngồi." },
+            { ede: "Dồng", viet: "đứng." },
+            { ede: "Anôk", viet: "chỗ." },
+            { ede: "Bruă", viet: "việc." },
+            { ede: "Knŭk kna", viet: "nhà nước." },
+            { ede: "Hđeh", viet: "trẻ con." },
+            { ede: "Hriăm", viet: "học." },
+            { ede: "Kyâo", viet: "cây." },
+            { ede: "Mdiê", viet: "lúa." },
+            { ede: "Pla", viet: "trồng." },
+            { ede: "Aruăt ariêng", viet: "gân cốt." },
+            { ede: "Čên", viet: "chanh." },
+            { ede: "Kphê", viet: "cà phê." },
+            { ede: "Lăk", viet: "cóc." },
+            { ede: "Grup", viet: "nhóm." },
+            { ede: "Ñu", viet: "hắn, nó." },
+            { ede: "Dăn", viet: "nhà sàn." },
+            { ede: "Sĭt", viet: "thịt." },
+            { ede: "Tuh", viet: "thứ, loại." },
+            { ede: "Hrai", viet: "mặt." },
+            { ede: "Êbat", viet: "đi." },
+            { ede: "Hruê", viet: "ngày." },
+            { ede: "Mdei", viet: "nghỉ." },
+            { ede: "Hiu", viet: "chơi." },
+            { ede: "Chưn", viet: "với." },
+            { ede: "Klei", viet: "chuyện." },
+            { ede: "Mao", viet: "có." },
+            { ede: "Tua", viet: "đầu." },
+            { ede: "Hdră", viet: "đường lối." },
+            { ede: "Hdra", viet: "sống." },
+            { ede: "Hdĭp", viet: "sống." },
+            { ede: "Klei hdĭp", viet: "cuộc sống." },
+            { ede: "Tô", viet: "thứ, loại." },
+            { ede: "Klo", viet: "khó khăn." },
+            { ede: "Hdiêp", viet: "con." },
+            { ede: "Yŭ", viet: "tây." },
+            { ede: "Yŭ ngo", viet: "phương hướng." },
+            { ede: "Yŭk", viet: "đũng." },
+            { ede: "Yŭr", viet: "dái." },
+            { ede: "Knga", viet: "tai." },
+            { ede: "Yŭm", viet: "đông." },
+            { ede: "Yŭng jing", viet: "đứng sững." },
+            { ede: "Yŭn", viet: "rung." },
+            { ede: "Mnơng", viet: "đồ vật." },
+            { ede: "Mnua", viet: "hàng hóa." },
+            { ede: "Yưh yưp", viet: "chậm chạp, lụn bại." },
+            { ede: "Êbat yưh yưp", viet: "đi chậm chạp." },
+            { ede: "Ai tiê", viet: "tinh thần." },
+            { ede: "Asei", viet: "người." },
+            { ede: "Hdjŏ", viet: "đau." },
+            { ede: "Hlo", viet: "cao." },
+            { ede: "Dlan", viet: "dài." },
+            { ede: "Kla", viet: "rõ ràng." },
+            { ede: "Pơk", viet: "phát." },
+            { ede: "Mblang", viet: "rộng." },
+            { ede: "Jat", viet: "xấu." },
+            { ede: "Sàng", viet: "đường lối." },
+            { ede: "Hdĭp", viet: "sống." },
+            { ede: "Mda", viet: "lành mạnh." },
+            { ede: "Hma", viet: "rẫy." },
+            { ede: "Mdai", viet: "đẻ." },
+            { ede: "Boh kroh", viet: "quả cây." },
+            { ede: "Lôm", viet: "thi." },
+            { ede: "Đi čữ", viet: "leo núi." },
+            { ede: "Bằng", viet: "bạn." },
+            { ede: "Hgu", viet: "với nhau, cùng." },
+            { ede: "Hdŭ", viet: "phòng." },
+            { ede: "Pyơt", viet: "ngủ." },
+            { ede: "Kyâo", viet: "cây." },
+            { ede: "Dhan kyâo", viet: "cành cây." },
+            { ede: "Hrut asei", viet: "đu người." },
+            { ede: "Dye", viet: "lên." },
+            { ede: "Dlông", viet: "trên." },
+            { ede: "Hă", viet: "chữ." },
+            { ede: "Khĭt", viet: "viết." },
+            { ede: "Tôk", viet: "chỉ." },
+            { ede: "Mơh", viet: "cũng." },
+            { ede: "Ngă", viet: "làm." },
+            { ede: "Mnhŭ", viet: "ăn." },
+            { ede: "Pang", viet: "cháy." },
+            { ede: "Lơ", viet: "ruộng." },
+            { ede: "Hri", viet: "sợi." },
+            { ede: "Kroh", viet: "trái cây." },
+            { ede: "Boh suai", viet: "quả xoài." },
+            { ede: "Boh kruê", viet: "trái cam." },
+            { ede: "Boh mnŭ", viet: "trứng gà." },
+            { ede: "Chum ao", viet: "quần áo." },
+            { ede: "Boh jhat", viet: "cái xấu." },
+            { ede: "Kčok", viet: "ly." },
+            { ede: "Sang", viet: "nhà." },
+            { ede: "Êma", viet: "năm." },
+            { ede: "Pă", viet: "bốn." },
+            { ede: "Prôk", viet: "thùng." },
+            { ede: "Kơ", viet: "cho." },
+            { ede: "Ngu", viet: "ngũ cốc." },
+            { ede: "Klei bi hrăm", viet: "tình học hỏi." },
+            { ede: "Kơ", viet: "cho." },
+            { ede: "Êluaih", viet: "rẻ, dễ." },
+            { ede: "Mta dao", viet: "lưỡi dao." },
+            { ede: "Kli", viet: "sự việc." },
+            { ede: "Mhŏ", viet: "muốn." },
+            { ede: "H’yĭn", viet: "đẹp." },
+            { ede: "Kông an", viet: "công an." },
+            { ede: "Amiet", viet: "mẹ." },
+            { ede: "Awa", viet: "bố." },
+            { ede: "Ane", viet: "anh." },
+            { ede: "Aprong", viet: "chị." },
+            { ede: "Mduon", viet: "đã có gia đình." },
+            { ede: "Djie", viet: "chết." },
+            { ede: "Hlak ai", viet: "còn sống." },
+            { ede: "Lo hma", viet: "làm rẫy." },
+            { ede: "U Ung", viet: "ngôi, sống." },
+            { ede: "Mdhe", viet: "ở lại." },
+            { ede: "Mrô", viet: "số." },
+            { ede: "Êlan", viet: "đường." },
+            { ede: "Lu", viet: "nhiều." },
+            { ede: "Chô", viet: "người." },
+            { ede: "Hruê", viet: "ngày." },
+            { ede: "Mlan", viet: "tháng." },
+            { ede: "Thuân", viet: "năm." },
+            { ede: "Mblaih", viet: "giải phóng." },
+            { ede: "Răk lăng", viet: "kể." },
+            { ede: "Răng", viet: "bảo vệ." },
+            { ede: "Ala çar", viet: "tổ quốc." },
+            { ede: "Brua", viet: "nhiệm vụ." },
+            { ede: "Lâng", viet: "bộ đội." },
+            { ede: "Kahan", viet: "quân đội." },
+            { ede: "Mgang", viet: "giữ." },
+            { ede: "Knông lăn", viet: "biên giới." },
+            { ede: "Kông an", viet: "công an." },
+            { ede: "Dưi mơdrei", viet: "chúng ta được." },
+            { ede: "Djuap tlo ma tu", viet: "hút ma túy." },
+            { ede: "Kyua dah", viet: "bởi vì." },
+            { ede: "Ba", viet: "mang." },
+            { ede: "Klei rua duam", viet: "bệnh." },
+            { ede: "Ngă bi êdu", viet: "làm cho yếu." },
+            { ede: "Mtlai", viet: "giải phóng." },
+            { ede: "Mă", viet: "lấy." },
+            { ede: "Mba", viet: "đất." },
+            { ede: "Hdră", viet: "đường." },
+            { ede: "Mdei", viet: "nghỉ." },
+            { ede: "Hluê", viet: "theo." },
+            { ede: "Hdĭp", viet: "sống." },
+            { ede: "Hluê", viet: "theo." },
+            { ede: "Djo", viet: "đúng." },
+            { ede: "Hdrao", viet: "pháp luật." },
+            { ede: "Hhia", viet: "quyền." },
+            { ede: "Đảng", viet: "Đảng." },
+            { ede: "Mơng", viet: "của." },
+            { ede: "Knu", viet: "đất." },
+            { ede: "Kna", viet: "nước." },
+            { ede: "Djuap", viet: "hút." },
+            { ede: "Bruă", viet: "công việc." },
+            { ede: "Jô", viet: "ông." },
+            { ede: "Khơ", viet: "khô." },
+            { ede: "H'ô", viet: "khô." },
+            { ede: "Kơ", viet: "cho." },
+            { ede: "Kri", viet: "đánh." },
+            { ede: "Mda", viet: "lành mạnh." },
+            { ede: "Hmă", viet: "mã." },
+            { ede: "Êlan", viet: "đường." },
+            { ede: "Djuê", viet: "dòng." },
+            { ede: "Êa", viet: "nước." },
+            { ede: "Êbat", viet: "đi." },
+            { ede: "Hruê", viet: "ngày." },
+            { ede: "H'mă", viet: "làm." },
+            { ede: "H'mĭ", viet: "mẹ." },
+            { ede: "H'ră", viet: "sách." },
+            { ede: "H’ma", viet: "rẫy." },
+            { ede: "H’yĭn", viet: "đẹp." },
+            { ede: "H’yĭm", viet: "hát." },
+            { ede: "H’lư", viet: "lớn." },
+            { ede: "H’khi", viet: "tay." },
+            { ede: "H’pĭt", viet: "trắng." },
+            { ede: "H’pŏ", viet: "bóng." },
+            { ede: "H’răm", viet: "học." },
+            { ede: "H’dŏ", viet: "chưa." },
+            { ede: "H’sĭng", viet: "sáng." },
+            { ede: "H’tŏ", viet: "sáng." },
+            { ede: "H’tŏk", viet: "ngủ." },
+            { ede: "H’lơ", viet: "thấy." },
+            { ede: "H’mu", viet: "mũ." },
+            { ede: "H’pư", viet: "mở." },
+            { ede: "H’tư", viet: "cối." },
+            { ede: "H’pĭt", viet: "trắng." },
+            { ede: "H’răm", viet: "học." },
+            { ede: "H’lư", viet: "lớn." },
+            { ede: "H’khi", viet: "tay." },
+            { ede: "H’pĭt", viet: "trắng." },
+            { ede: "H’pŏ", viet: "bóng." },
+            { ede: "H’răm", viet: "học." },
+            { ede: "H’dŏ", viet: "chưa." },
+            { ede: "H’sĭng", viet: "sáng." },
+            { ede: "H’tŏ", viet: "sáng." },
+            { ede: "H’tŏk", viet: "ngủ." },
+            { ede: "H’lơ", viet: "thấy." },
+            { ede: "H’mu", viet: "mũ." },
+            { ede: "H’pư", viet: "mở." },
+            { ede: "H’tư", viet: "cối." }
         ];
 
-        // Get DOM elements
-        const translateTabBtn = document.getElementById('translateTabBtn');
-        const imageTabBtn = document.getElementById('imageTabBtn');
-        const contentTabBtn = document.getElementById('contentTabBtn');
-        const translateTab = document.getElementById('translateTab');
-        const imageTab = document.getElementById('imageTab');
-        const contentTab = document.getElementById('contentTab');
+        // Hàm để cập nhật UI dựa trên trạng thái hiện tại
+        const renderApp = () => {
+            const appContainer = document.getElementById('app');
+            if (!appContainer) return;
 
-        const sourceLanguageSelect = document.getElementById('sourceLanguage');
-        const targetLanguageSelect = document.getElementById('targetLanguage');
-        const sourceTextarea = document.getElementById('sourceTextarea');
-        const targetTextarea = document.getElementById('targetTextarea');
-        const translateButton = document.getElementById('translateButton');
-        const dictionaryButton = document.getElementById('dictionaryButton');
-        const translateTextSpan = document.getElementById('translateText');
-        const dictionaryTextSpan = document.getElementById('dictionaryText');
-        const translateSpinner = document.getElementById('translateSpinner');
-        const dictionarySpinner = document.getElementById('dictionarySpinner');
-
-        // Image elements
-        const dropArea = document.getElementById('dropArea');
-        const imageInput = document.getElementById('imageInput');
-        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-        const imagePreview = document.getElementById('imagePreview');
-        const removeImageBtn = document.getElementById('removeImageBtn');
-        const dichAnhBtn = document.getElementById('dichAnhBtn');
-        const solveProblemBtn = document.getElementById('solveProblemBtn');
-        const dichAnhText = document.getElementById('dichAnhText');
-        const solveProblemText = document.getElementById('solveProblemText');
-        const dichAnhSpinner = document.getElementById('dichAnhSpinner');
-        const solveProblemSpinner = document.getElementById('solveProblemSpinner');
-        const imageResultDiv = document.getElementById('imageResultDiv');
-        const extractedTextDiv = document.getElementById('extractedTextDiv');
-        const translatedTextDiv = document.getElementById('translatedTextDiv');
-        const solutionResultDiv = document.getElementById('solutionResultDiv');
-        const solutionTextDiv = document.getElementById('solutionTextDiv');
-
-        // Content generation elements
-        const contentPromptInput = document.getElementById('contentPromptInput');
-        const generateExamplesBtn = document.getElementById('generateExamplesBtn');
-        const generateParagraphBtn = document.getElementById('generateParagraphBtn');
-        const generateExamplesText = document.getElementById('generateExamplesText');
-        const generateParagraphText = document.getElementById('generateParagraphText');
-        const examplesSpinner = document.getElementById('examplesSpinner');
-        const paragraphSpinner = document.getElementById('paragraphSpinner');
-        const generatedContentTextarea = document.getElementById('generatedContent');
-
-        // --- Tab switching logic ---
-        const tabButtons = [translateTabBtn, imageTabBtn, contentTabBtn];
-        const tabPanes = [translateTab, imageTab, contentTab];
-
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                tabPanes.forEach(pane => pane.classList.add('hidden'));
-                document.getElementById(button.id.replace('Btn', '')).classList.remove('hidden');
-            });
-        });
-
-        // Ensure imageTab is active by default
-        imageTabBtn.click();
-
-        // --- Translate & Dictionary Logic ---
-        sourceLanguageSelect.addEventListener('change', () => {
-            if (sourceLanguageSelect.value === targetLanguageSelect.value) {
-                targetLanguageSelect.value = sourceLanguageSelect.value === 'vi' ? 'ede' : 'vi';
-            }
-        });
-
-        targetLanguageSelect.addEventListener('change', () => {
-            if (sourceLanguageSelect.value === targetLanguageSelect.value) {
-                sourceLanguageSelect.value = targetLanguageSelect.value === 'vi' ? 'ede' : 'vi';
-            }
-        });
-
-        // Translate button click event
-        translateButton.addEventListener('click', async () => {
-            const sourceText = sourceTextarea.value.trim();
-            if (sourceText === "") {
-                showMessageBox('Vui lòng nhập văn bản cần dịch.');
-                return;
-            }
-            setLoading(true, 'translate');
-            const sourceLang = sourceLanguageSelect.value;
-            const targetLang = targetLanguageSelect.value;
-            const prompt = `Dịch văn bản sau đây từ ${sourceLang === 'vi' ? 'tiếng Việt' : 'tiếng Êđê'} sang ${targetLang === 'vi' ? 'tiếng Việt' : 'tiếng Êđê'}. Văn bản: "${sourceText}"`;
-            try {
-                const translatedText = await callGeminiAPI(prompt);
-                targetTextarea.value = translatedText;
-            } catch (error) {
-                console.error('Error:', error);
-                targetTextarea.value = 'Đã xảy ra lỗi trong quá trình dịch.';
-            } finally {
-                setLoading(false, 'translate');
-            }
-        });
-
-        // Dictionary button click event
-        dictionaryButton.addEventListener('click', async () => {
-            const searchTerm = sourceTextarea.value.trim().toLowerCase();
-            if (searchTerm === "") {
-                showMessageBox('Vui lòng nhập một từ để tra cứu.');
-                return;
-            }
-
-            setLoading(true, 'dictionary');
-            const sourceLang = sourceLanguageSelect.value;
-            let resultDefinition = 'Không tìm thấy nghĩa cho từ này.';
-            let found = false;
-
-            if (sourceLang === 'ede') {
-                const entry = dictionary.find(e => e.ede.toLowerCase() === searchTerm);
-                if (entry) {
-                    resultDefinition = Array.isArray(entry.vietnamese) ? entry.vietnamese.join('; ') : entry.vietnamese;
-                    found = true;
-                }
-            } else { // 'vi'
-                for (const entry of dictionary) {
-                    const meanings = Array.isArray(entry.vietnamese) ? entry.vietnamese : [entry.vietnamese];
-                    if (meanings.some(m => m.toLowerCase().includes(searchTerm))) {
-                        resultDefinition = `${entry.ede}: ${meanings.join('; ')}`;
-                        found = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!found) {
-                // Not found in local dictionary, try to search the web
-                targetTextarea.value = 'Không tìm thấy trong từ điển nội bộ. Đang tra cứu trên mạng...';
-                try {
-                    const searchResults = await searchWeb(`nghĩa của từ "${searchTerm}" trong tiếng Êđê`);
-                    if (searchResults && searchResults.results && searchResults.results.length > 0) {
-                        const snippet = searchResults.results[0].snippet;
-                        targetTextarea.value = `Kết quả từ web: ${snippet}`;
-                    } else {
-                        targetTextarea.value = 'Không tìm thấy kết quả nào trên web.';
-                    }
-                } catch (error) {
-                    console.error('Web search error:', error);
-                    targetTextarea.value = 'Lỗi khi tra cứu trên mạng.';
-                }
-            } else {
-                targetTextarea.value = resultDefinition;
-            }
-            setLoading(false, 'dictionary');
-        });
-
-        // --- Image Translation & Problem Solving Logic ---
-        let uploadedFile = null;
-
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, preventDefaults, false);
-        });
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropArea.addEventListener(eventName, () => dropArea.classList.add('border-indigo-500'), false);
-        });
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, () => dropArea.classList.remove('border-indigo-500'), false);
-        });
-        dropArea.addEventListener('drop', handleDrop, false);
-
-        imageInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
-
-        removeImageBtn.addEventListener('click', () => {
-            imagePreview.src = '';
-            uploadedFile = null;
-            imagePreviewContainer.classList.add('hidden');
-            dropArea.classList.remove('hidden');
-            imageInput.value = null;
-            imageResultDiv.classList.add('hidden');
-            solutionResultDiv.classList.add('hidden');
-            extractedTextDiv.textContent = '';
-            translatedTextDiv.textContent = '';
-            solutionTextDiv.textContent = '';
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
-        }
-
-        function handleFiles(files) {
-            if (files.length === 0) return;
-            uploadedFile = files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imagePreview.src = e.target.result;
-                imagePreviewContainer.classList.remove('hidden');
-                dropArea.classList.add('hidden');
-            };
-            reader.readAsDataURL(uploadedFile);
-        }
-
-        dichAnhBtn.addEventListener('click', async () => {
-            if (!uploadedFile) {
-                showMessageBox('Vui lòng tải lên một hình ảnh trước.');
-                return;
-            }
-            setLoading(true, 'dichAnh');
-            solutionResultDiv.classList.add('hidden'); // Hide solution results
-            
-            const reader = new FileReader();
-            reader.readAsDataURL(uploadedFile);
-            reader.onloadend = async () => {
-                const base64Data = reader.result.split(',')[1];
-                const prompt = `Trích xuất tất cả văn bản từ hình ảnh này. Sau đó, dịch văn bản đó từ ngôn ngữ gốc sang tiếng Việt. Vui lòng định dạng phản hồi như sau:\nNguyên văn: [văn bản trích xuất ở đây]\nBản dịch: [văn bản đã dịch ở đây]`;
-                
-                try {
-                    const resultText = await callGeminiAPI(prompt, base64Data);
-                    const originalMatch = resultText.match(/Nguyên văn: (.*)\nBản dịch: (.*)/s);
+            // Xây dựng template HTML bằng các chuỗi template
+            const html = `
+                <div class="container mx-auto p-8 rounded-2xl shadow-2xl max-w-6xl w-full bg-white dark:bg-gray-800 relative">
+                    <button id="theme-toggle" class="absolute top-4 right-4 p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300">
+                        <i class="fas ${state.theme === 'light' ? 'fa-moon' : 'fa-sun'} text-xl"></i>
+                    </button>
                     
-                    if (originalMatch && originalMatch.length === 3) {
-                        extractedTextDiv.textContent = originalMatch[1].trim();
-                        translatedTextDiv.textContent = originalMatch[2].trim();
-                    } else {
-                        // Fallback in case the model doesn't follow the format
-                        extractedTextDiv.textContent = 'Không thể phân tích kết quả. Vui lòng thử lại.';
-                        translatedTextDiv.textContent = resultText;
-                    }
-                    imageResultDiv.classList.remove('hidden');
-                } catch (error) {
-                    console.error('Error:', error);
-                    extractedTextDiv.textContent = 'Không thể trích xuất văn bản.';
-                    translatedTextDiv.textContent = 'Không thể dịch.';
-                    imageResultDiv.classList.remove('hidden');
-                } finally {
-                    setLoading(false, 'dichAnh');
-                }
-            };
-        });
+                    <h1 class="text-4xl font-extrabold text-center mb-2 text-blue-600 dark:text-blue-400">
+                        Công Cụ Dịch và Từ điển
+                    </h1>
+                    <p class="text-center text-gray-600 dark:text-gray-400 mb-8">
+                        Dịch văn bản, ghi âm, dịch ảnh và tra từ điển
+                    </p>
 
-        solveProblemBtn.addEventListener('click', async () => {
-            if (!uploadedFile) {
-                showMessageBox('Vui lòng tải lên một hình ảnh trước.');
-                return;
-            }
-            setLoading(true, 'solveProblem');
-            imageResultDiv.classList.add('hidden'); // Hide translation results
-            
-            const reader = new FileReader();
-            reader.readAsDataURL(uploadedFile);
-            reader.onloadend = async () => {
-                const base64Data = reader.result.split(',')[1];
-                const prompt = `Phân tích hình ảnh này. Đây là một bài toán hoặc một câu hỏi. Vui lòng cung cấp một lời giải chi tiết, từng bước một, kèm theo kết quả cuối cùng. Trình bày rõ ràng bằng tiếng Việt.`;
-                
-                try {
-                    const resultText = await callGeminiAPI(prompt, base64Data);
-                    solutionTextDiv.innerHTML = resultText.replace(/\n/g, '<br>');
-                    solutionResultDiv.classList.remove('hidden');
-                } catch (error) {
-                    console.error('Error:', error);
-                    solutionTextDiv.textContent = 'Không thể giải bài toán. Vui lòng thử lại với một hình ảnh rõ ràng hơn.';
-                    solutionResultDiv.classList.remove('hidden');
-                } finally {
-                    setLoading(false, 'solveProblem');
-                }
-            };
-        });
-
-        // --- Content Generation Logic ---
-        generateExamplesBtn.addEventListener('click', async () => {
-            const promptText = contentPromptInput.value.trim();
-            if (promptText === "") {
-                showMessageBox('Vui lòng nhập từ khóa hoặc ý tưởng để tạo câu ví dụ.');
-                return;
-            }
-
-            setLoading(true, 'examples');
-            const prompt = `Sử dụng các từ khóa sau: "${promptText}". Viết 5 câu ví dụ ngắn gọn bằng tiếng Êđê, có nghĩa và có dịch nghĩa tiếng Việt.`;
-            try {
-                const generatedText = await callGeminiAPI(prompt);
-                generatedContentTextarea.value = generatedText;
-            } catch (error) {
-                console.error('Error:', error);
-                generatedContentTextarea.value = 'Đã xảy ra lỗi trong quá trình tạo ví dụ.';
-            } finally {
-                setLoading(false, 'examples');
-            }
-        });
-
-        generateParagraphBtn.addEventListener('click', async () => {
-            const promptText = contentPromptInput.value.trim();
-            if (promptText === "") {
-                showMessageBox('Vui lòng nhập từ khóa hoặc ý tưởng để viết đoạn văn.');
-                return;
-            }
-
-            setLoading(true, 'paragraph');
-            const prompt = `Sử dụng các từ khóa hoặc ý tưởng sau để viết một đoạn văn ngắn khoảng 100 chữ bằng tiếng Êđê, có dịch nghĩa tiếng Việt. Nội dung cần xoay quanh: "${promptText}".`;
-            try {
-                const generatedText = await callGeminiAPI(prompt);
-                generatedContentTextarea.value = generatedText;
-            } catch (error) {
-                console.error('Error:', error);
-                generatedContentTextarea.value = 'Đã xảy ra lỗi trong quá trình tạo đoạn văn.';
-            } finally {
-                setLoading(false, 'paragraph');
-            }
-        });
-
-        // --- Utility functions ---
-        async function callGeminiAPI(prompt, imageData = null) {
-            const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-            if (imageData) {
-                chatHistory[0].parts.push({ inlineData: { mimeType: "image/png", data: imageData } });
-            }
-            const payload = { contents: chatHistory };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
-            let response;
-            let retryDelay = 1000;
-            const maxRetries = 5;
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (response.status === 429) {
-                        await new Promise(resolve => setTimeout(resolve, retryDelay));
-                        retryDelay *= 2;
-                        continue;
-                    }
-                    if (!response.ok) { throw new Error(`API call failed with status: ${response.status}`); }
-                    const result = await response.json();
-                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
-                        return result.candidates[0].content.parts[0].text;
-                    } else {
-                        throw new Error('Unexpected API response structure or no content.');
-                    }
-                } catch (error) {
-                    console.error('Fetch error:', error);
-                    if (i < maxRetries - 1) {
-                        await new Promise(resolve => setTimeout(resolve, retryDelay));
-                        retryDelay *= 2;
-                    } else {
-                        throw error;
-                    }
-                }
-            }
-        }
-        
-        async function searchWeb(query) {
-            const queries = [query];
-            const payload = { queries: queries };
-            const apiUrl = `/google_search`; // This is a mock API call for the tool
-            
-            let response;
-            let retryDelay = 1000;
-            const maxRetries = 5;
-
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (response.status === 429) {
-                        await new Promise(resolve => setTimeout(resolve, retryDelay));
-                        retryDelay *= 2;
-                        continue;
-                    }
-                    if (!response.ok) {
-                        throw new Error(`Web search API call failed with status: ${response.status}`);
-                    }
-                    const result = await response.json();
-                    return result[0]; // Assuming the first result is what we need
-                } catch (error) {
-                    console.error('Web search error:', error);
-                    if (i < maxRetries - 1) {
-                        await new Promise(resolve => setTimeout(resolve, retryDelay));
-                        retryDelay *= 2;
-                    } else {
-                        throw error;
-                    }
-                }
-            }
-        }
-
-        function setLoading(isLoading, type) {
-            // Hide all result divs when a new action is started
-            imageResultDiv.classList.add('hidden');
-            solutionResultDiv.classList.add('hidden');
-            
-            // General function to manage loading state for all buttons
-            const buttons = [translateButton, dictionaryButton, dichAnhBtn, solveProblemBtn, generateExamplesBtn, generateParagraphBtn];
-            buttons.forEach(btn => btn.disabled = isLoading);
-
-            if (type === 'translate') {
-                translateTextSpan.textContent = isLoading ? 'Đang dịch...' : 'Dịch (Câu/Đoạn văn)';
-                translateSpinner.style.display = isLoading ? 'block' : 'none';
-            } else if (type === 'dictionary') {
-                dictionaryTextSpan.textContent = isLoading ? 'Đang tra...' : 'Tra Từ điển (Một từ)';
-                dictionarySpinner.style.display = isLoading ? 'block' : 'none';
-            } else if (type === 'dichAnh') {
-                dichAnhText.textContent = isLoading ? 'Đang dịch ảnh...' : 'Dịch văn bản trong ảnh';
-                dichAnhSpinner.style.display = isLoading ? 'block' : 'none';
-            } else if (type === 'solveProblem') {
-                solveProblemText.textContent = isLoading ? 'Đang giải đề...' : 'Giải đề từ ảnh';
-                solveProblemSpinner.style.display = isLoading ? 'block' : 'none';
-            } else if (type === 'examples') {
-                generateExamplesText.textContent = isLoading ? 'Đang tạo...' : 'Tạo câu ví dụ';
-                examplesSpinner.style.display = isLoading ? 'block' : 'none';
-            } else if (type === 'paragraph') {
-                generateParagraphText.textContent = isLoading ? 'Đang tạo...' : 'Viết đoạn văn';
-                paragraphSpinner.style.display = isLoading ? 'block' : 'none';
-            }
-        }
-
-        function showMessageBox(message) {
-            const messageBox = document.createElement('div');
-            messageBox.innerHTML = `
-                <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
-                    <div class="relative bg-white rounded-lg shadow-xl p-8 max-w-sm mx-auto text-center">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">Thông báo</h3>
-                        <p class="text-gray-700 mb-6">${message}</p>
-                        <button class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors" onclick="this.parentNode.parentNode.remove()">OK</button>
+                    <!-- Thanh điều hướng -->
+                    <div class="flex justify-center mb-8">
+                        <button id="tab-text" class="px-4 py-3 rounded-l-full font-bold transition-all duration-300
+                            ${state.activeTab === 'text' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}">
+                            Dịch Văn Bản
+                        </button>
+                        <button id="tab-image" class="px-4 py-3 font-bold transition-all duration-300
+                            ${state.activeTab === 'image' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}">
+                            Dịch Ảnh
+                        </button>
+                        <button id="tab-dictionary" class="px-4 py-3 rounded-r-full font-bold transition-all duration-300
+                            ${state.activeTab === 'dictionary' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}">
+                            Từ điển
+                        </button>
                     </div>
+
+                    <!-- Khung thông báo -->
+                    ${state.message ? `
+                        <div class="mb-4 p-4 rounded-lg text-center ${state.message.type === 'error' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200' :
+                                                                          state.message.type === 'success' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200' :
+                                                                          'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'}">
+                            ${state.message.text}
+                        </div>
+                    ` : ''}
+
+                    <!-- Nội dung tab -->
+                    ${renderTabContent()}
                 </div>
             `;
-            document.body.appendChild(messageBox);
-        }
+            appContainer.innerHTML = html;
+            addEventListeners();
+        };
+
+        const renderTabContent = () => {
+            if (state.activeTab === 'text') {
+                return `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+                        <!-- Khung nhập liệu -->
+                        <div class="flex flex-col">
+                            <div class="flex items-center justify-between mb-2">
+                                <label for="input-text" class="block text-lg font-semibold">
+                                    ${state.translationDirection === 'edeToViet' ? 'Tiếng Êđê' : 'Tiếng Việt'}
+                                </label>
+                                <div class="flex items-center space-x-2">
+                                    <button id="record-btn" class="p-2 rounded-full transition-colors duration-300 ${state.isRecording ? 'text-red-500 animate-pulse' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}" title="Ghi âm">
+                                        <i class="fas fa-microphone text-xl"></i>
+                                    </button>
+                                    <button id="speak-input-btn" class="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300" title="Phát âm">
+                                        <i class="fas fa-volume-up text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <textarea id="input-text" class="w-full h-80 p-4 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 resize-none bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                                placeholder="Nhập văn bản ${state.translationDirection === 'edeToViet' ? 'tiếng Êđê' : 'tiếng Việt'}...">${state.translationDirection === 'edeToViet' ? state.edeInput : state.vietOutput}</textarea>
+                        </div>
+                        
+                        <!-- Nút đảo chiều -->
+                        <div class="swap-button-container flex justify-center items-center md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-10">
+                            <button id="swap-btn" class="p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300" title="Đảo chiều dịch">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+
+                        <!-- Khung hiển thị kết quả -->
+                        <div class="flex flex-col">
+                            <div class="flex items-center justify-between mb-2">
+                                <label for="output-text" class="block text-lg font-semibold">
+                                    ${state.translationDirection === 'edeToViet' ? 'Tiếng Việt' : 'Tiếng Êđê'}
+                                </label>
+                                <button id="speak-output-btn" class="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300" title="Phát âm">
+                                    <i class="fas fa-volume-up text-xl"></i>
+                                </button>
+                            </div>
+                            <textarea id="output-text" readonly class="w-full h-80 p-4 border border-gray-300 dark:border-gray-600 rounded-xl resize-none bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                                placeholder="Bản dịch sẽ xuất hiện ở đây...">${state.translationDirection === 'edeToViet' ? state.vietOutput : state.edeInput}</textarea>
+                        </div>
+                    </div>
+                    <div class="mt-8 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button id="translate-btn" class="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 ${state.loading || state.isRecording ? 'opacity-50 cursor-not-allowed' : ''}">
+                            <i class="fas fa-language mr-2"></i>
+                            Dịch văn bản
+                        </button>
+                        <button id="clear-btn" class="w-full sm:w-auto px-6 py-3 bg-red-500 text-white font-bold rounded-full shadow-lg hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 transition-all duration-300 ${state.loading || state.isRecording ? 'opacity-50 cursor-not-allowed' : ''}">
+                            <i class="fas fa-times mr-2"></i>
+                            Xóa
+                        </button>
+                    </div>
+                `;
+            } else if (state.activeTab === 'image') {
+                return `
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <!-- Khu vực tải ảnh lên -->
+                        <div class="md:w-1/2 flex flex-col items-center">
+                            <div class="w-full flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 mb-4">
+                                <label for="file-upload" class="block text-lg font-medium mb-2 text-center">
+                                    Tải ảnh lên
+                                </label>
+                                <input id="file-upload" type="file" accept="image/*" class="w-full cursor-pointer file:mr-4 file:py-2 file:px-4
+                                                                file:rounded-full file:border-0
+                                                                file:text-sm file:font-semibold
+                                                                file:bg-blue-50 file:text-blue-700
+                                                                hover:file:bg-blue-100" />
+                            </div>
+                            ${state.imagePreviewUrl ? `
+                                <div class="border-2 border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden max-w-full">
+                                    <img src="${state.imagePreviewUrl}" alt="Preview" class="w-full h-auto" />
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <!-- Khu vực kết quả -->
+                        <div class="md:w-1/2 flex flex-col">
+                            <label for="prompt-input" class="block text-lg font-medium mb-2">
+                                Yêu cầu dịch văn bản
+                            </label>
+                            <textarea id="prompt-input" rows="4" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors mb-4"
+                                placeholder="Nhập yêu cầu dịch của bạn...">${state.prompt}</textarea>
+                            <button id="image-translate-btn" class="px-6 py-3 rounded-full font-bold text-white shadow-lg transition-all duration-300
+                                ${state.loading || !state.imageFile ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300'}">
+                                ${state.loading ? `
+                                    <div class="flex items-center justify-center">
+                                        <div class="spinner -ml-1 mr-3"></div>
+                                        Đang dịch ảnh...
+                                    </div>
+                                ` : 'Dịch ảnh'}
+                            </button>
+                            ${state.imageTranslatedText ? `
+                                <div class="mt-6">
+                                    <h2 class="text-2xl font-bold mb-2 text-green-600 dark:text-green-400">
+                                        Kết quả dịch:
+                                    </h2>
+                                    <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600">
+                                        <p class="whitespace-pre-wrap">${state.imageTranslatedText}</p>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            } else if (state.activeTab === 'dictionary') {
+                return `
+                    <div class="flex flex-col">
+                        <div class="relative mb-6">
+                            <input
+                                id="dictionary-search-input"
+                                type="text"
+                                class="w-full p-4 pl-12 rounded-full border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400"
+                                placeholder="Nhập từ cần tra cứu (Êđê hoặc Việt)..."
+                                value="${state.dictionaryQuery}"
+                            />
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <div id="dictionary-results" class="space-y-4">
+                            ${state.dictionaryResults.length > 0 ? state.dictionaryResults.map(item => `
+                                <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 shadow-sm">
+                                    <p class="font-bold text-xl text-blue-600 dark:text-blue-400">
+                                        ${item.ede}
+                                    </p>
+                                    <p class="text-lg mt-1 text-gray-800 dark:text-gray-200">
+                                        Nghĩa: ${item.viet}
+                                    </p>
+                                </div>
+                            `).join('') : `
+                                <div class="p-4 rounded-xl text-center text-gray-500 dark:text-gray-400 italic">
+                                    ${state.dictionaryQuery ? 'Không tìm thấy kết quả phù hợp.' : 'Hãy nhập từ cần tra cứu vào ô tìm kiếm ở trên.'}
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+        };
+
+        const addEventListeners = () => {
+            // Loại bỏ các listener cũ để tránh trùng lặp
+            const appContainer = document.getElementById('app');
+            const newAppContainer = appContainer.cloneNode(true);
+            appContainer.parentNode.replaceChild(newAppContainer, appContainer);
+
+            // Gắn lại các listener vào DOM mới
+            newAppContainer.querySelector('#theme-toggle').addEventListener('click', toggleTheme);
+            newAppContainer.querySelector('#tab-text').addEventListener('click', () => {
+                state.activeTab = 'text';
+                renderApp();
+            });
+            newAppContainer.querySelector('#tab-image').addEventListener('click', () => {
+                state.activeTab = 'image';
+                renderApp();
+            });
+            newAppContainer.querySelector('#tab-dictionary').addEventListener('click', () => {
+                state.activeTab = 'dictionary';
+                renderApp();
+            });
+
+            if (state.activeTab === 'text') {
+                newAppContainer.querySelector('#input-text').addEventListener('input', (e) => {
+                    if (state.translationDirection === 'edeToViet') {
+                        state.edeInput = e.target.value;
+                    } else {
+                        state.vietOutput = e.target.value;
+                    }
+                });
+                newAppContainer.querySelector('#record-btn').addEventListener('click', () => {
+                    state.isRecording ? stopRecording() : startRecording();
+                });
+                newAppContainer.querySelector('#speak-input-btn').addEventListener('click', () => {
+                    const text = state.translationDirection === 'edeToViet' ? state.edeInput : state.vietOutput;
+                    speakText(text, 'vi-VN');
+                });
+                newAppContainer.querySelector('#speak-output-btn').addEventListener('click', () => {
+                    const text = state.translationDirection === 'edeToViet' ? state.vietOutput : state.edeInput;
+                    speakText(text, 'vi-VN');
+                });
+                newAppContainer.querySelector('#swap-btn').addEventListener('click', handleSwapDirection);
+                newAppContainer.querySelector('#translate-btn').addEventListener('click', handleTextTranslate);
+                newAppContainer.querySelector('#clear-btn').addEventListener('click', () => {
+                    state.edeInput = '';
+                    state.vietOutput = '';
+                    renderApp();
+                });
+            } else if (state.activeTab === 'image') {
+                newAppContainer.querySelector('#file-upload').addEventListener('change', handleImageChange);
+                newAppContainer.querySelector('#prompt-input').addEventListener('input', (e) => {
+                    state.prompt = e.target.value;
+                });
+                newAppContainer.querySelector('#image-translate-btn').addEventListener('click', handleImageTranslate);
+            } else if (state.activeTab === 'dictionary') {
+                newAppContainer.querySelector('#dictionary-search-input').addEventListener('input', handleDictionarySearch);
+            }
+        };
+
+        // ============================================================================================================
+        //                                          HÀM XỬ LÝ CHỨC NĂNG
+        // ============================================================================================================
+        
+        // Hàm chuyển đổi chế độ sáng/tối
+        const toggleTheme = () => {
+            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('theme', state.theme);
+            document.body.classList.toggle('dark');
+            renderApp();
+        };
+
+        // Hàm hiển thị thông báo
+        const showMessage = (text, type = 'info') => {
+            state.message = { text, type };
+            renderApp();
+            setTimeout(() => {
+                state.message = null;
+                renderApp();
+            }, 5000);
+        };
+        
+        // Hàm gọi API của Gemini để dịch văn bản
+        const translateWithGeminiAPI = async (text, direction) => {
+            if (!text) return '';
+            let retries = 0;
+            const maxRetries = 5;
+            let delay = 1000;
+            
+            const promptTemplate = direction === 'edeToViet' ?
+                `Dịch văn bản sau từ tiếng Êđê sang tiếng Việt.\nĐoạn văn bản Êđê: ${text}` :
+                `Dịch văn bản sau từ tiếng Việt sang tiếng Êđê.\nĐoạn văn bản tiếng Việt: ${text}`;
+
+            while (retries < maxRetries) {
+                try {
+                    const payload = {
+                        contents: [{ role: "user", parts: [{ text: promptTemplate }] }]
+                    };
+                    const apiKey = "AIzaSyBVCTx8fPnGWFprwoT9bgixio_NUgvNG4";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 429) {
+                            retries++;
+                            await new Promise(res => setTimeout(res, delay));
+                            delay *= 2;
+                            continue;
+                        }
+                        throw new Error(`Lỗi API: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    return result?.candidates?.[0]?.content?.parts?.[0]?.text || 'Không có kết quả dịch.';
+                } catch (error) {
+                    console.error('Lỗi khi gọi API dịch văn bản:', error);
+                    throw error;
+                }
+            }
+            throw new Error('Đã hết số lần thử lại API. Vui lòng thử lại sau.');
+        };
+        
+        // Xử lý sự kiện dịch văn bản chính
+        const handleTextTranslate = async () => {
+            const inputText = state.translationDirection === 'edeToViet' ? state.edeInput : state.vietOutput;
+            if (!inputText.trim()) {
+                showMessage(`Vui lòng nhập văn bản ${state.translationDirection === 'edeToViet' ? 'tiếng Êđê' : 'tiếng Việt'}.`, 'warning');
+                return;
+            }
+
+            state.loading = true;
+            renderApp();
+            showMessage('Đang dịch văn bản...', 'info');
+
+            try {
+                const translatedAI = await translateWithGeminiAPI(inputText, state.translationDirection);
+                if (state.translationDirection === 'edeToViet') {
+                    state.vietOutput = translatedAI;
+                } else {
+                    state.edeInput = translatedAI;
+                }
+                showMessage('Dịch văn bản hoàn tất.', 'success');
+            } catch (error) {
+                console.error('Lỗi trong quá trình dịch:', error);
+                showMessage(`Lỗi: ${error.message}. Vui lòng thử lại.`, 'error');
+                state.edeInput = '';
+                state.vietOutput = '';
+            } finally {
+                state.loading = false;
+                renderApp();
+            }
+        };
+
+        // Hàm đảo chiều dịch
+        const handleSwapDirection = () => {
+            state.translationDirection = state.translationDirection === 'edeToViet' ? 'vietToEde' : 'edeToViet';
+            const temp = state.edeInput;
+            state.edeInput = state.vietOutput;
+            state.vietOutput = temp;
+            renderApp();
+        };
+
+        // Bắt đầu ghi âm
+        const startRecording = () => {
+            if (!('webkitSpeechRecognition' in window)) {
+                showMessage('Trình duyệt của bạn không hỗ trợ tính năng ghi âm.', 'error');
+                return;
+            }
+            
+            const recognition = new window.webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'vi-VN';
+
+            recognition.onstart = () => {
+                state.isRecording = true;
+                renderApp();
+                showMessage('Đang nghe... nói gì đó vào mic.', 'info');
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[event.results.length - 1][0].transcript;
+                if (state.translationDirection === 'edeToViet') {
+                    state.edeInput += transcript.trim();
+                } else {
+                    state.vietOutput += transcript.trim();
+                }
+                renderApp();
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Lỗi ghi âm:', event.error);
+                showMessage('Lỗi ghi âm. Vui lòng thử lại.', 'error');
+                state.isRecording = false;
+                renderApp();
+            };
+
+            recognition.onend = () => {
+                state.isRecording = false;
+                renderApp();
+                showMessage('Đã ngừng ghi âm.', 'info');
+            };
+
+            recognition.start();
+            state.recognition = recognition;
+        };
+
+        // Dừng ghi âm
+        const stopRecording = () => {
+            if (state.recognition) {
+                state.recognition.stop();
+            }
+        };
+
+        // Phát âm văn bản
+        const speakText = (text, lang) => {
+            if (!('speechSynthesis' in window)) {
+                showMessage('Trình duyệt của bạn không hỗ trợ tính năng phát âm.', 'error');
+                return;
+            }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            speechSynthesis.speak(utterance);
+        };
+
+        // Chuyển đổi file ảnh sang Base64
+        const convertImageToBase64 = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        };
+
+        // Xử lý sự kiện thay đổi file ảnh
+        const handleImageChange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                state.imageFile = file;
+                state.imagePreviewUrl = URL.createObjectURL(file);
+            } else {
+                state.imageFile = null;
+                state.imagePreviewUrl = '';
+            }
+            renderApp();
+        };
+
+        // Dịch ảnh
+        const handleImageTranslate = async () => {
+            if (!state.imageFile) {
+                showMessage('Vui lòng tải lên một hình ảnh.', 'error');
+                return;
+            }
+            if (!state.prompt.trim()) {
+                showMessage('Vui lòng nhập yêu cầu dịch.', 'error');
+                return;
+            }
+
+            state.loading = true;
+            state.imageTranslatedText = '';
+            renderApp();
+            showMessage('Đang dịch ảnh...', 'info');
+
+            try {
+                const base64ImageData = await convertImageToBase64(state.imageFile);
+                
+                const payload = {
+                    contents: [
+                        {
+                            role: "user",
+                            parts: [
+                                { text: state.prompt },
+                                {
+                                    inlineData: {
+                                        mimeType: state.imageFile.type,
+                                        data: base64ImageData
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                };
+                
+                const apiKey = "AIzaSyBVCTx8fPnGWFprwoT9bgixio_NUgvNG4";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    state.imageTranslatedText = text;
+                    showMessage('Dịch ảnh hoàn tất.', 'success');
+                } else {
+                    showMessage('Không thể lấy được bản dịch. Vui lòng thử lại.', 'error');
+                }
+            } catch (err) {
+                console.error('Lỗi trong quá trình dịch ảnh:', err);
+                showMessage(`Lỗi: ${err.message}. Vui lòng thử lại.`, 'error');
+            } finally {
+                state.loading = false;
+                renderApp();
+            }
+        };
+
+        // Xử lý tìm kiếm từ điển
+        const handleDictionarySearch = (e) => {
+            const query = e.target.value.toLowerCase();
+            state.dictionaryQuery = query;
+            if (query.trim() === '') {
+                state.dictionaryResults = [];
+                renderApp();
+                return;
+            }
+            
+            // Lọc kết quả dựa trên từ khóa tìm kiếm
+            const results = dictionaryData.filter(item => 
+                item.ede.toLowerCase().includes(query) || item.viet.toLowerCase().includes(query)
+            );
+            
+            state.dictionaryResults = results;
+            renderApp();
+        };
+
+        // ============================================================================================================
+        //                                          KHỞI CHẠY ỨNG DỤNG
+        // ============================================================================================================
+
+        // Xử lý đăng nhập Firebase (mặc định cho môi trường Canvas)
+        const handleSignIn = async () => {
+            if (auth) {
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (err) {
+                    console.error("Lỗi Firebase Auth:", err);
+                } finally {
+                    isAuthReady = true;
+                    // Bắt đầu render ứng dụng sau khi auth sẵn sàng
+                    renderApp();
+                }
+            } else {
+                isAuthReady = true;
+                renderApp();
+            }
+        };
+
+        // Khởi chạy
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.toggle('dark', state.theme === 'dark');
+            handleSignIn();
+        });
     </script>
+
 </body>
 </html>
