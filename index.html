@@ -143,6 +143,7 @@
                     <button id="theme-orange" class="theme-button w-10 h-10 rounded-full bg-orange-600 focus:outline-none transition-all duration-200"></button>
                     <button id="theme-brown" class="theme-button w-10 h-10 rounded-full bg-amber-800 focus:outline-none transition-all duration-200"></button>
                     <button id="theme-pink" class="theme-button w-10 h-10 rounded-full bg-fuchsia-400 focus:outline-none transition-all duration-200"></button>
+                    <button id="theme-black" class="theme-button w-10 h-10 rounded-full bg-gray-900 focus:outline-none transition-all duration-200"></button>
                 </div>
             </div>
 
@@ -239,36 +240,6 @@
                 </div>
             </div>
 
-            <!-- Dictionary Lookup Section -->
-            <div class="card rounded-2xl shadow-lg p-6 md:p-8 mt-10">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Tra từ Điển & Thêm từ</h2>
-                <div class="flex flex-col sm:flex-row gap-4 mb-4">
-                    <input type="text" id="dictionaryInput" class="flex-1 w-full p-3 rounded-lg border-2 border-gray-200 focus:ring-2 ring-primary border-primary transition duration-300 placeholder-gray-400" placeholder="Nhập từ cần tra cứu...">
-                    <button id="dictionarySearchButton" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-lg shadow-md hover-bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 ring-primary transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                        <span class="button-icon text-white">🔍</span>
-                        <span class="button-text">Tra cứu</span>
-                    </button>
-                </div>
-                <!-- Add New Word Section -->
-                <div class="flex flex-col sm:flex-row gap-4 mb-4">
-                    <input type="text" id="addEdeInput" class="flex-1 w-full p-3 rounded-lg border-2 border-gray-200 focus:ring-2 ring-primary border-primary transition duration-300 placeholder-gray-400" placeholder="Từ tiếng Ê-đê">
-                    <input type="text" id="addVietnameseInput" class="flex-1 w-full p-3 rounded-lg border-2 border-gray-200 focus:ring-2 ring-primary border-primary transition duration-300 placeholder-gray-400" placeholder="Nghĩa tiếng Việt">
-                    <button id="addWordButton" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                        <span class="button-icon text-white">➕</span>
-                        <span class="button-text">Thêm từ</span>
-                    </button>
-                </div>
-                <div id="dictionaryOutput" class="mt-4 p-4 bg-gray-100 rounded-lg border-2 border-gray-200">
-                    <div class="grid grid-cols-2 gap-4 text-center font-bold mb-2 text-gray-700">
-                        <div>Ê-đê</div>
-                        <div>Tiếng Việt</div>
-                    </div>
-                    <div id="dictionaryResults" class="divide-y divide-gray-300">
-                        <!-- Kết quả sẽ hiển thị ở đây -->
-                    </div>
-                </div>
-            </div>
-
             <!-- Image-based Translation Section -->
             <div class="card rounded-2xl shadow-lg p-6 md:p-8 mt-10">
                 <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Dịch từ ảnh</h2>
@@ -305,6 +276,33 @@
                         <span class="button-icon text-white">🧠</span>
                         <span class="button-text">Giải bài tập</span>
                     </button>
+                </div>
+            </div>
+
+            <!-- Dictionary Lookup & Add Word Section -->
+            <div class="card rounded-2xl shadow-lg p-6 md:p-8 mt-10">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Tra từ Điển & Thêm từ</h2>
+                <!-- Search Input -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                    <input type="text" id="dictionaryInput" class="flex-1 w-full p-3 rounded-lg border-2 border-gray-200 focus:ring-2 ring-primary border-primary transition duration-300 placeholder-gray-400" placeholder="Nhập từ cần tra cứu...">
+                    <button id="dictionarySearchButton" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-lg shadow-md hover-bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 ring-primary transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                        <span class="button-icon text-white">🔍</span>
+                        <span class="button-text">Tra cứu</span>
+                    </button>
+                </div>
+                <!-- Add New Word Section -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                    <input type="text" id="addEdeInput" class="flex-1 w-full p-3 rounded-lg border-2 border-gray-200 focus:ring-2 ring-primary border-primary transition duration-300 placeholder-gray-400" placeholder="Từ tiếng Ê-đê">
+                    <input type="text" id="addVietnameseInput" class="flex-1 w-full p-3 rounded-lg border-2 border-gray-200 focus:ring-2 ring-primary border-primary transition duration-300 placeholder-gray-400" placeholder="Nghĩa tiếng Việt">
+                    <button id="addWordButton" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                        <span class="button-icon text-white">➕</span>
+                        <span class="button-text">Thêm từ</span>
+                    </button>
+                </div>
+                <div id="dictionaryOutput" class="mt-4 p-4 bg-gray-100 rounded-lg border-2 border-gray-200">
+                    <div id="dictionaryResults" class="divide-y divide-gray-300 max-h-[400px] overflow-y-auto">
+                        <!-- Kết quả sẽ hiển thị ở đây -->
+                    </div>
                 </div>
             </div>
         </main>
@@ -4503,41 +4501,70 @@
             }
         }
         
+        // Function to translate text using local dictionary first, then API
+        async function translateTextWithLocalDictionary(text, sourceLang, targetLang) {
+            const words = text.split(/\s+/);
+            const translatedWords = [];
+            const nonDictionaryWords = [];
+
+            for (const word of words) {
+                const cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "").toLowerCase();
+                let localMatch = null;
+                if (sourceLang === 'vietnamese') {
+                    localMatch = state.dictionary.find(t => t.meanings.some(m => m.vietnamese.toLowerCase() === cleanWord));
+                } else {
+                    localMatch = state.dictionary.find(t => t.ede.toLowerCase() === cleanWord);
+                }
+
+                if (localMatch) {
+                    if (sourceLang === 'vietnamese') {
+                        translatedWords.push(localMatch.ede);
+                    } else {
+                        translatedWords.push(localMatch.meanings[0].vietnamese);
+                    }
+                } else {
+                    nonDictionaryWords.push(word);
+                    translatedWords.push(null); // Placeholder for API call
+                }
+            }
+
+            if (nonDictionaryWords.length > 0) {
+                const prompt = `Bạn là một công cụ dịch thuật chuyên nghiệp. Hãy dịch đoạn văn sau đây từ ${sourceLang === 'vietnamese' ? 'tiếng Việt' : 'tiếng Ê-đê'} sang ${targetLang === 'vietnamese' ? 'tiếng Việt' : 'tiếng Ê-đê'}. Chỉ trả về văn bản đã dịch. Đoạn văn: ${nonDictionaryWords.join(' ')}`;
+                try {
+                    const apiTranslatedText = await callGeminiAPI(prompt);
+                    const apiWords = apiTranslatedText.split(/\s+/);
+                    let apiWordIndex = 0;
+                    for (let i = 0; i < translatedWords.length; i++) {
+                        if (translatedWords[i] === null) {
+                            if (apiWordIndex < apiWords.length) {
+                                translatedWords[i] = apiWords[apiWordIndex];
+                                apiWordIndex++;
+                            } else {
+                                translatedWords[i] = nonDictionaryWords[apiWordIndex-1]; // Fallback to original word
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error("Lỗi API dịch thuật:", error);
+                    return `Lỗi trong quá trình dịch: ${error.message}`;
+                }
+            }
+
+            return translatedWords.join(' ');
+        }
+        
         async function handleTranslate() {
             if (state.isLoading || !ui.inputText.value.trim()) return;
             setLoadingState(ui.translateButton, true, 'Dịch');
             ui.outputText.value = '';
             ui.additionalOutputWrapper.classList.add('hidden');
             
-            const inputTextLower = ui.inputText.value.trim().toLowerCase();
+            const inputText = ui.inputText.value.trim();
             const sourceLang = ui.sourceLanguage.value;
-            let translatedText = '';
-
-            // Kiểm tra từ điển cục bộ trước
-            let localMatch = null;
-            if (sourceLang === 'ede') {
-                localMatch = state.dictionary.find(t => t.ede.toLowerCase() === inputTextLower);
-            } else {
-                localMatch = state.dictionary.find(t => t.meanings.some(m => m.vietnamese.toLowerCase() === inputTextLower));
-            }
-
-            if (localMatch) {
-                if (sourceLang === 'ede') {
-                    translatedText = localMatch.meanings.map(m => m.vietnamese).join(", ");
-                } else {
-                    translatedText = localMatch.ede;
-                }
-                ui.outputText.value = translatedText + " (từ điển cục bộ)";
-                setLoadingState(ui.translateButton, false, 'Dịch');
-                return;
-            }
-            
-            // Nếu không có trong từ điển, gọi API
-            const targetLang = sourceLang === 'ede' ? 'tiếng Việt' : 'tiếng Ê-đê';
-            const prompt = `Bạn là một công cụ dịch thuật chuyên nghiệp. Hãy dịch văn bản sau đây từ ${sourceLang === 'ede' ? 'tiếng Ê-đê' : 'tiếng Việt'} sang ${targetLang}. Chỉ trả về văn bản đã dịch, không thêm bất kỳ giải thích nào. Văn bản cần dịch: ${ui.inputText.value}`;
+            const targetLang = sourceLang === 'ede' ? 'vietnamese' : 'ede';
 
             try {
-                translatedText = await callGeminiAPI(prompt);
+                const translatedText = await translateTextWithLocalDictionary(inputText, sourceLang, targetLang);
                 ui.outputText.value = translatedText;
             } catch (error) {
                 ui.outputText.value = `Đã xảy ra lỗi trong quá trình dịch: ${error.message}`;
@@ -4548,16 +4575,22 @@
         }
 
         async function handleGenerateExamples() {
-            if (state.isLoading || !ui.outputText.value.trim() || ui.outputText.value.includes("Kết quả dịch sẽ hiển thị ở đây")) return;
+            if (state.isLoading || !ui.aiInput.value.trim()) {
+                showAlert("Vui lòng nhập yêu cầu của bạn vào ô văn bản AI để tạo ví dụ.");
+                return;
+            }
             setLoadingState(ui.generateExamplesButton, true, 'Tạo Ví Dụ');
             ui.additionalOutput.value = '';
-            
-            const prompt = `Tạo 3 câu ví dụ sử dụng từ hoặc cụm từ "${ui.outputText.value}" trong ngữ cảnh khác nhau. Các câu ví dụ này nên được dịch sang ngôn ngữ còn lại (nếu từ gốc là tiếng Việt, ví dụ là tiếng Ê-đê và ngược lại). Chỉ trả về các câu ví dụ, mỗi câu trên một dòng mới, không thêm bất kỳ giải thích nào.`;
+            ui.additionalOutputWrapper.classList.remove('hidden');
+
+            const keywords = ui.aiInput.value.trim();
+            const prompt = `Sử dụng các từ khóa "${keywords}", tạo ra 3 câu ví dụ có chủ ngữ, vị ngữ, và các thành phần khác. Các câu này phải có nghĩa và phù hợp với ngữ cảnh. Chỉ trả về các câu ví dụ đã được viết bằng tiếng Việt, mỗi câu trên một dòng mới, không thêm bất kỳ giải thích nào.`;
 
             try {
-                const examples = await callGeminiAPI(prompt);
-                ui.additionalOutput.value = examples;
-                ui.additionalOutputWrapper.classList.remove('hidden');
+                const vietnameseExamples = await callGeminiAPI(prompt);
+                const translatedExamples = await translateTextWithLocalDictionary(vietnameseExamples, 'vietnamese', 'ede');
+                
+                ui.additionalOutput.value = `Các câu ví dụ (Tiếng Việt):\n${vietnameseExamples}\n\nDịch sang tiếng Ê-đê (từ điển):\n${translatedExamples}`;
             } catch (error) {
                 ui.additionalOutput.value = `Đã xảy ra lỗi khi tạo ví dụ: ${error.message}`;
                 showAlert(`Đã xảy ra lỗi khi tạo ví dụ: ${error.message}`);
@@ -4565,8 +4598,7 @@
                 setLoadingState(ui.generateExamplesButton, false, 'Tạo Ví Dụ');
             }
         }
-        
-        // New function to handle custom AI requests
+
         async function handleAICustomRequest() {
             if (state.isLoading || !ui.aiInput.value.trim()) {
                 showAlert('Vui lòng nhập yêu cầu của bạn vào ô văn bản.');
@@ -4575,6 +4607,7 @@
             setLoadingState(ui.aiSupportButton, true, 'Gửi yêu cầu AI');
             ui.additionalOutput.value = '';
             ui.additionalOutputWrapper.classList.remove('hidden');
+            ui.essayOutputWrapper.classList.add('hidden');
 
             const prompt = ui.aiInput.value;
             
@@ -4589,18 +4622,21 @@
             }
         }
 
-
         async function handleSummarize() {
-            if (state.isLoading || !ui.outputText.value.trim() || ui.outputText.value.includes("Kết quả dịch sẽ hiển thị ở đây")) return;
+            if (state.isLoading || !ui.inputText.value.trim()) {
+                showAlert("Vui lòng nhập văn bản vào ô dịch để tóm tắt.");
+                return;
+            }
             setLoadingState(ui.summarizeExplainButton, true, 'Tóm Tắt');
             ui.additionalOutput.value = '';
+            ui.additionalOutputWrapper.classList.remove('hidden');
+            ui.essayOutputWrapper.classList.add('hidden');
 
-            const prompt = `Tóm tắt hoặc giải thích ngắn gọn ý nghĩa của văn bản sau: "${ui.outputText.value}". Nếu văn bản phức tạp, hãy giải thích các điểm chính. Chỉ trả về phần tóm tắt/giải thích, không thêm bất kỳ giải thích nào khác.`;
+            const prompt = `Tóm tắt hoặc giải thích ngắn gọn ý nghĩa của văn bản sau: "${ui.inputText.value}". Nếu văn bản phức tạp, hãy giải thích các điểm chính. Chỉ trả về phần tóm tắt/giải thích, không thêm bất kỳ giải thích nào khác.`;
 
             try {
                 const summary = await callGeminiAPI(prompt);
                 ui.additionalOutput.value = summary;
-                ui.additionalOutputWrapper.classList.remove('hidden');
             } catch (error) {
                 ui.additionalOutput.value = `Đã xảy ra lỗi khi tóm tắt/giải thích: ${error.message}`;
                 showAlert(`Đã xảy ra lỗi khi tóm tắt/giải thích: ${error.message}`);
@@ -4610,20 +4646,22 @@
         }
 
         async function handleGenerateEssay() {
-            if (state.isLoading || !ui.essayKeywords.value.trim()) {
+            if (state.isLoading || !ui.aiInput.value.trim()) {
                 showAlert('Vui lòng nhập từ khóa để tạo bài văn.');
                 return;
             }
             setLoadingState(ui.generateEssayButton, true, 'Viết Bài Văn');
             ui.essayOutput.value = '';
-            ui.essayOutputWrapper.classList.remove('hidden'); // Show the wrapper
-            ui.additionalOutputWrapper.classList.add('hidden'); // Hide other output
+            ui.essayOutputWrapper.classList.remove('hidden'); 
+            ui.additionalOutputWrapper.classList.add('hidden'); 
 
-            const prompt = `Viết một bài văn về chủ đề dựa trên các từ khóa sau: "${ui.essayKeywords.value}". Bài văn nên có độ dài vừa phải, khoảng 200-300 từ, và có cấu trúc rõ ràng (mở bài, thân bài, kết luận).`;
+            const prompt = `Viết một bài văn về chủ đề dựa trên các từ khóa sau: "${ui.aiInput.value}". Bài văn phải có 3 phần: Mở bài, Thân bài, và Kết bài.`;
 
             try {
-                const essay = await callGeminiAPI(prompt);
-                ui.essayOutput.value = essay;
+                const vietnameseEssay = await callGeminiAPI(prompt);
+                const translatedEssay = await translateTextWithLocalDictionary(vietnameseEssay, 'vietnamese', 'ede');
+
+                ui.essayOutput.value = `Bài văn đã tạo (Tiếng Việt):\n\n${vietnameseEssay}\n\nDịch sang tiếng Ê-đê (từ điển):\n\n${translatedEssay}`;
             } catch (error) {
                 ui.essayOutput.value = `Đã xảy ra lỗi khi tạo bài văn: ${error.message}`;
                 showAlert(`Đã xảy ra lỗi khi tạo bài văn: ${error.message}`);
@@ -4639,13 +4677,10 @@
                 return;
             }
             state.dictionary.sort((a, b) => a.ede.localeCompare(b.ede)).forEach(word => {
-                const resultItem = document.createElement('div');
-                resultItem.classList.add('grid', 'grid-cols-2', 'gap-4', 'py-2', 'text-gray-800');
                 const vietMeanings = word.meanings.map(m => m.vietnamese).join(", ");
-                resultItem.innerHTML = `
-                    <div class="p-2 border-r border-gray-200">${word.ede}</div>
-                    <div class="p-2">${vietMeanings}</div>
-                `;
+                const resultItem = document.createElement('div');
+                resultItem.classList.add('py-2', 'border-b', 'border-gray-200');
+                resultItem.innerHTML = `<span class="font-bold text-primary">${word.ede}</span>: ${vietMeanings}`;
                 ui.dictionaryResults.appendChild(resultItem);
             });
         }
@@ -4667,13 +4702,10 @@
 
             if (foundWords.length > 0) {
                 foundWords.forEach(word => {
-                    const resultItem = document.createElement('div');
-                    resultItem.classList.add('grid', 'grid-cols-2', 'gap-4', 'py-2', 'text-gray-800');
                     const vietMeanings = word.meanings.map(m => m.vietnamese).join(", ");
-                    resultItem.innerHTML = `
-                        <div class="p-2 border-r border-gray-200">${word.ede}</div>
-                        <div class="p-2">${vietMeanings}</div>
-                    `;
+                    const resultItem = document.createElement('div');
+                    resultItem.classList.add('py-2', 'border-b', 'border-gray-200');
+                    resultItem.innerHTML = `<span class="font-bold text-primary">${word.ede}</span>: ${vietMeanings}`;
                     ui.dictionaryResults.appendChild(resultItem);
                 });
             } else {
@@ -4779,51 +4811,73 @@
         
         // Theme switching logic
         function setTheme(theme) {
-            let primaryColor, secondaryColor;
+            let primaryColor, secondaryColor, textColor;
             
             switch (theme) {
                 case 'blue':
-                    primaryColor = '#2563eb';
-                    secondaryColor = '#dbeafe';
+                    primaryColor = '#1e40af';
+                    secondaryColor = '#c4d7f7';
+                    textColor = '#1f2937';
                     break;
                 case 'green':
-                    primaryColor = '#10b981';
-                    secondaryColor = '#d1fae5';
+                    primaryColor = '#065f46';
+                    secondaryColor = '#c8e6d8';
+                    textColor = '#1f2937';
                     break;
                 case 'purple':
-                    primaryColor = '#8b5cf6';
-                    secondaryColor = '#e9d5ff';
+                    primaryColor = '#5b21b6';
+                    secondaryColor = '#ddd6fe';
+                    textColor = '#1f2937';
                     break;
                 case 'red':
-                    primaryColor = '#dc2626';
-                    secondaryColor = '#fee2e2';
+                    primaryColor = '#991b1b';
+                    secondaryColor = '#fca5a5';
+                    textColor = '#1f2937';
                     break;
                 case 'orange':
-                    primaryColor = '#f97316';
-                    secondaryColor = '#ffedd5';
+                    primaryColor = '#c2410c';
+                    secondaryColor = '#fdba74';
+                    textColor = '#1f2937';
                     break;
                 case 'brown':
-                    primaryColor = '#8b5d33';
-                    secondaryColor = '#f7e9d7';
+                    primaryColor = '#713f12';
+                    secondaryColor = '#fcd34d';
+                    textColor = '#1f2937';
                     break;
                 case 'pink':
-                    primaryColor = '#e879f9';
-                    secondaryColor = '#fae8ff';
+                    primaryColor = '#be185d';
+                    secondaryColor = '#f9a8d4';
+                    textColor = '#1f2937';
+                    break;
+                case 'black':
+                    primaryColor = '#ffffff';
+                    secondaryColor = '#1f2937';
+                    textColor = '#f9fafb';
                     break;
                 default:
-                    primaryColor = '#2563eb';
-                    secondaryColor = '#dbeafe';
+                    primaryColor = '#1e40af';
+                    secondaryColor = '#c4d7f7';
+                    textColor = '#1f2937';
             }
             
             document.documentElement.style.setProperty('--primary-color', primaryColor);
             document.documentElement.style.setProperty('--secondary-color', secondaryColor);
-            document.body.style.backgroundColor = secondaryColor;
-
+            document.documentElement.style.setProperty('--background-color', secondaryColor);
+            document.documentElement.style.setProperty('--text-color', textColor);
+            
             // Highlight active button
             ui.themeButtons.forEach(button => {
                 button.classList.remove('active');
             });
             document.getElementById(`theme-${theme}`).classList.add('active');
+
+            // Set card background color based on theme
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.style.backgroundColor = primaryColor === '#ffffff' ? 'rgba(31, 41, 55, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+                card.style.color = primaryColor === '#ffffff' ? '#f9fafb' : '#1f2937';
+            });
+            document.body.style.backgroundColor = secondaryColor;
         }
 
         ui.themeButtons.forEach(button => {
