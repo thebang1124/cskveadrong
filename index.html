@@ -25,6 +25,7 @@
             font-family: 'Be Vietnam Pro', sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .card {
@@ -33,6 +34,7 @@
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 6px var(--shadow-color);
+            transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
         }
         
         .tab-button.active {
@@ -112,6 +114,13 @@
         .theme-button.active {
             box-shadow: 0 0 0 3px var(--primary-color);
         }
+        
+        .text-primary { color: var(--primary-color); }
+        .bg-primary { background-color: var(--primary-color); }
+        .bg-secondary { background-color: var(--secondary-color); }
+        .border-primary { border-color: var(--primary-color); }
+        .ring-primary { --tw-ring-color: var(--primary-color); }
+        .hover-bg-primary:hover { background-color: color-mix(in srgb, var(--primary-color) 80%, black); }
     </style>
 </head>
 <body class="antialiased text-gray-800 bg-gray-50">
@@ -142,9 +151,15 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Input Area -->
                     <div class="flex flex-col space-y-4">
-                        <label for="inputText" class="font-semibold text-gray-800">Văn bản gốc (Việt hoặc Ê-đê)</label>
+                        <label for="inputText" class="font-semibold text-gray-800">
+                            <span id="inputLabel">Văn bản gốc</span>
+                            <select id="sourceLanguage" class="ml-2 p-1 rounded-md border-2 border-gray-200 focus:ring-2 ring-primary border-primary">
+                                <option value="vietnamese">Tiếng Việt</option>
+                                <option value="ede">Tiếng Ê-đê</option>
+                            </select>
+                        </label>
                         <div class="relative w-full">
-                            <textarea id="inputText" rows="8" class="w-full p-4 rounded-lg border-2 border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300 resize-none placeholder-gray-400" placeholder="Nhập văn bản cần dịch..."></textarea>
+                            <textarea id="inputText" rows="8" class="w-full p-4 rounded-lg border-2 border-gray-200 focus:ring-2 ring-primary border-primary transition duration-300 resize-none placeholder-gray-400" placeholder="Nhập văn bản cần dịch..."></textarea>
                             <button id="recordButton" title="Ghi âm giọng nói" class="absolute bottom-3 right-3 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed">
                                 <span class="record-icon text-gray-700">🎙️</span>
                             </button>
@@ -164,7 +179,7 @@
 
                 <!-- Action Buttons -->
                 <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <button id="translateButton" class="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                    <button id="translateButton" class="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-primary text-white font-semibold rounded-lg shadow-md hover-bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 ring-primary transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                         <span class="button-icon text-white">✨</span>
                         <span class="button-text">Dịch</span>
                     </button>
@@ -174,6 +189,18 @@
             <!-- AI-Powered Tools Section -->
             <div class="card rounded-2xl shadow-lg p-6 md:p-8 mt-10">
                 <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">AI Hỗ trợ</h2>
+                <!-- New AI Support Input Field -->
+                <div class="flex flex-col space-y-4 mb-6">
+                    <label for="aiInput" class="font-semibold text-gray-800">Nhập yêu cầu AI (Ví dụ: "Viết một bài thơ về Tây Nguyên")</label>
+                    <div class="relative w-full">
+                        <textarea id="aiInput" rows="4" class="w-full p-4 rounded-lg border-2 border-gray-200 focus:ring-2 ring-primary border-primary transition duration-300 resize-none placeholder-gray-400" placeholder="Nhập yêu cầu của bạn ở đây..."></textarea>
+                    </div>
+                    <button id="aiSupportButton" class="w-full flex items-center justify-center gap-2 px-8 py-3 bg-primary text-white font-semibold rounded-lg shadow-md hover-bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 ring-primary transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                        <span class="button-icon text-white">🤖</span>
+                        <span class="button-text">Gửi yêu cầu AI</span>
+                    </button>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <button id="generateExamplesButton" class="w-full flex flex-col items-center justify-center gap-2 px-4 py-6 bg-yellow-500 text-gray-900 font-semibold rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                         <span class="button-icon text-3xl">💡</span>
@@ -200,7 +227,7 @@
                 <div id="essayOutputWrapper" class="mt-6 hidden">
                     <label for="essayKeywords" class="font-semibold text-gray-800">Từ khóa cho bài văn</label>
                     <div class="relative w-full mt-2 mb-4">
-                        <textarea id="essayKeywords" rows="2" class="w-full p-4 rounded-lg border-2 border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300 resize-none placeholder-gray-400" placeholder="Nhập các từ khóa, cách nhau bằng dấu phẩy..."></textarea>
+                        <textarea id="essayKeywords" rows="2" class="w-full p-4 rounded-lg border-2 border-gray-200 focus:ring-2 ring-primary border-primary transition duration-300 resize-none placeholder-gray-400" placeholder="Nhập các từ khóa, cách nhau bằng dấu phẩy..."></textarea>
                     </div>
                     <label for="essayOutput" class="font-semibold text-gray-800">Bài văn đã tạo</label>
                     <div class="relative w-full mt-2">
@@ -214,12 +241,21 @@
 
             <!-- Dictionary Lookup Section -->
             <div class="card rounded-2xl shadow-lg p-6 md:p-8 mt-10">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Tra từ Điển</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Tra từ Điển & Thêm từ</h2>
                 <div class="flex flex-col sm:flex-row gap-4 mb-4">
-                    <input type="text" id="dictionaryInput" class="flex-1 w-full p-3 rounded-lg border-2 border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300 placeholder-gray-400" placeholder="Nhập từ cần tra cứu...">
-                    <button id="dictionarySearchButton" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                    <input type="text" id="dictionaryInput" class="flex-1 w-full p-3 rounded-lg border-2 border-gray-200 focus:ring-2 ring-primary border-primary transition duration-300 placeholder-gray-400" placeholder="Nhập từ cần tra cứu...">
+                    <button id="dictionarySearchButton" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-lg shadow-md hover-bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 ring-primary transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                         <span class="button-icon text-white">🔍</span>
                         <span class="button-text">Tra cứu</span>
+                    </button>
+                </div>
+                <!-- Add New Word Section -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                    <input type="text" id="addEdeInput" class="flex-1 w-full p-3 rounded-lg border-2 border-gray-200 focus:ring-2 ring-primary border-primary transition duration-300 placeholder-gray-400" placeholder="Từ tiếng Ê-đê">
+                    <input type="text" id="addVietnameseInput" class="flex-1 w-full p-3 rounded-lg border-2 border-gray-200 focus:ring-2 ring-primary border-primary transition duration-300 placeholder-gray-400" placeholder="Nghĩa tiếng Việt">
+                    <button id="addWordButton" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                        <span class="button-icon text-white">➕</span>
+                        <span class="button-text">Thêm từ</span>
                     </button>
                 </div>
                 <div id="dictionaryOutput" class="mt-4 p-4 bg-gray-100 rounded-lg border-2 border-gray-200">
@@ -252,7 +288,7 @@
                 <div class="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition mt-4" id="dropZone">
                     <div id="imagePlaceholder">
                         <span class="text-4xl">🖼️</span>
-                        <p class="mt-2 text-gray-600">Kéo và thả ảnh vào đây, hoặc <span class="font-semibold text-indigo-600">nhấn để chọn file</span></p>
+                        <p class="mt-2 text-gray-600">Kéo và thả ảnh vào đây, hoặc <span class="font-semibold text-primary">nhấn để chọn file</span></p>
                     </div>
                     <div id="imagePreviewWrapper" class="hidden relative">
                         <img id="imagePreview" class="max-h-60 mx-auto rounded-md shadow-md"/>
@@ -274,7 +310,7 @@
         </main>
         
         <footer class="text-center mt-10 text-gray-500 text-sm">
-            <p>Phát triển bởi Thế Bằng &copy; 2025</p>
+            <p>Phát triển bởi Bằng &copy; 2025</p>
             <p id="userIdDisplay" class="mt-1 opacity-70 hidden"></p>
         </footer>
     </div>
@@ -284,7 +320,7 @@
         <div class="modal-content">
             <span class="close-button" id="closeAlertModal">&times;</span>
             <p id="alertMessage" class="text-lg font-semibold text-gray-800 mb-4"></p>
-            <button id="okAlertButton" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">OK</button>
+            <button id="okAlertButton" class="px-6 py-2 bg-primary text-white rounded-md hover-bg-primary transition">OK</button>
         </div>
     </div>
 
@@ -4344,6 +4380,12 @@
             dictionaryInput: document.getElementById('dictionaryInput'),
             dictionarySearchButton: document.getElementById('dictionarySearchButton'),
             dictionaryResults: document.getElementById('dictionaryResults'),
+            aiInput: document.getElementById('aiInput'),
+            aiSupportButton: document.getElementById('aiSupportButton'),
+            sourceLanguage: document.getElementById('sourceLanguage'),
+            addEdeInput: document.getElementById('addEdeInput'),
+            addVietnameseInput: document.getElementById('addVietnameseInput'),
+            addWordButton: document.getElementById('addWordButton'),
         };
 
         // Custom alert function
@@ -4450,6 +4492,8 @@
                         case 'Trích xuất & Dịch': iconSpan.innerHTML = '↔️'; break;
                         case 'Giải bài tập': iconSpan.innerHTML = '🧠'; break;
                         case 'Tra cứu': iconSpan.innerHTML = '🔍'; break;
+                        case 'Gửi yêu cầu AI': iconSpan.innerHTML = '🤖'; break;
+                        case 'Thêm từ': iconSpan.innerHTML = '➕'; break;
                     }
                 }
                 if (ui.imagePreviewWrapper.classList.contains('hidden') === false && state.selectedImageFile) {
@@ -4466,19 +4510,31 @@
             ui.additionalOutputWrapper.classList.add('hidden');
             
             const inputTextLower = ui.inputText.value.trim().toLowerCase();
+            const sourceLang = ui.sourceLanguage.value;
             let translatedText = '';
 
             // Kiểm tra từ điển cục bộ trước
-            const localMatch = state.dictionary.find(t => t.ede.toLowerCase() === inputTextLower || t.viet.toLowerCase() === inputTextLower);
+            let localMatch = null;
+            if (sourceLang === 'ede') {
+                localMatch = state.dictionary.find(t => t.ede.toLowerCase() === inputTextLower);
+            } else {
+                localMatch = state.dictionary.find(t => t.meanings.some(m => m.vietnamese.toLowerCase() === inputTextLower));
+            }
+
             if (localMatch) {
-                translatedText = localMatch.ede.toLowerCase() === inputTextLower ? localMatch.viet : localMatch.ede;
+                if (sourceLang === 'ede') {
+                    translatedText = localMatch.meanings.map(m => m.vietnamese).join(", ");
+                } else {
+                    translatedText = localMatch.ede;
+                }
                 ui.outputText.value = translatedText + " (từ điển cục bộ)";
                 setLoadingState(ui.translateButton, false, 'Dịch');
                 return;
             }
             
             // Nếu không có trong từ điển, gọi API
-            const prompt = `Bạn là một công cụ dịch thuật chuyên nghiệp. Hãy dịch văn bản sau đây giữa tiếng Việt và tiếng Ê-đê. Nếu văn bản là tiếng Việt, hãy dịch sang tiếng Ê-đê. Nếu văn bản là tiếng Ê-đê, hãy dịch sang tiếng Việt. Chỉ trả về văn bản đã dịch, không thêm bất kỳ giải thích nào. Văn bản cần dịch: ${ui.inputText.value}`;
+            const targetLang = sourceLang === 'ede' ? 'tiếng Việt' : 'tiếng Ê-đê';
+            const prompt = `Bạn là một công cụ dịch thuật chuyên nghiệp. Hãy dịch văn bản sau đây từ ${sourceLang === 'ede' ? 'tiếng Ê-đê' : 'tiếng Việt'} sang ${targetLang}. Chỉ trả về văn bản đã dịch, không thêm bất kỳ giải thích nào. Văn bản cần dịch: ${ui.inputText.value}`;
 
             try {
                 translatedText = await callGeminiAPI(prompt);
@@ -4509,6 +4565,30 @@
                 setLoadingState(ui.generateExamplesButton, false, 'Tạo Ví Dụ');
             }
         }
+        
+        // New function to handle custom AI requests
+        async function handleAICustomRequest() {
+            if (state.isLoading || !ui.aiInput.value.trim()) {
+                showAlert('Vui lòng nhập yêu cầu của bạn vào ô văn bản.');
+                return;
+            }
+            setLoadingState(ui.aiSupportButton, true, 'Gửi yêu cầu AI');
+            ui.additionalOutput.value = '';
+            ui.additionalOutputWrapper.classList.remove('hidden');
+
+            const prompt = ui.aiInput.value;
+            
+            try {
+                const result = await callGeminiAPI(prompt);
+                ui.additionalOutput.value = result;
+            } catch (error) {
+                ui.additionalOutput.value = `Đã xảy ra lỗi khi xử lý yêu cầu: ${error.message}`;
+                showAlert(`Đã xảy ra lỗi khi xử lý yêu cầu: ${error.message}`);
+            } finally {
+                setLoadingState(ui.aiSupportButton, false, 'Gửi yêu cầu AI');
+            }
+        }
+
 
         async function handleSummarize() {
             if (state.isLoading || !ui.outputText.value.trim() || ui.outputText.value.includes("Kết quả dịch sẽ hiển thị ở đây")) return;
@@ -4552,33 +4632,74 @@
             }
         }
         
+        function displayAllDictionaryWords() {
+            ui.dictionaryResults.innerHTML = '';
+            if (state.dictionary.length === 0) {
+                ui.dictionaryResults.innerHTML = '<p class="text-center text-gray-500">Từ điển trống. Vui lòng thêm từ mới.</p>';
+                return;
+            }
+            state.dictionary.sort((a, b) => a.ede.localeCompare(b.ede)).forEach(word => {
+                const resultItem = document.createElement('div');
+                resultItem.classList.add('grid', 'grid-cols-2', 'gap-4', 'py-2', 'text-gray-800');
+                const vietMeanings = word.meanings.map(m => m.vietnamese).join(", ");
+                resultItem.innerHTML = `
+                    <div class="p-2 border-r border-gray-200">${word.ede}</div>
+                    <div class="p-2">${vietMeanings}</div>
+                `;
+                ui.dictionaryResults.appendChild(resultItem);
+            });
+        }
+        
         async function handleDictionarySearch() {
             const searchTerm = ui.dictionaryInput.value.trim().toLowerCase();
             ui.dictionaryResults.innerHTML = ''; // Clear previous results
 
             if (!searchTerm) {
-                ui.dictionaryResults.innerHTML = '<p class="text-center text-gray-500">Vui lòng nhập từ khóa để tra cứu.</p>';
+                displayAllDictionaryWords();
                 return;
             }
 
-            const foundWords = state.dictionary.filter(item => 
-                item.ede.toLowerCase().includes(searchTerm) || 
-                item.viet.toLowerCase().includes(searchTerm)
-            );
+            const foundWords = state.dictionary.filter(item => {
+                const edeMatch = item.ede.toLowerCase().includes(searchTerm);
+                const vietMatch = item.meanings.some(m => m.vietnamese.toLowerCase().includes(searchTerm));
+                return edeMatch || vietMatch;
+            });
 
             if (foundWords.length > 0) {
                 foundWords.forEach(word => {
                     const resultItem = document.createElement('div');
                     resultItem.classList.add('grid', 'grid-cols-2', 'gap-4', 'py-2', 'text-gray-800');
+                    const vietMeanings = word.meanings.map(m => m.vietnamese).join(", ");
                     resultItem.innerHTML = `
                         <div class="p-2 border-r border-gray-200">${word.ede}</div>
-                        <div class="p-2">${word.viet}</div>
+                        <div class="p-2">${vietMeanings}</div>
                     `;
                     ui.dictionaryResults.appendChild(resultItem);
                 });
             } else {
                 ui.dictionaryResults.innerHTML = '<p class="text-center text-gray-500">Không tìm thấy kết quả phù hợp trong từ điển.</p>';
             }
+        }
+        
+        function handleAddWord() {
+            const edeWord = ui.addEdeInput.value.trim();
+            const vietnameseWord = ui.addVietnameseInput.value.trim();
+
+            if (!edeWord || !vietnameseWord) {
+                showAlert("Vui lòng nhập cả từ tiếng Ê-đê và tiếng Việt.");
+                return;
+            }
+
+            const newEntry = {
+                ede: edeWord,
+                meanings: [{ type: "tùy chỉnh", vietnamese: vietnameseWord }]
+            };
+            
+            state.dictionary.push(newEntry);
+            showAlert("Đã thêm từ thành công!");
+            ui.addEdeInput.value = '';
+            ui.addVietnameseInput.value = '';
+            displayAllDictionaryWords();
         }
 
         function handleImageSelection(file) {
@@ -4696,13 +4817,8 @@
             
             document.documentElement.style.setProperty('--primary-color', primaryColor);
             document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+            document.body.style.backgroundColor = secondaryColor;
 
-            // Update button colors
-            ui.translateButton.style.backgroundColor = primaryColor;
-            ui.translateButton.style.boxShadow = `0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08), 0 0 0 2px ${primaryColor}`;
-            ui.translateButton.onmouseover = () => ui.translateButton.style.backgroundColor = `${primaryColor}CC`;
-            ui.translateButton.onmouseout = () => ui.translateButton.style.backgroundColor = primaryColor;
-            
             // Highlight active button
             ui.themeButtons.forEach(button => {
                 button.classList.remove('active');
@@ -4722,6 +4838,8 @@
         ui.summarizeExplainButton.addEventListener('click', handleSummarize);
         ui.generateEssayButton.addEventListener('click', handleGenerateEssay);
         ui.dictionarySearchButton.addEventListener('click', handleDictionarySearch);
+        ui.aiSupportButton.addEventListener('click', handleAICustomRequest);
+        ui.addWordButton.addEventListener('click', handleAddWord);
         
         ui.takePhotoButton.addEventListener('click', () => {
             ui.imageInput.setAttribute('capture', 'environment');
@@ -4777,6 +4895,12 @@
                 speakText(ui.essayOutput.value);
             } else {
                 showAlert('Không có văn bản để phát âm.');
+            }
+        });
+        
+        ui.dictionaryInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleDictionarySearch();
             }
         });
 
@@ -4850,6 +4974,7 @@
             ui.translateTextFromImageButton.disabled = true;
             ui.solveEdeProblemButton.disabled = true;
             setTheme('blue'); // Set initial theme
+            displayAllDictionaryWords(); // Display all words on load
         }
         
         initializeApp();
