@@ -114,7 +114,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, getDocs, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, getDocs, setLogLevel, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // IMPORTANT: Global variables are provided by the Canvas environment.
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -126,7 +126,8 @@
         let userId = null;
         let isAdmin = false;
 
-        const ADMIN_ID = "admin12345";
+        const ADMIN_ID = "admin";
+        const ADMIN_PASSWORD = "admin123";
         
         setLogLevel('debug');
 
@@ -145,15 +146,25 @@
                     loginButtons.classList.add('hidden');
                     mainContent.classList.remove('hidden');
                     
-                    if (userId === ADMIN_ID) {
+                    const adminRef = doc(db, `artifacts/${appId}/public/data/users/`, 'admin');
+                    const adminSnap = await getDoc(adminRef);
+
+                    if (user.uid === ADMIN_ID) {
                         isAdmin = true;
-                        authStatusEl.innerHTML = 'Đã đăng nhập với vai trò **Quản trị viên**';
+                        authStatusEl.innerHTML = `Đã đăng nhập với vai trò **Quản trị viên** (ID: ${userId})`;
                         uiElements.addPrecinctBtn.classList.remove('hidden');
                         uiElements.addHouseholdBtn.classList.remove('hidden');
                         uiElements.addMemberBtn.classList.remove('hidden');
+                    } else if (adminSnap.exists() && adminSnap.data().cadres && adminSnap.data().cadres[user.uid]) {
+                        isAdmin = false;
+                        const cadreData = adminSnap.data().cadres[user.uid];
+                        authStatusEl.innerHTML = `Đã đăng nhập với vai trò **Cán bộ** (Tên: ${cadreData.name})`;
+                        uiElements.addPrecinctBtn.classList.add('hidden');
+                        uiElements.addHouseholdBtn.classList.add('hidden');
+                        uiElements.addMemberBtn.classList.add('hidden');
                     } else {
                         isAdmin = false;
-                        authStatusEl.innerHTML = 'Đã đăng nhập với vai trò **Cán bộ**';
+                        authStatusEl.innerHTML = `Đã đăng nhập ẩn danh (ID: ${userId})`;
                         uiElements.addPrecinctBtn.classList.add('hidden');
                         uiElements.addHouseholdBtn.classList.add('hidden');
                         uiElements.addMemberBtn.classList.add('hidden');
@@ -171,6 +182,20 @@
 
             // Đăng nhập với token được cung cấp hoặc ẩn danh
             (async () => {
+                const adminRef = doc(db, `artifacts/${appId}/public/data/users/`, 'admin');
+                const adminSnap = await getDoc(adminRef);
+                if (!adminSnap.exists()) {
+                     await setDoc(adminRef, {
+                        cadres: {
+                            [ADMIN_ID]: {
+                                name: "Quản trị viên",
+                                precincts: initialPrecincts,
+                                password: ADMIN_PASSWORD
+                            }
+                        }
+                    });
+                }
+                
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else {
@@ -220,7 +245,6 @@
         // --- Firestore Listeners và Render UI ---
 
         async function initializePrecincts() {
-            if (!isAdmin) return;
             const precinctsCollectionRef = collection(db, `artifacts/${appId}/public/data/precincts`);
             const snapshot = await getDocs(precinctsCollectionRef);
             if (snapshot.empty) {
@@ -238,12 +262,28 @@
         function setupPrecinctsListener() {
             const precinctsCollection = `artifacts/${appId}/public/data/precincts`;
             onSnapshot(collection(db, precinctsCollection), (snapshot) => {
-                const precincts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                let precincts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // Nếu là cán bộ, chỉ hiển thị thôn/buôn được phân công
+                if (!isAdmin) {
+                    const userPrecincts = getUserPrecincts();
+                    precincts = precincts.filter(p => userPrecincts.includes(p.name));
+                }
+                
                 displayPrecincts(precincts);
             }, (error) => {
                 console.error("Lỗi khi lắng nghe thôn/buôn:", error);
                 showModal("Lỗi", "Không thể tải danh sách thôn/buôn.");
             });
+        }
+        
+        async function getUserPrecincts() {
+             const userRef = doc(db, `artifacts/${appId}/public/data/users/`, 'admin');
+             const userSnap = await getDoc(userRef);
+             if (userSnap.exists() && userSnap.data().cadres && userSnap.data().cadres[userId]) {
+                 return userSnap.data().cadres[userId].precincts;
+             }
+             return [];
         }
 
         function displayPrecincts(precincts) {
@@ -403,13 +443,29 @@
         
         // --- Xử lý Đăng nhập, Thêm và Xóa ---
         document.getElementById('admin-login-btn').addEventListener('click', async () => {
-            if (!auth) { showModal("Lỗi", "Hệ thống xác thực chưa sẵn sàng."); return; }
-            await signInWithCustomToken(auth, ADMIN_ID);
+             if (!auth) { showModal("Lỗi", "Hệ thống xác thực chưa sẵn sàng."); return; }
+             showLoginModal('Đăng nhập Quản trị', async (username, password) => {
+                 if (username === ADMIN_ID && password === ADMIN_PASSWORD) {
+                     await signInWithCustomToken(auth, ADMIN_ID);
+                     showModal("Thành công", "Đăng nhập với quyền quản trị thành công!");
+                 } else {
+                     showModal("Lỗi", "Sai tên đăng nhập hoặc mật khẩu quản trị.");
+                 }
+             });
         });
-        
+
         document.getElementById('cadre-login-btn').addEventListener('click', async () => {
             if (!auth) { showModal("Lỗi", "Hệ thống xác thực chưa sẵn sàng."); return; }
-            await signInAnonymously(auth);
+             showLoginModal('Đăng nhập Cán bộ', async (username, password) => {
+                const userRef = doc(db, `artifacts/${appId}/public/data/users/`, 'admin');
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists() && userSnap.data().cadres && userSnap.data().cadres[username] && userSnap.data().cadres[username].password === password) {
+                    await signInWithCustomToken(auth, username);
+                    showModal("Thành công", `Đăng nhập với vai trò cán bộ thành công!`);
+                } else {
+                    showModal("Lỗi", "Sai tên đăng nhập hoặc mật khẩu cán bộ.");
+                }
+            });
         });
 
         document.getElementById('home-link').addEventListener('click', (e) => {
@@ -531,6 +587,31 @@
                 console.error("Lỗi khi xóa:", error);
                 showModal("Lỗi", `Không thể xóa ${type}. Vui lòng thử lại.`);
             }
+        }
+        
+        function showLoginModal(title, onSubmit) {
+            const modalContent = document.getElementById('modal-content-area');
+            modalContent.innerHTML = `
+                <form id="login-form" class="space-y-4">
+                    <input type="text" id="username-input" placeholder="Tên đăng nhập" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                    <input type="password" id="password-input" placeholder="Mật khẩu" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200">
+                        Đăng nhập
+                    </button>
+                </form>
+            `;
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal').style.display = 'flex';
+
+            document.getElementById('login-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username-input').value;
+                const password = document.getElementById('password-input').value;
+                onSubmit(username, password);
+                document.getElementById('modal').style.display = 'none';
+            });
         }
 
         // --- Modal Control ---
