@@ -1,542 +1,778 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Quản Lý Địa Bàn & Tài Khoản — Ea Drông</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Địa Bàn & Đối Tượng</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Inter Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .modal { display: none; position: fixed; z-index: 1000; left:0; top:0; width:100%; height:100%; background-color: rgba(0,0,0,0.5); justify-content:center; align-items:center; }
-        .hidden { display:none; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
-  <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-4xl mx-auto">
-    <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">Hệ Thống Quản Lý Địa Bàn</h1>
-    <p class="text-center text-gray-600 mb-6">Quản lý các Thôn, Hộ và Thành viên — Ea Drông</p>
+    <!-- Main Container -->
+    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">Hệ Thống Quản Lý Địa Bàn & Đối Tượng</h1>
+        <p class="text-center text-gray-600 mb-6">Quản lý các Thôn, Hộ, Thành viên và Đối tượng.</p>
 
-    <div id="auth-section" class="bg-blue-100 text-blue-800 rounded-lg p-3 mb-6 flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0 md:space-x-4">
-      <div class="flex items-center space-x-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-        <div id="auth-status" class="text-sm font-medium">Đang tải hệ thống...</div>
-      </div>
-
-      <div id="login-buttons" class="flex space-x-2">
-        <button id="admin-login-btn" class="bg-blue-600 text-white font-semibold py-1 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200">Đăng nhập Quản trị</button>
-        <button id="cadre-login-btn" class="bg-indigo-600 text-white font-semibold py-1 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">Đăng nhập Cán bộ</button>
-      </div>
-    </div>
-
-    <div id="main-content" class="hidden">
-      <nav class="flex items-center space-x-2 mb-4 text-sm font-medium text-gray-500">
-        <a href="#" id="home-link" class="hover:text-blue-600">Thôn/Buôn</a>
-        <span id="household-crumb" class="hidden">/ <a href="#" class="household-crumb-link hover:text-blue-600"></a></span>
-        <span id="member-crumb" class="hidden">/ <span class="text-gray-700">Thành viên</span></span>
-      </nav>
-
-      <div id="precinct-list-section">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-2xl font-semibold text-gray-700">Danh Sách Thôn/Buôn</h2>
-          <button id="add-precinct-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200 hidden">+ Thêm Thôn/Buôn</button>
-        </div>
-        <div id="precincts-list" class="space-y-4">
-          <p class="text-center text-gray-500">Đang tải danh sách...</p>
-        </div>
-      </div>
-
-      <div id="household-list-section" class="hidden">
-        <div class="flex items-center justify-between mb-4">
-          <h2 id="household-list-title" class="text-2xl font-semibold text-gray-700"></h2>
-          <button id="add-household-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200 hidden">+ Thêm Hộ gia đình</button>
-        </div>
-        <div id="households-list" class="space-y-4">
-          <p class="text-center text-gray-500">Đang tải danh sách...</p>
-        </div>
-      </div>
-
-      <div id="member-list-section" class="hidden">
-        <div class="flex items-center justify-between mb-4">
-          <h2 id="member-list-title" class="text-2xl font-semibold text-gray-700"></h2>
-          <button id="add-member-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200 hidden">+ Thêm Thành viên</button>
-        </div>
-        <div id="members-list" class="space-y-4">
-          <p class="text-center text-gray-500">Đang tải danh sách...</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="modal" class="modal">
-    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full">
-      <h3 id="modal-title" class="text-xl font-bold mb-4 text-center"></h3>
-      <div id="modal-content-area"></div>
-    </div>
-  </div>
-
-  <!-- Firebase SDKs (client) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, getDocs, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    /*********** CẤU HÌNH: bạn cần thay firebaseConfig thật nếu triển khai thực tế ***********/
-    const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) ? JSON.parse(__firebase_config) : {};
-    const appId = (typeof __app_id !== 'undefined' && __app_id) ? __app_id : 'default-app-id';
-
-    // --- Danh sách 32 thôn/buôn (đảm bảo khai báo trước khi dùng) ---
-    const initialPrecincts = [
-      "buôn alê gŏ","buôn dhu","buôn ea kjoh a","buôn ea kjoh b","buôn hně","buôn hnĕ",
-      "buôn klat a","buôn klat b","buôn klat c","buôn kmiên","buôn pheo","buôn phieo",
-      "buôn sĭng a","buôn sing a","buôn tring 4","buôn tung krăk","buôn tung krắk",
-      "buôn trang","buôn trăp","t2b","thôn 10","thôn 1a","thôn 1b","thôn 2","thôn 2a",
-      "thôn 2b","thôn 3","thôn 5","thôn 6","thôn 6a","thôn 6b","thôn 7","thôn 8",
-      "thôn 9","thôn đông xuân","thôn ea kung","thôn quyết thắng","thôn tân hợp"
-    ];
-
-    // --- Hệ thống admin/cadre mock (nếu muốn tích hợp auth thật, sẽ cần thay đổi) ---
-    const ADMIN_ID = "admin12345";
-    const ADMIN_PASSWORD = "admin123";
-    // Ví dụ cán bộ: username -> { name, password, precincts: [...] }
-    const MOCK_CADRES = {
-      "cadre001": { name: "Lãnh đạo xã", password: "cadrepass", precincts: ["buôn alê gŏ","buôn dhu"] }
-    };
-
-    // Biến trạng thái
-    let app, db, auth;
-    let currentUserUid = null;
-    let isAdmin = false;
-
-    // UI elements
-    const ui = {
-      authStatusEl: document.getElementById('auth-status'),
-      loginButtons: document.getElementById('login-buttons'),
-      mainContent: document.getElementById('main-content'),
-      precinctsList: document.getElementById('precincts-list'),
-      householdsList: document.getElementById('households-list'),
-      membersList: document.getElementById('members-list'),
-      addPrecinctBtn: document.getElementById('add-precinct-btn'),
-      addHouseholdBtn: document.getElementById('add-household-btn'),
-      addMemberBtn: document.getElementById('add-member-btn'),
-      householdListTitle: document.getElementById('household-list-title'),
-      memberListTitle: document.getElementById('member-list-title'),
-      homeLink: document.getElementById('home-link'),
-      householdCrumb: document.getElementById('household-crumb'),
-      memberCrumb: document.getElementById('member-crumb')
-    };
-
-    // Trạng thái navigation
-    let currentPrecinctId = null;
-    let currentPrecinctName = null;
-    let currentHouseholdId = null;
-    let currentHouseholdName = null;
-
-    // Helper: show modal
-    function showModal(title, message) {
-      document.getElementById('modal-title').textContent = title;
-      const contentArea = document.getElementById('modal-content-area');
-      contentArea.innerHTML = `<p class="text-gray-700 mb-6">${message}</p><button id="modal-close-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition-all duration-200">Đóng</button>`;
-      document.getElementById('modal').style.display = 'flex';
-      document.getElementById('modal-close-btn').addEventListener('click', () => {
-        document.getElementById('modal').style.display = 'none';
-      });
-    }
-
-    // Khởi tạo Firebase (nếu bạn chưa cấu hình, app sẽ vẫn hoạt động với firestore bị vô hiệu)
-    try {
-      if (Object.keys(firebaseConfig).length === 0) {
-        console.warn('firebaseConfig rỗng — nếu triển khai thực tế, hãy cung cấp cấu hình.');
-      }
-      app = initializeApp(firebaseConfig);
-      db = getFirestore(app);
-      auth = getAuth(app);
-    } catch (e) {
-      console.error('Lỗi khởi tạo Firebase:', e);
-      showModal('Lỗi', 'Không thể khởi tạo Firebase. Kiểm tra cấu hình.');
-    }
-
-    // Sign in anonymously để có quyền đọc/ghi thử trên Firestore (tuỳ rules)
-    async function ensureAnonymousAuth() {
-      try {
-        await signInAnonymously(auth);
-      } catch (e) {
-        console.warn('Không thể signInAnonymously (có thể do rules).', e);
-      }
-    }
-
-    // Gọi khởi tạo
-    (async () => {
-      await ensureAnonymousAuth();
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          currentUserUid = user.uid;
-          ui.loginButtons.classList.add('hidden');
-          ui.mainContent.classList.remove('hidden');
-          ui.authStatusEl.textContent = `Đã kết nối (ID: ${currentUserUid}) — đang tải dữ liệu...`;
-          setupPrecinctsListener();
-        } else {
-          currentUserUid = null;
-          ui.authStatusEl.textContent = 'Chưa xác thực';
-          ui.loginButtons.classList.remove('hidden');
-          ui.mainContent.classList.add('hidden');
-        }
-      });
-    })();
-
-    // --- Firestore helpers ---
-    async function initializePrecincts() {
-      try {
-        const precinctsCollectionRef = collection(db, `artifacts/${appId}/public/data/precincts`);
-        const snapshot = await getDocs(precinctsCollectionRef);
-        if (snapshot.empty) {
-          for (const precinctName of initialPrecincts) {
-            await addDoc(precinctsCollectionRef, {
-              name: precinctName,
-              creatorId: 'initial_setup',
-              createdAt: new Date().toISOString()
-            });
-          }
-        }
-      } catch (e) {
-        console.warn('initializePrecincts lỗi (có thể do rules hoặc config Firebase):', e);
-      }
-    }
-
-    function setupPrecinctsListener() {
-      try {
-        const precinctsCollection = `artifacts/${appId}/public/data/precincts`;
-        onSnapshot(collection(db, precinctsCollection), (snapshot) => {
-          let precincts = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-          // Nếu đang là cán bộ (mock), lọc theo precincts được phân công — ở đây chỉ demo
-          if (!isAdmin && typeof MOCK_CADRES === 'object') {
-            // Nếu cần lọc theo user, implement ở đây
-          }
-          displayPrecincts(precincts);
-        }, (error) => {
-          console.error('Lỗi khi lắng nghe thôn/buôn:', error);
-          // Nếu chưa có dữ liệu Firestore (ví dụ cấu hình không đúng), ta vẫn có thể dùng initialPrecincts tạm thời:
-          displayPrecincts(initialPrecincts.map((name, idx) => ({ id: `p-${idx}`, name })));
-        });
-      } catch (e) {
-        console.error('setupPrecinctsListener lỗi:', e);
-      }
-    }
-
-    function displayPrecincts(precincts) {
-      ui.precinctsList.innerHTML = '';
-      if (!precincts || precincts.length === 0) {
-        ui.precinctsList.innerHTML = '<p class="text-center text-gray-500">Chưa có thôn/buôn nào.</p>';
-        return;
-      }
-      precincts.forEach(p => {
-        const item = document.createElement('div');
-        item.className = 'bg-gray-50 rounded-lg p-4 shadow-sm flex items-center justify-between transition-colors duration-200 hover:bg-gray-100 cursor-pointer';
-        item.innerHTML = `
-          <div class="flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-            </svg>
-            <span class="text-lg font-medium">${p.name}</span>
-          </div>
-          ${isAdmin ? `<button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${p.id}" data-type="precinct">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>` : ''}
-        `;
-        item.addEventListener('click', () => showHouseholds(p.id, p.name));
-        ui.precinctsList.appendChild(item);
-      });
-      setupDeleteListeners();
-    }
-
-    function setupHouseholdsListener() {
-      const householdsCollection = `artifacts/${appId}/public/data/precincts/${currentPrecinctId}/households`;
-      onSnapshot(collection(db, householdsCollection), (snapshot) => {
-        const households = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        displayHouseholds(households);
-      }, (error) => {
-        console.error('Lỗi khi lắng nghe hộ gia đình:', error);
-        ui.householdsList.innerHTML = '<p class="text-center text-gray-500">Không thể tải hộ gia đình (kiểm tra cấu hình Firestore).</p>';
-      });
-    }
-
-    function displayHouseholds(households) {
-      ui.householdsList.innerHTML = '';
-      if (!households || households.length === 0) {
-        ui.householdsList.innerHTML = '<p class="text-center text-gray-500">Chưa có hộ gia đình nào trong thôn này.</p>';
-        return;
-      }
-      households.forEach(h => {
-        const item = document.createElement('div');
-        item.className = 'bg-gray-50 rounded-lg p-4 shadow-sm flex items-center justify-between transition-colors duration-200 hover:bg-gray-100 cursor-pointer';
-        item.innerHTML = `
-          <div class="flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2m14 0V9a2 2 0 00-2-2H7a2 2 0 00-2 2v2"/>
-            </svg>
-            <span class="text-lg font-medium">${h.name}</span>
-          </div>
-          ${isAdmin ? `<button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${h.id}" data-type="household">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>` : ''}
-        `;
-        item.addEventListener('click', () => showMembers(h.id, h.name));
-        ui.householdsList.appendChild(item);
-      });
-      setupDeleteListeners();
-    }
-
-    function setupMembersListener() {
-      const membersCollection = `artifacts/${appId}/public/data/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`;
-      onSnapshot(collection(db, membersCollection), (snapshot) => {
-        const members = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        displayMembers(members);
-      }, (error) => {
-        console.error('Lỗi khi lắng nghe thành viên:', error);
-        ui.membersList.innerHTML = '<p class="text-center text-gray-500">Không thể tải thành viên (kiểm tra cấu hình Firestore).</p>';
-      });
-    }
-
-    function displayMembers(members) {
-      ui.membersList.innerHTML = '';
-      if (!members || members.length === 0) {
-        ui.membersList.innerHTML = '<p class="text-center text-gray-500">Chưa có thành viên nào trong hộ này.</p>';
-        return;
-      }
-      members.forEach(m => {
-        const item = document.createElement('div');
-        item.className = 'bg-gray-50 rounded-lg p-4 shadow-sm flex items-center justify-between';
-        item.innerHTML = `
-          <div class="flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5"/>
-            </svg>
-            <div>
-              <span class="text-lg font-medium">${m.name || '—'}</span>
-              <p class="text-sm text-gray-600">CCCD: ${m.cccd || '—'}</p>
+        <!-- Login Section -->
+        <div id="login-section" class="flex flex-col items-center space-y-4">
+            <h2 class="text-2xl font-semibold text-gray-700">Đăng nhập</h2>
+            <div class="w-full max-w-xs">
+                <input type="text" id="username-input" placeholder="Tên đăng nhập" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200">
             </div>
-          </div>
-          ${isAdmin ? `<button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${m.id}" data-type="member">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>` : ''}
-        `;
-        ui.membersList.appendChild(item);
-      });
-      setupDeleteListeners();
-    }
+            <div class="w-full max-w-xs">
+                <input type="password" id="password-input" placeholder="Mật khẩu" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+            </div>
+            <button id="login-btn" class="w-full max-w-xs bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200">
+                Đăng nhập
+            </button>
+        </div>
 
-    // Navigation helpers
-    function showPrecincts() {
-      document.getElementById('precinct-list-section').classList.remove('hidden');
-      document.getElementById('household-list-section').classList.add('hidden');
-      document.getElementById('member-list-section').classList.add('hidden');
-      ui.householdCrumb.classList.add('hidden'); ui.memberCrumb.classList.add('hidden');
-      currentPrecinctId = null; currentPrecinctName = null; currentHouseholdId = null; currentHouseholdName = null;
-    }
+        <!-- Main Content (Hidden until login) -->
+        <div id="main-content" class="hidden">
+            <!-- User Info and Status -->
+            <div id="auth-section" class="bg-blue-100 text-blue-800 rounded-lg p-3 mb-6 flex items-center justify-between space-x-4">
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <div id="auth-status" class="text-sm font-medium">Xin chào, Quản trị viên!</div>
+                </div>
+                <button id="logout-btn" class="bg-red-600 text-white font-semibold py-1 px-4 rounded-lg hover:bg-red-700 transition-all duration-200">Đăng xuất</button>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <div class="flex border-b border-gray-200 mb-6">
+                <button id="tab-precincts" class="py-2 px-4 text-center font-medium text-lg text-gray-600 hover:text-blue-600 focus:outline-none focus:text-blue-600">Thôn/Buôn</button>
+                <button id="tab-subjects" class="py-2 px-4 text-center font-medium text-lg text-gray-600 hover:text-blue-600 focus:outline-none focus:text-blue-600">Đối tượng</button>
+            </div>
+            
+            <!-- Tab Content -->
+            <div id="tab-content">
+                <!-- Precincts and Households Section -->
+                <div id="precincts-tab" class="space-y-4">
+                    <!-- Breadcrumbs -->
+                    <nav class="flex items-center space-x-2 mb-4 text-sm font-medium text-gray-500">
+                        <a href="#" id="precinct-home-link" class="hover:text-blue-600">Thôn/Buôn</a>
+                        <span id="household-crumb" class="hidden">/ <a href="#" class="household-crumb-link hover:text-blue-600"></a></span>
+                        <span id="member-crumb" class="hidden">/ <span class="text-gray-700">Thành viên</span></span>
+                    </nav>
 
-    function showHouseholds(precinctId, precinctName) {
-      document.getElementById('precinct-list-section').classList.add('hidden');
-      document.getElementById('household-list-section').classList.remove('hidden');
-      document.getElementById('member-list-section').classList.add('hidden');
-      ui.householdListTitle.textContent = `Hộ gia đình tại Thôn ${precinctName}`;
-      ui.householdCrumb.classList.remove('hidden'); ui.householdCrumb.querySelector('a').textContent = precinctName;
-      currentPrecinctId = precinctId; currentPrecinctName = precinctName; currentHouseholdId = null; currentHouseholdName = null;
-      setupHouseholdsListener();
-    }
+                    <!-- Precinct List Section -->
+                    <div id="precinct-list-section">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-2xl font-semibold text-gray-700">Danh Sách Thôn/Buôn</h2>
+                        </div>
+                        <div id="precincts-list" class="space-y-4">
+                            <p class="text-center text-gray-500">Đang tải danh sách...</p>
+                        </div>
+                    </div>
 
-    function showMembers(householdId, householdName) {
-      document.getElementById('precinct-list-section').classList.add('hidden');
-      document.getElementById('household-list-section').classList.add('hidden');
-      document.getElementById('member-list-section').classList.remove('hidden');
-      ui.memberListTitle.textContent = `Thành viên Hộ ${householdName}`;
-      ui.memberCrumb.classList.remove('hidden');
-      currentHouseholdId = householdId; currentHouseholdName = householdName;
-      setupMembersListener();
-    }
+                    <!-- Household List Section -->
+                    <div id="household-list-section" class="hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 id="household-list-title" class="text-2xl font-semibold text-gray-700"></h2>
+                            <button id="add-household-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
+                                + Thêm Hộ gia đình
+                            </button>
+                        </div>
+                        <div id="households-list" class="space-y-4">
+                            <p class="text-center text-gray-500">Đang tải danh sách...</p>
+                        </div>
+                    </div>
 
-    // Delete handlers (admin-only)
-    function setupDeleteListeners() {
-      document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
-          event.stopPropagation();
-          const idToDelete = event.currentTarget.getAttribute('data-id');
-          const type = event.currentTarget.getAttribute('data-type');
-          handleDelete(idToDelete, type);
+                    <!-- Member List Section -->
+                    <div id="member-list-section" class="hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 id="member-list-title" class="text-2xl font-semibold text-gray-700"></h2>
+                            <button id="add-member-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
+                                + Thêm Thành viên
+                            </button>
+                        </div>
+                        <div id="members-list" class="space-y-4">
+                            <p class="text-center text-gray-500">Đang tải danh sách...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Subjects Management Section -->
+                <div id="subjects-tab" class="hidden">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Quản Lý Đối Tượng</h2>
+                    <div class="flex items-center justify-between mb-4">
+                        <input type="text" id="subject-search" placeholder="Tìm kiếm đối tượng..."
+                               class="w-full max-w-sm px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                        <button id="add-subject-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
+                            + Thêm Đối tượng
+                        </button>
+                    </div>
+                    <div id="subjects-list" class="space-y-4">
+                        <p class="text-center text-gray-500">Chưa có đối tượng nào.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Forms and Messages -->
+    <div id="modal" class="modal">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full">
+            <h3 id="modal-title" class="text-xl font-bold mb-4 text-center"></h3>
+            <div id="modal-content-area">
+                <!-- Forms and messages will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, deleteDoc, doc, getDocs, setDoc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables provided by the Canvas environment.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+        let app, db, auth;
+        let userId = null;
+        const ADMIN_USERNAME = "admin";
+        const ADMIN_PASSWORD = "admin123";
+
+        setLogLevel('debug');
+
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch (error) {
+            console.error("Lỗi khi khởi tạo Firebase:", error);
+            showModal("Lỗi", "Không thể kết nối đến hệ thống. Vui lòng thử lại sau.");
+        }
+
+        // --- Cấu trúc dữ liệu và UI Elements ---
+        let currentPrecinctId = null;
+        let currentPrecinctName = null;
+        let currentHouseholdId = null;
+        let currentHouseholdName = null;
+
+        const initialPrecincts = [
+            "buôn alê gŏ", "buôn dhu", "buôn ea kjoh a", "buôn ea kjoh b", "buôn hně", "buôn hnĕ",
+            "buôn klat a", "buôn klat b", "buôn klat c", "buôn kmiên", "buôn pheo", "buôn phieo",
+            "buôn sĭng a", "buôn sing a", "buôn tring 4", "buôn tung krăk", "buôn tung krắk",
+            "buôn trang", "buôn trăp", "t2b", "thôn 10", "thôn 1a", "thôn 1b", "thôn 2", "thôn 2a",
+            "thôn 2b", "thôn 3", "thôn 5", "thôn 6", "thôn 6a", "thôn 6b", "thôn 7", "thôn 8",
+            "thôn 9", "thôn đông xuân", "thôn ea kung", "thôn quyết thắng", "thôn tân hợp"
+        ];
+
+        const uiElements = {
+            loginSection: document.getElementById('login-section'),
+            mainContent: document.getElementById('main-content'),
+            precinctsTab: document.getElementById('precincts-tab'),
+            subjectsTab: document.getElementById('subjects-tab'),
+            precinctsList: document.getElementById('precincts-list'),
+            householdsList: document.getElementById('households-list'),
+            membersList: document.getElementById('members-list'),
+            precinctSection: document.getElementById('precinct-list-section'),
+            householdSection: document.getElementById('household-list-section'),
+            memberSection: document.getElementById('member-list-section'),
+            householdListTitle: document.getElementById('household-list-title'),
+            memberListTitle: document.getElementById('member-list-title'),
+            addHouseholdBtn: document.getElementById('add-household-btn'),
+            addMemberBtn: document.getElementById('add-member-btn'),
+            subjectsList: document.getElementById('subjects-list'),
+            addSubjectBtn: document.getElementById('add-subject-btn'),
+            subjectSearch: document.getElementById('subject-search'),
+        };
+
+        // --- Authentication ---
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const username = document.getElementById('username-input').value;
+            const password = document.getElementById('password-input').value;
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                try {
+                    // Sign in with a custom token if available, or anonymously for a simple setup
+                    // For this simple version, we will just show/hide the UI
+                    userId = 'admin';
+                    uiElements.loginSection.classList.add('hidden');
+                    uiElements.mainContent.classList.remove('hidden');
+                    setupFirestoreListeners();
+                } catch (error) {
+                    console.error("Lỗi đăng nhập:", error);
+                    showModal("Lỗi", "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+                }
+            } else {
+                showModal("Lỗi", "Sai tên đăng nhập hoặc mật khẩu.");
+            }
         });
-      });
-    }
+        
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            userId = null;
+            uiElements.loginSection.classList.remove('hidden');
+            uiElements.mainContent.classList.add('hidden');
+            showModal("Thông báo", "Đã đăng xuất thành công.");
+        });
 
-    async function handleDelete(idToDelete, type) {
-      if (!isAdmin) { showModal('Lỗi', 'Bạn không có quyền xóa mục này.'); return; }
-      try {
-        let path;
-        if (type === 'precinct') path = `artifacts/${appId}/public/data/precincts`;
-        else if (type === 'household') path = `artifacts/${appId}/public/data/precincts/${currentPrecinctId}/households`;
-        else if (type === 'member') path = `artifacts/${appId}/public/data/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`;
-        await deleteDoc(doc(db, path, idToDelete));
-        showModal('Thành công', `Đã xóa ${type} thành công.`);
-      } catch (e) {
-        console.error('Xóa lỗi:', e);
-        showModal('Lỗi', `Không thể xóa ${type}. Kiểm tra console.`);
-      }
-    }
-
-    // Add forms
-    function showAddForm(title, onSubmit) {
-      const modalContent = document.getElementById('modal-content-area');
-      modalContent.innerHTML = `
-        <form id="add-item-form" class="space-y-4">
-          <input type="text" id="item-name" placeholder="Nhập tên" required class="w-full px-4 py-3 border border-gray-300 rounded-lg" />
-          <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Thêm</button>
-        </form>
-      `;
-      document.getElementById('modal-title').textContent = title;
-      document.getElementById('modal').style.display = 'flex';
-      document.getElementById('add-item-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = document.getElementById('item-name').value.trim();
-        onSubmit(name);
-        document.getElementById('modal').style.display = 'none';
-      });
-    }
-
-    function showAddMemberForm() {
-      const modalContent = document.getElementById('modal-content-area');
-      modalContent.innerHTML = `
-        <form id="add-member-item-form" class="space-y-4">
-          <input type="text" id="member-name" placeholder="Nhập tên thành viên" required class="w-full px-4 py-3 border border-gray-300 rounded-lg" />
-          <input type="text" id="member-cccd" placeholder="Nhập số căn cước" required class="w-full px-4 py-3 border border-gray-300 rounded-lg" />
-          <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Thêm Thành viên</button>
-        </form>
-      `;
-      document.getElementById('modal-title').textContent = "Thêm Thành viên mới";
-      document.getElementById('modal').style.display = 'flex';
-      document.getElementById('add-member-item-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const name = document.getElementById('member-name').value.trim();
-        const cccd = document.getElementById('member-cccd').value.trim();
-        if (!name || !cccd) { showModal('Lỗi', 'Vui lòng điền đầy đủ thông tin.'); return; }
-        try {
-          const membersCollection = `artifacts/${appId}/public/data/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`;
-          await addDoc(collection(db, membersCollection), { name, cccd, creatorId: currentUserUid || 'anon', createdAt: new Date().toISOString() });
-          showModal('Thành công', 'Đã thêm thành viên thành công.');
-        } catch (err) {
-          console.error('Thêm thành viên lỗi:', err);
-          showModal('Lỗi', 'Không thể thêm thành viên (kiểm tra cấu hình).');
+        // --- Firestore Listeners và Render UI ---
+        async function initializeData() {
+            const precinctsCollectionRef = collection(db, `artifacts/${appId}/precincts`);
+            const snapshot = await getDocs(precinctsCollectionRef);
+            if (snapshot.empty) {
+                for (const precinctName of initialPrecincts) {
+                    await addDoc(precinctsCollectionRef, {
+                        name: precinctName,
+                        creatorId: 'initial_setup',
+                        createdAt: new Date().toISOString()
+                    });
+                }
+            }
         }
-        document.getElementById('modal').style.display = 'none';
-      });
-    }
-
-    // Login modals (mock)
-    function showLoginModal(title, onSubmit) {
-      const modalContent = document.getElementById('modal-content-area');
-      modalContent.innerHTML = `
-        <form id="login-form" class="space-y-4">
-          <input type="text" id="username-input" placeholder="Tên đăng nhập" required class="w-full px-4 py-3 border border-gray-300 rounded-lg" />
-          <input type="password" id="password-input" placeholder="Mật khẩu" required class="w-full px-4 py-3 border border-gray-300 rounded-lg" />
-          <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Đăng nhập</button>
-        </form>
-      `;
-      document.getElementById('modal-title').textContent = title;
-      document.getElementById('modal').style.display = 'flex';
-      document.getElementById('login-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const username = document.getElementById('username-input').value.trim();
-        const password = document.getElementById('password-input').value.trim();
-        onSubmit(username, password);
-        document.getElementById('modal').style.display = 'none';
-      });
-    }
-
-    // Login button events (mocked behaviour)
-    document.getElementById('admin-login-btn').addEventListener('click', () => {
-      showLoginModal('Đăng nhập Quản trị', (username, password) => {
-        if (username === ADMIN_ID && password === ADMIN_PASSWORD) {
-          isAdmin = true;
-          ui.authStatusEl.textContent = `Đã đăng nhập Quản trị (ID: ${ADMIN_ID})`;
-          ui.addPrecinctBtn.classList.remove('hidden');
-          ui.addHouseholdBtn.classList.remove('hidden');
-          ui.addMemberBtn.classList.remove('hidden');
-          showPrecincts();
-          setupPrecinctsListener(); // refresh
-          showModal('Thành công', 'Đăng nhập quản trị thành công (mock).');
-        } else {
-          showModal('Lỗi', 'Sai tên đăng nhập hoặc mật khẩu quản trị.');
+        
+        function setupFirestoreListeners() {
+            if (!db) return;
+            setupPrecinctsListener();
+            setupSubjectsListener();
         }
-      });
-    });
 
-    document.getElementById('cadre-login-btn').addEventListener('click', () => {
-      showLoginModal('Đăng nhập Cán bộ', (username, password) => {
-        const cadre = MOCK_CADRES[username];
-        if (cadre && cadre.password === password) {
-          isAdmin = false;
-          ui.authStatusEl.textContent = `Đã đăng nhập Cán bộ (Tên: ${cadre.name})`;
-          ui.addPrecinctBtn.classList.add('hidden');
-          ui.addHouseholdBtn.classList.add('hidden');
-          ui.addMemberBtn.classList.add('hidden');
-          // nếu muốn: giới hạn danh sách theo cadre.precincts
-          showModal('Thành công', 'Đăng nhập cán bộ thành công (mock).');
-        } else {
-          showModal('Lỗi', 'Sai tên đăng nhập hoặc mật khẩu cán bộ.');
+        function setupPrecinctsListener() {
+            const precinctsCollection = `artifacts/${appId}/precincts`;
+            onSnapshot(collection(db, precinctsCollection), (snapshot) => {
+                const precincts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                displayPrecincts(precincts);
+            }, (error) => {
+                console.error("Lỗi khi lắng nghe thôn/buôn:", error);
+                showModal("Lỗi", "Không thể tải danh sách thôn/buôn.");
+            });
         }
-      });
-    });
-
-    // UI event binding
-    ui.homeLink.addEventListener('click', (e) => { e.preventDefault(); showPrecincts(); });
-    document.querySelector('.household-crumb-link').addEventListener('click', (e) => { e.preventDefault(); showHouseholds(currentPrecinctId, currentPrecinctName); });
-
-    ui.addPrecinctBtn.addEventListener('click', () => {
-      if (!isAdmin) { showModal('Lỗi', 'Bạn không có quyền thêm thôn/buôn.'); return; }
-      showAddForm('Thêm Thôn/Buôn', async (name) => {
-        try {
-          await addDoc(collection(db, `artifacts/${appId}/public/data/precincts`), { name, creatorId: currentUserUid || 'admin-mock', createdAt: new Date().toISOString() });
-          showModal('Thành công', 'Đã thêm thôn/buôn thành công.');
-        } catch (e) {
-          console.error('Thêm thôn lỗi:', e);
-          showModal('Lỗi', 'Không thể thêm thôn/buôn (kiểm tra cấu hình).');
+        
+        function displayPrecincts(precincts) {
+            uiElements.precinctsList.innerHTML = '';
+            if (precincts.length === 0) {
+                uiElements.precinctsList.innerHTML = '<p class="text-center text-gray-500">Chưa có thôn/buôn nào.</p>';
+            }
+            precincts.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'bg-gray-50 rounded-lg p-4 shadow-sm flex items-center justify-between transition-colors duration-200 hover:bg-gray-100 cursor-pointer';
+                item.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        <span class="text-lg font-medium editable" data-id="${p.id}" data-type="precinct">${p.name}</span>
+                    </div>
+                    <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${p.id}" data-type="precinct">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                item.querySelector('.flex').addEventListener('click', () => showHouseholds(p.id, p.name));
+                uiElements.precinctsList.appendChild(item);
+            });
+            setupEditableFields();
+            setupDeleteListeners();
         }
-      });
-    });
 
-    ui.addHouseholdBtn.addEventListener('click', () => {
-      if (!isAdmin) { showModal('Lỗi', 'Bạn không có quyền thêm hộ gia đình.'); return; }
-      showAddForm('Thêm Hộ gia đình', async (name) => {
-        try {
-          const path = `artifacts/${appId}/public/data/precincts/${currentPrecinctId}/households`;
-          await addDoc(collection(db, path), { name, creatorId: currentUserUid || 'admin-mock', createdAt: new Date().toISOString() });
-          showModal('Thành công', 'Đã thêm hộ gia đình thành công.');
-        } catch (e) {
-          console.error('Thêm hộ lỗi:', e);
-          showModal('Lỗi', 'Không thể thêm hộ gia đình (kiểm tra cấu hình).');
+        function setupHouseholdsListener() {
+            const householdsCollection = `artifacts/${appId}/precincts/${currentPrecinctId}/households`;
+            onSnapshot(collection(db, householdsCollection), (snapshot) => {
+                const households = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                displayHouseholds(households);
+            }, (error) => {
+                console.error("Lỗi khi lắng nghe hộ gia đình:", error);
+                showModal("Lỗi", "Không thể tải danh sách hộ gia đình.");
+            });
         }
-      });
-    });
+        
+        function displayHouseholds(households) {
+            uiElements.householdsList.innerHTML = '';
+            if (households.length === 0) {
+                uiElements.householdsList.innerHTML = '<p class="text-center text-gray-500">Chưa có hộ gia đình nào trong thôn này.</p>';
+            }
+            households.forEach(h => {
+                const item = document.createElement('div');
+                item.className = 'bg-gray-50 rounded-lg p-4 shadow-sm flex items-center justify-between transition-colors duration-200 hover:bg-gray-100 cursor-pointer';
+                item.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2m14 0V9a2 2 0 00-2-2H7a2 2 0 00-2 2v2m14 0a2 2 0 01-2 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2m14 0V9a2 2 0 00-2-2H7a2 2 0 00-2 2v2" />
+                        </svg>
+                        <span class="text-lg font-medium editable" data-id="${h.id}" data-type="household">${h.name}</span>
+                    </div>
+                    <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${h.id}" data-type="household">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                item.querySelector('.flex').addEventListener('click', () => showMembers(h.id, h.name));
+                uiElements.householdsList.appendChild(item);
+            });
+            setupEditableFields();
+            setupDeleteListeners();
+        }
 
-    ui.addMemberBtn.addEventListener('click', () => {
-      if (!isAdmin) { showModal('Lỗi', 'Bạn không có quyền thêm thành viên.'); return; }
-      showAddMemberForm();
-    });
+        function setupMembersListener() {
+            const membersCollection = `artifacts/${appId}/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`;
+            onSnapshot(collection(db, membersCollection), (snapshot) => {
+                const members = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                displayMembers(members);
+            }, (error) => {
+                console.error("Lỗi khi lắng nghe thành viên:", error);
+                showModal("Lỗi", "Không thể tải danh sách thành viên.");
+            });
+        }
 
-    // Khởi tạo dữ liệu nếu cần (chỉ khi Firestore cho phép đọc/ghi)
-    window.addEventListener('load', async () => {
-      await initializePrecincts();
-    });
+        function displayMembers(members) {
+            uiElements.membersList.innerHTML = '';
+            if (members.length === 0) {
+                uiElements.membersList.innerHTML = '<p class="text-center text-gray-500">Chưa có thành viên nào trong hộ này.</p>';
+            }
+            members.forEach(m => {
+                const item = document.createElement('div');
+                item.className = 'bg-gray-50 rounded-lg p-4 shadow-sm flex items-center justify-between';
+                item.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-6 0H6"/>
+                        </svg>
+                        <div>
+                            <span class="text-lg font-medium editable" data-id="${m.id}" data-type="member" data-field="name">${m.name}</span>
+                            <p class="text-sm text-gray-600">CCCD: <span class="editable" data-id="${m.id}" data-type="member" data-field="cccd">${m.cccd}</span></p>
+                        </div>
+                    </div>
+                    <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${m.id}" data-type="member">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                item.addEventListener('click', (event) => { event.stopPropagation(); });
+                uiElements.membersList.appendChild(item);
+            });
+            setupEditableFields();
+            setupDeleteListeners();
+        }
+        
+        function setupSubjectsListener() {
+            const subjectsCollection = `artifacts/${appId}/subjects`;
+            onSnapshot(collection(db, subjectsCollection), (snapshot) => {
+                let subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                const searchTerm = uiElements.subjectSearch.value.toLowerCase();
+                if (searchTerm) {
+                    subjects = subjects.filter(s => s.name.toLowerCase().includes(searchTerm) || s.description.toLowerCase().includes(searchTerm));
+                }
+                
+                displaySubjects(subjects);
+            }, (error) => {
+                console.error("Lỗi khi lắng nghe đối tượng:", error);
+                showModal("Lỗi", "Không thể tải danh sách đối tượng.");
+            });
+        }
+        
+        function displaySubjects(subjects) {
+            uiElements.subjectsList.innerHTML = '';
+            if (subjects.length === 0) {
+                uiElements.subjectsList.innerHTML = '<p class="text-center text-gray-500">Chưa có đối tượng nào.</p>';
+            }
+            subjects.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'bg-gray-50 rounded-lg p-4 shadow-sm flex items-start justify-between transition-colors duration-200 hover:bg-gray-100 cursor-pointer';
+                item.innerHTML = `
+                    <div class="flex-1 space-y-2">
+                        <div class="flex items-center space-x-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span class="text-lg font-medium editable" data-id="${s.id}" data-type="subject" data-field="name">${s.name}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 editable" data-id="${s.id}" data-type="subject" data-field="description">${s.description || 'Chưa có mô tả.'}</p>
+                        <div class="space-y-1 mt-2">
+                            <h4 class="text-xs font-semibold text-gray-500">Diễn biến:</h4>
+                            <div class="text-xs text-gray-500 space-y-1" id="events-${s.id}">
+                                ${s.events?.map(event => `<div class="flex justify-between items-center bg-gray-100 p-2 rounded-md"><span>${event.text}</span><button class="delete-event-btn text-red-400 hover:text-red-600" data-subject-id="${s.id}" data-event-text="${event.text}">&times;</button></div>`).join('') || 'Chưa có diễn biến.'}
+                            </div>
+                            <button class="add-event-btn text-blue-500 hover:text-blue-700 text-xs mt-1" data-id="${s.id}">+ Thêm diễn biến</button>
+                        </div>
+                    </div>
+                    <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${s.id}" data-type="subject">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                item.addEventListener('click', (event) => { event.stopPropagation(); });
+                uiElements.subjectsList.appendChild(item);
+            });
+            setupEditableFields();
+            setupDeleteListeners();
+        }
 
-  </script>
 
+        // --- Chuyển đổi giao diện ---
+        function showPrecincts() {
+            uiElements.precinctSection.classList.remove('hidden');
+            uiElements.householdSection.classList.add('hidden');
+            uiElements.memberSection.classList.add('hidden');
+            document.getElementById('household-crumb').classList.add('hidden');
+            document.getElementById('member-crumb').classList.add('hidden');
+            currentPrecinctId = null;
+            currentPrecinctName = null;
+            currentHouseholdId = null;
+            currentHouseholdName = null;
+        }
+
+        function showHouseholds(precinctId, precinctName) {
+            uiElements.precinctSection.classList.add('hidden');
+            uiElements.householdSection.classList.remove('hidden');
+            uiElements.memberSection.classList.add('hidden');
+            
+            uiElements.householdListTitle.textContent = `Hộ gia đình tại Thôn ${precinctName}`;
+            document.getElementById('household-crumb').classList.remove('hidden');
+            document.querySelector('.household-crumb-link').textContent = precinctName;
+            document.getElementById('member-crumb').classList.add('hidden');
+            
+            currentPrecinctId = precinctId;
+            currentPrecinctName = precinctName;
+            currentHouseholdId = null;
+            currentHouseholdName = null;
+            
+            setupHouseholdsListener();
+        }
+
+        function showMembers(householdId, householdName) {
+            uiElements.precinctSection.classList.add('hidden');
+            uiElements.householdSection.classList.add('hidden');
+            uiElements.memberSection.classList.remove('hidden');
+            
+            uiElements.memberListTitle.textContent = `Thành viên Hộ ${householdName}`;
+            document.getElementById('member-crumb').classList.remove('hidden');
+            
+            currentHouseholdId = householdId;
+            currentHouseholdName = householdName;
+            
+            setupMembersListener();
+        }
+        
+        // --- Xử lý Đăng nhập, Thêm và Xóa ---
+        document.getElementById('precinct-home-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPrecincts();
+        });
+
+        document.querySelector('.household-crumb-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showHouseholds(currentPrecinctId, currentPrecinctName);
+        });
+        
+        document.getElementById('add-household-btn').addEventListener('click', () => {
+            showAddForm("Thêm Hộ gia đình", (name) => {
+                const householdsCollection = `artifacts/${appId}/precincts/${currentPrecinctId}/households`;
+                addDoc(collection(db, householdsCollection), { name, creatorId: userId, createdAt: new Date().toISOString() })
+                    .then(() => showModal("Thành công", "Đã thêm hộ gia đình thành công."))
+                    .catch(error => { console.error("Lỗi thêm hộ gia đình:", error); showModal("Lỗi", "Không thể thêm hộ gia đình."); });
+            });
+        });
+
+        document.getElementById('add-member-btn').addEventListener('click', () => {
+            showAddMemberForm();
+        });
+        
+        document.getElementById('add-subject-btn').addEventListener('click', () => {
+            showAddSubjectForm();
+        });
+
+        function showAddForm(title, onSubmit) {
+            const modalContent = document.getElementById('modal-content-area');
+            modalContent.innerHTML = `
+                <form id="add-item-form" class="space-y-4">
+                    <input type="text" id="item-name" placeholder="Nhập tên" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200">
+                        Thêm
+                    </button>
+                </form>
+            `;
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal').style.display = 'flex';
+            
+            document.getElementById('add-item-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('item-name').value;
+                if (!name) return;
+                onSubmit(name);
+                document.getElementById('modal').style.display = 'none';
+            });
+        }
+        
+        function showAddMemberForm() {
+            const modalContent = document.getElementById('modal-content-area');
+            modalContent.innerHTML = `
+                <form id="add-member-item-form" class="space-y-4">
+                    <input type="text" id="member-name" placeholder="Nhập tên thành viên" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                    <input type="text" id="member-cccd" placeholder="Nhập số căn cước" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200">
+                        Thêm Thành viên
+                    </button>
+                </form>
+            `;
+            document.getElementById('modal-title').textContent = "Thêm Thành viên mới";
+            document.getElementById('modal').style.display = 'flex';
+            
+            document.getElementById('add-member-item-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('member-name').value;
+                const cccd = document.getElementById('member-cccd').value;
+                if (!name || !cccd) { showModal("Lỗi", "Vui lòng điền đầy đủ thông tin."); return; }
+                
+                const membersCollection = `artifacts/${appId}/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`;
+                addDoc(collection(db, membersCollection), { name, cccd, creatorId: userId, createdAt: new Date().toISOString() })
+                    .then(() => showModal("Thành công", "Đã thêm thành viên thành công."))
+                    .catch(error => { console.error("Lỗi thêm thành viên:", error); showModal("Lỗi", "Không thể thêm thành viên."); });
+                document.getElementById('modal').style.display = 'none';
+            });
+        }
+        
+        function showAddSubjectForm() {
+            const modalContent = document.getElementById('modal-content-area');
+            modalContent.innerHTML = `
+                <form id="add-subject-item-form" class="space-y-4">
+                    <input type="text" id="subject-name" placeholder="Tên đối tượng" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                    <textarea id="subject-description" rows="3" placeholder="Mô tả"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"></textarea>
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200">
+                        Thêm Đối tượng
+                    </button>
+                </form>
+            `;
+            document.getElementById('modal-title').textContent = "Thêm Đối tượng mới";
+            document.getElementById('modal').style.display = 'flex';
+            
+            document.getElementById('add-subject-item-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('subject-name').value;
+                const description = document.getElementById('subject-description').value;
+                if (!name) { showModal("Lỗi", "Vui lòng nhập tên đối tượng."); return; }
+                
+                const subjectsCollection = `artifacts/${appId}/subjects`;
+                addDoc(collection(db, subjectsCollection), { name, description, creatorId: userId, createdAt: new Date().toISOString(), events: [] })
+                    .then(() => showModal("Thành công", "Đã thêm đối tượng thành công."))
+                    .catch(error => { console.error("Lỗi thêm đối tượng:", error); showModal("Lỗi", "Không thể thêm đối tượng."); });
+                document.getElementById('modal').style.display = 'none';
+            });
+        }
+        
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('add-event-btn')) {
+                const subjectId = e.target.getAttribute('data-id');
+                showAddEventForm(subjectId);
+            }
+            if (e.target.classList.contains('delete-event-btn')) {
+                const subjectId = e.target.getAttribute('data-subject-id');
+                const eventText = e.target.getAttribute('data-event-text');
+                handleDeleteEvent(subjectId, eventText);
+            }
+        });
+        
+        function showAddEventForm(subjectId) {
+            const modalContent = document.getElementById('modal-content-area');
+            modalContent.innerHTML = `
+                <form id="add-event-form" class="space-y-4">
+                    <input type="text" id="event-text" placeholder="Nhập diễn biến" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200">
+                        Thêm diễn biến
+                    </button>
+                </form>
+            `;
+            document.getElementById('modal-title').textContent = "Thêm Diễn biến mới";
+            document.getElementById('modal').style.display = 'flex';
+            
+            document.getElementById('add-event-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const eventText = document.getElementById('event-text').value;
+                if (!eventText) return;
+                
+                try {
+                    const subjectRef = doc(db, `artifacts/${appId}/subjects`, subjectId);
+                    const subjectDoc = await getDoc(subjectRef);
+                    if (subjectDoc.exists()) {
+                        const data = subjectDoc.data();
+                        const newEvents = data.events || [];
+                        newEvents.push({ text: eventText, timestamp: new Date().toISOString() });
+                        await updateDoc(subjectRef, { events: newEvents });
+                        showModal("Thành công", "Đã thêm diễn biến thành công.");
+                    }
+                } catch (error) {
+                    console.error("Lỗi khi thêm diễn biến:", error);
+                    showModal("Lỗi", "Không thể thêm diễn biến.");
+                }
+                document.getElementById('modal').style.display = 'none';
+            });
+        }
+
+        async function handleDeleteEvent(subjectId, eventText) {
+            try {
+                const subjectRef = doc(db, `artifacts/${appId}/subjects`, subjectId);
+                const subjectDoc = await getDoc(subjectRef);
+                if (subjectDoc.exists()) {
+                    const data = subjectDoc.data();
+                    const newEvents = data.events.filter(event => event.text !== eventText);
+                    await updateDoc(subjectRef, { events: newEvents });
+                    showModal("Thành công", "Đã xóa diễn biến thành công.");
+                }
+            } catch (error) {
+                console.error("Lỗi khi xóa diễn biến:", error);
+                showModal("Lỗi", "Không thể xóa diễn biến.");
+            }
+        }
+        
+        function setupDeleteListeners() {
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const idToDelete = event.currentTarget.getAttribute('data-id');
+                    const type = event.currentTarget.getAttribute('data-type');
+                    handleDelete(idToDelete, type);
+                });
+            });
+        }
+        
+        async function handleDelete(idToDelete, type) {
+            let collectionPath;
+            if (type === 'precinct') {
+                collectionPath = `artifacts/${appId}/precincts`;
+            } else if (type === 'household') {
+                collectionPath = `artifacts/${appId}/precincts/${currentPrecinctId}/households`;
+            } else if (type === 'member') {
+                collectionPath = `artifacts/${appId}/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`;
+            } else if (type === 'subject') {
+                collectionPath = `artifacts/${appId}/subjects`;
+            }
+            
+            try {
+                await deleteDoc(doc(db, collectionPath, idToDelete));
+                showModal("Thành công", `Đã xóa ${type} thành công.`);
+            } catch (error) {
+                console.error("Lỗi khi xóa:", error);
+                showModal("Lỗi", `Không thể xóa ${type}. Vui lòng thử lại.`);
+            }
+        }
+        
+        function setupEditableFields() {
+            document.querySelectorAll('.editable').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const originalText = e.target.textContent;
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = originalText;
+                    input.className = 'w-full px-2 py-1 border rounded';
+                    
+                    e.target.replaceWith(input);
+                    input.focus();
+                    
+                    const updateData = async () => {
+                        const newValue = input.value;
+                        if (newValue === originalText || !newValue.trim()) {
+                            input.replaceWith(e.target);
+                            return;
+                        }
+                        
+                        const id = e.target.getAttribute('data-id');
+                        const type = e.target.getAttribute('data-type');
+                        const field = e.target.getAttribute('data-field') || 'name';
+                        
+                        let docRef;
+                        if (type === 'precinct') {
+                            docRef = doc(db, `artifacts/${appId}/precincts`, id);
+                        } else if (type === 'household') {
+                            docRef = doc(db, `artifacts/${appId}/precincts/${currentPrecinctId}/households`, id);
+                        } else if (type === 'member') {
+                            docRef = doc(db, `artifacts/${appId}/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`, id);
+                        } else if (type === 'subject') {
+                             docRef = doc(db, `artifacts/${appId}/subjects`, id);
+                        }
+
+                        try {
+                            await updateDoc(docRef, { [field]: newValue });
+                            e.target.textContent = newValue;
+                            showModal("Thành công", "Đã cập nhật thành công.");
+                        } catch (error) {
+                            console.log("Lỗi cập nhật:", error);
+                            showModal("Lỗi", "Không thể cập nhật. Vui lòng thử lại.");
+                            e.target.textContent = originalText;
+                        }
+                        input.replaceWith(e.target);
+                    };
+                    
+                    input.addEventListener('blur', updateData);
+                    input.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter') {
+                            input.blur();
+                        }
+                    });
+                });
+            });
+        }
+
+
+        // --- Tab Navigation ---
+        document.getElementById('tab-precincts').addEventListener('click', () => {
+            uiElements.precinctsTab.classList.remove('hidden');
+            uiElements.subjectsTab.classList.add('hidden');
+        });
+        
+        document.getElementById('tab-subjects').addEventListener('click', () => {
+            uiElements.precinctsTab.classList.add('hidden');
+            uiElements.subjectsTab.classList.remove('hidden');
+        });
+        
+        uiElements.subjectSearch.addEventListener('input', setupSubjectsListener);
+
+        // --- Modal Control ---
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            const contentArea = document.getElementById('modal-content-area');
+            contentArea.innerHTML = `<p class="text-gray-700 mb-6">${message}</p>
+                                     <button id="modal-close-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition-all duration-200">Đóng</button>`;
+            modal.style.display = 'flex';
+            document.getElementById('modal-close-btn').addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+        }
+        
+        // Khởi tạo dữ liệu khi ứng dụng khởi chạy
+        window.onload = initializeData;
+        
+    </script>
 </body>
 </html>
