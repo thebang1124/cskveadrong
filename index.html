@@ -27,25 +27,37 @@
         .hidden {
             display: none;
         }
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+            border-bottom-width: 2px;
+            border-bottom-color: transparent;
+        }
+        .tab-button:hover {
+            color: #4f46e5;
+        }
+        .tab-button.active {
+            color: #4f46e5;
+            border-bottom-color: #4f46e5;
+        }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+<body class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
 
     <!-- Main Container -->
     <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-4xl mx-auto">
-        <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">Hệ Thống Quản Lý Địa Bàn & Đối Tượng</h1>
-        <p class="text-center text-gray-600 mb-6">Quản lý các Thôn, Hộ, Thành viên và Đối tượng.</p>
+        <h1 class="text-4xl font-bold text-center text-slate-800 mb-2">Hệ Thống Quản Lý Địa Bàn & Đối Tượng</h1>
+        <p class="text-center text-slate-600 mb-6">Quản lý các Thôn, Hộ, Thành viên và Đối tượng.</p>
 
         <!-- Login Section -->
         <div id="login-section" class="flex flex-col items-center space-y-4">
-            <h2 class="text-2xl font-semibold text-gray-700">Đăng nhập</h2>
+            <h2 class="text-2xl font-semibold text-slate-700">Đăng nhập</h2>
             <div class="w-full max-w-xs">
-                <input type="text" id="username-input" placeholder="Tên đăng nhập" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                <input type="text" id="username-input" placeholder="Tên đăng nhập" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
             </div>
             <div class="w-full max-w-xs">
-                <input type="password" id="password-input" placeholder="Mật khẩu" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                <input type="password" id="password-input" placeholder="Mật khẩu" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
             </div>
-            <button id="login-btn" class="w-full max-w-xs bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200">
+            <button id="login-btn" class="w-full max-w-xs bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
                 Đăng nhập
             </button>
         </div>
@@ -53,7 +65,7 @@
         <!-- Main Content (Hidden until login) -->
         <div id="main-content" class="hidden">
             <!-- User Info and Status -->
-            <div id="auth-section" class="bg-blue-100 text-blue-800 rounded-lg p-3 mb-6 flex items-center justify-between space-x-4">
+            <div id="auth-section" class="bg-indigo-100 text-indigo-800 rounded-lg p-3 mb-6 flex items-center justify-between space-x-4">
                 <div class="flex items-center space-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -64,71 +76,99 @@
             </div>
             
             <!-- Navigation Tabs -->
-            <div class="flex border-b border-gray-200 mb-6">
-                <button id="tab-precincts" class="py-2 px-4 text-center font-medium text-lg text-gray-600 hover:text-blue-600 focus:outline-none focus:text-blue-600">Thôn/Buôn</button>
-                <button id="tab-subjects" class="py-2 px-4 text-center font-medium text-lg text-gray-600 hover:text-blue-600 focus:outline-none focus:text-blue-600">Đối tượng</button>
+            <div class="flex border-b border-slate-200 mb-6 space-x-4">
+                <button id="tab-precincts" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600 active">Địa bàn</button>
+                <button id="tab-subjects" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Đối tượng</button>
+                <button id="tab-incidents" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Vụ việc</button>
+                <button id="tab-images" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Hình ảnh</button>
             </div>
             
             <!-- Tab Content -->
             <div id="tab-content">
                 <!-- Precincts and Households Section -->
-                <div id="precincts-tab" class="space-y-4">
+                <div id="precincts-tab-content">
                     <!-- Breadcrumbs -->
-                    <nav class="flex items-center space-x-2 mb-4 text-sm font-medium text-gray-500">
-                        <a href="#" id="precinct-home-link" class="hover:text-blue-600">Thôn/Buôn</a>
-                        <span id="household-crumb" class="hidden">/ <a href="#" class="household-crumb-link hover:text-blue-600"></a></span>
-                        <span id="member-crumb" class="hidden">/ <span class="text-gray-700">Thành viên</span></span>
+                    <nav class="flex items-center space-x-2 mb-4 text-sm font-medium text-slate-500">
+                        <a href="#" id="precinct-home-link" class="hover:text-indigo-600">Thôn/Buôn</a>
+                        <span id="household-crumb" class="hidden">/ <a href="#" class="household-crumb-link hover:text-indigo-600"></a></span>
+                        <span id="member-crumb" class="hidden">/ <span class="text-slate-700">Thành viên</span></span>
                     </nav>
 
                     <!-- Precinct List Section -->
                     <div id="precinct-list-section">
                         <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-2xl font-semibold text-gray-700">Danh Sách Thôn/Buôn</h2>
+                            <h2 class="text-2xl font-semibold text-slate-700">Danh Sách Thôn/Buôn</h2>
                         </div>
                         <div id="precincts-list" class="space-y-4">
-                            <p class="text-center text-gray-500">Đang tải danh sách...</p>
+                            <p class="text-center text-slate-500">Đang tải danh sách...</p>
                         </div>
                     </div>
 
                     <!-- Household List Section -->
                     <div id="household-list-section" class="hidden">
                         <div class="flex items-center justify-between mb-4">
-                            <h2 id="household-list-title" class="text-2xl font-semibold text-gray-700"></h2>
+                            <h2 id="household-list-title" class="text-2xl font-semibold text-slate-700"></h2>
                             <button id="add-household-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
                                 + Thêm Hộ gia đình
                             </button>
                         </div>
                         <div id="households-list" class="space-y-4">
-                            <p class="text-center text-gray-500">Đang tải danh sách...</p>
+                            <p class="text-center text-slate-500">Đang tải danh sách...</p>
                         </div>
                     </div>
 
                     <!-- Member List Section -->
                     <div id="member-list-section" class="hidden">
                         <div class="flex items-center justify-between mb-4">
-                            <h2 id="member-list-title" class="text-2xl font-semibold text-gray-700"></h2>
+                            <h2 id="member-list-title" class="text-2xl font-semibold text-slate-700"></h2>
                             <button id="add-member-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
                                 + Thêm Thành viên
                             </button>
                         </div>
                         <div id="members-list" class="space-y-4">
-                            <p class="text-center text-gray-500">Đang tải danh sách...</p>
+                            <p class="text-center text-slate-500">Đang tải danh sách...</p>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Subjects Management Section -->
-                <div id="subjects-tab" class="hidden">
-                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Quản Lý Đối Tượng</h2>
+                <div id="subjects-tab-content" class="hidden">
+                    <h2 class="text-2xl font-semibold text-slate-700 mb-4">Quản Lý Đối Tượng</h2>
                     <div class="flex items-center justify-between mb-4">
                         <input type="text" id="subject-search" placeholder="Tìm kiếm đối tượng..."
-                               class="w-full max-w-sm px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                               class="w-full max-w-sm px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
                         <button id="add-subject-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
                             + Thêm Đối tượng
                         </button>
                     </div>
                     <div id="subjects-list" class="space-y-4">
-                        <p class="text-center text-gray-500">Chưa có đối tượng nào.</p>
+                        <p class="text-center text-slate-500">Chưa có đối tượng nào.</p>
+                    </div>
+                </div>
+
+                <!-- Incidents Management Section -->
+                <div id="incidents-tab-content" class="hidden">
+                    <h2 class="text-2xl font-semibold text-slate-700 mb-4">Quản Lý Vụ Việc Mâu Thuẫn</h2>
+                    <div class="flex items-center justify-between mb-4">
+                        <button id="add-incident-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
+                            + Thêm Vụ việc
+                        </button>
+                    </div>
+                    <div id="incidents-list" class="space-y-4">
+                        <p class="text-center text-slate-500">Chưa có vụ việc nào.</p>
+                    </div>
+                </div>
+
+                <!-- Images Management Section -->
+                <div id="images-tab-content" class="hidden">
+                    <h2 class="text-2xl font-semibold text-slate-700 mb-4">Quản Lý Hình Ảnh Khu Vực</h2>
+                    <div class="flex items-center justify-between mb-4">
+                        <button id="add-image-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
+                            + Thêm Hình ảnh
+                        </button>
+                    </div>
+                    <div id="images-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <p class="text-center text-slate-500 col-span-full">Chưa có hình ảnh nào.</p>
                     </div>
                 </div>
             </div>
@@ -149,16 +189,18 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, deleteDoc, doc, getDocs, setDoc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, deleteDoc, doc, getDocs, setDoc, getDoc, setLogLevel, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         // Global variables provided by the Canvas environment.
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
-        let app, db, auth;
+        let app, db, auth, storage;
         let userId = null;
         const ADMIN_USERNAME = "admin";
         const ADMIN_PASSWORD = "admin123";
+        const adminUid = "admin_uid_placeholder";
 
         setLogLevel('debug');
 
@@ -166,6 +208,7 @@
             app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
+            storage = getStorage(app);
         } catch (error) {
             console.error("Lỗi khi khởi tạo Firebase:", error);
             showModal("Lỗi", "Không thể kết nối đến hệ thống. Vui lòng thử lại sau.");
@@ -185,12 +228,15 @@
             "thôn 2b", "thôn 3", "thôn 5", "thôn 6", "thôn 6a", "thôn 6b", "thôn 7", "thôn 8",
             "thôn 9", "thôn đông xuân", "thôn ea kung", "thôn quyết thắng", "thôn tân hợp"
         ];
-
+        
         const uiElements = {
             loginSection: document.getElementById('login-section'),
             mainContent: document.getElementById('main-content'),
-            precinctsTab: document.getElementById('precincts-tab'),
-            subjectsTab: document.getElementById('subjects-tab'),
+            tabButtons: document.querySelectorAll('.tab-button'),
+            precinctsTabContent: document.getElementById('precincts-tab-content'),
+            subjectsTabContent: document.getElementById('subjects-tab-content'),
+            incidentsTabContent: document.getElementById('incidents-tab-content'),
+            imagesTabContent: document.getElementById('images-tab-content'),
             precinctsList: document.getElementById('precincts-list'),
             householdsList: document.getElementById('households-list'),
             membersList: document.getElementById('members-list'),
@@ -204,6 +250,10 @@
             subjectsList: document.getElementById('subjects-list'),
             addSubjectBtn: document.getElementById('add-subject-btn'),
             subjectSearch: document.getElementById('subject-search'),
+            incidentsList: document.getElementById('incidents-list'),
+            addIncidentBtn: document.getElementById('add-incident-btn'),
+            imagesList: document.getElementById('images-list'),
+            addImageBtn: document.getElementById('add-image-btn'),
         };
 
         // --- Authentication ---
@@ -211,17 +261,10 @@
             const username = document.getElementById('username-input').value;
             const password = document.getElementById('password-input').value;
             if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                try {
-                    // Sign in with a custom token if available, or anonymously for a simple setup
-                    // For this simple version, we will just show/hide the UI
-                    userId = 'admin';
-                    uiElements.loginSection.classList.add('hidden');
-                    uiElements.mainContent.classList.remove('hidden');
-                    setupFirestoreListeners();
-                } catch (error) {
-                    console.error("Lỗi đăng nhập:", error);
-                    showModal("Lỗi", "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
-                }
+                userId = adminUid;
+                uiElements.loginSection.classList.add('hidden');
+                uiElements.mainContent.classList.remove('hidden');
+                setupFirestoreListeners();
             } else {
                 showModal("Lỗi", "Sai tên đăng nhập hoặc mật khẩu.");
             }
@@ -236,16 +279,21 @@
 
         // --- Firestore Listeners và Render UI ---
         async function initializeData() {
-            const precinctsCollectionRef = collection(db, `artifacts/${appId}/precincts`);
-            const snapshot = await getDocs(precinctsCollectionRef);
-            if (snapshot.empty) {
-                for (const precinctName of initialPrecincts) {
-                    await addDoc(precinctsCollectionRef, {
-                        name: precinctName,
-                        creatorId: 'initial_setup',
-                        createdAt: new Date().toISOString()
-                    });
+            try {
+                const adminCollectionRef = collection(db, `artifacts/${appId}/users/${adminUid}/precincts`);
+                const snapshot = await getDocs(adminCollectionRef);
+                
+                if (snapshot.empty) {
+                    for (const precinctName of initialPrecincts) {
+                        await addDoc(adminCollectionRef, {
+                            name: precinctName,
+                            creatorId: 'initial_setup',
+                            createdAt: new Date().toISOString()
+                        });
+                    }
                 }
+            } catch (error) {
+                console.error("Lỗi khi khởi tạo dữ liệu:", error);
             }
         }
         
@@ -253,11 +301,13 @@
             if (!db) return;
             setupPrecinctsListener();
             setupSubjectsListener();
+            setupIncidentsListener();
+            setupImagesListener();
         }
 
         function setupPrecinctsListener() {
-            const precinctsCollection = `artifacts/${appId}/precincts`;
-            onSnapshot(collection(db, precinctsCollection), (snapshot) => {
+            const precinctsCollection = `artifacts/${appId}/users/${adminUid}/precincts`;
+            onSnapshot(query(collection(db, precinctsCollection)), (snapshot) => {
                 const precincts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 displayPrecincts(precincts);
             }, (error) => {
@@ -266,20 +316,41 @@
             });
         }
         
-        function displayPrecincts(precincts) {
+        async function displayPrecincts(precincts) {
             uiElements.precinctsList.innerHTML = '';
             if (precincts.length === 0) {
-                uiElements.precinctsList.innerHTML = '<p class="text-center text-gray-500">Chưa có thôn/buôn nào.</p>';
+                uiElements.precinctsList.innerHTML = '<p class="text-center text-slate-500">Chưa có thôn/buôn nào.</p>';
+                return;
             }
-            precincts.forEach(p => {
+            
+            // Wait for all sub-collection counts to be fetched
+            const precinctsWithCounts = await Promise.all(precincts.map(async p => {
+                const householdsRef = collection(db, `artifacts/${appId}/users/${adminUid}/precincts/${p.id}/households`);
+                const householdsSnapshot = await getDocs(householdsRef);
+                const householdsCount = householdsSnapshot.size;
+                
+                let membersCount = 0;
+                for (const hDoc of householdsSnapshot.docs) {
+                    const membersRef = collection(db, `artifacts/${appId}/users/${adminUid}/precincts/${p.id}/households/${hDoc.id}/members`);
+                    const membersSnapshot = await getDocs(membersRef);
+                    membersCount += membersSnapshot.size;
+                }
+                
+                return { ...p, householdsCount, membersCount };
+            }));
+
+            precinctsWithCounts.forEach(p => {
                 const item = document.createElement('div');
-                item.className = 'bg-gray-50 rounded-lg p-4 shadow-sm flex items-center justify-between transition-colors duration-200 hover:bg-gray-100 cursor-pointer';
+                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-center justify-between transition-colors duration-200 hover:bg-slate-100 cursor-pointer';
                 item.innerHTML = `
                     <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                         </svg>
                         <span class="text-lg font-medium editable" data-id="${p.id}" data-type="precinct">${p.name}</span>
+                    </div>
+                    <div class="text-sm text-slate-500 text-right">
+                        <span>Hộ: ${p.householdsCount} | Thành viên: ${p.membersCount}</span>
                     </div>
                     <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${p.id}" data-type="precinct">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -295,7 +366,7 @@
         }
 
         function setupHouseholdsListener() {
-            const householdsCollection = `artifacts/${appId}/precincts/${currentPrecinctId}/households`;
+            const householdsCollection = `artifacts/${appId}/users/${adminUid}/precincts/${currentPrecinctId}/households`;
             onSnapshot(collection(db, householdsCollection), (snapshot) => {
                 const households = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 displayHouseholds(households);
@@ -305,20 +376,31 @@
             });
         }
         
-        function displayHouseholds(households) {
+        async function displayHouseholds(households) {
             uiElements.householdsList.innerHTML = '';
             if (households.length === 0) {
-                uiElements.householdsList.innerHTML = '<p class="text-center text-gray-500">Chưa có hộ gia đình nào trong thôn này.</p>';
+                uiElements.householdsList.innerHTML = '<p class="text-center text-slate-500">Chưa có hộ gia đình nào trong thôn này.</p>';
+                return;
             }
-            households.forEach(h => {
+            
+            const householdsWithCounts = await Promise.all(households.map(async h => {
+                const membersRef = collection(db, `artifacts/${appId}/users/${adminUid}/precincts/${currentPrecinctId}/households/${h.id}/members`);
+                const membersSnapshot = await getDocs(membersRef);
+                return { ...h, membersCount: membersSnapshot.size };
+            }));
+
+            householdsWithCounts.forEach(h => {
                 const item = document.createElement('div');
-                item.className = 'bg-gray-50 rounded-lg p-4 shadow-sm flex items-center justify-between transition-colors duration-200 hover:bg-gray-100 cursor-pointer';
+                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-center justify-between transition-colors duration-200 hover:bg-slate-100 cursor-pointer';
                 item.innerHTML = `
                     <div class="flex items-center space-x-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2m14 0V9a2 2 0 00-2-2H7a2 2 0 00-2 2v2m14 0a2 2 0 01-2 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2m14 0V9a2 2 0 00-2-2H7a2 2 0 00-2 2v2" />
                         </svg>
                         <span class="text-lg font-medium editable" data-id="${h.id}" data-type="household">${h.name}</span>
+                    </div>
+                    <div class="text-sm text-slate-500 text-right">
+                        <span>Thành viên: ${h.membersCount}</span>
                     </div>
                     <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${h.id}" data-type="household">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -334,7 +416,7 @@
         }
 
         function setupMembersListener() {
-            const membersCollection = `artifacts/${appId}/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`;
+            const membersCollection = `artifacts/${appId}/users/${adminUid}/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`;
             onSnapshot(collection(db, membersCollection), (snapshot) => {
                 const members = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 displayMembers(members);
@@ -347,11 +429,11 @@
         function displayMembers(members) {
             uiElements.membersList.innerHTML = '';
             if (members.length === 0) {
-                uiElements.membersList.innerHTML = '<p class="text-center text-gray-500">Chưa có thành viên nào trong hộ này.</p>';
+                uiElements.membersList.innerHTML = '<p class="text-center text-slate-500">Chưa có thành viên nào trong hộ này.</p>';
             }
             members.forEach(m => {
                 const item = document.createElement('div');
-                item.className = 'bg-gray-50 rounded-lg p-4 shadow-sm flex items-center justify-between';
+                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-center justify-between';
                 item.innerHTML = `
                     <div class="flex items-center space-x-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -359,7 +441,7 @@
                         </svg>
                         <div>
                             <span class="text-lg font-medium editable" data-id="${m.id}" data-type="member" data-field="name">${m.name}</span>
-                            <p class="text-sm text-gray-600">CCCD: <span class="editable" data-id="${m.id}" data-type="member" data-field="cccd">${m.cccd}</span></p>
+                            <p class="text-sm text-slate-600">CCCD: <span class="editable" data-id="${m.id}" data-type="member" data-field="cccd">${m.cccd}</span></p>
                         </div>
                     </div>
                     <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${m.id}" data-type="member">
@@ -376,13 +458,13 @@
         }
         
         function setupSubjectsListener() {
-            const subjectsCollection = `artifacts/${appId}/subjects`;
-            onSnapshot(collection(db, subjectsCollection), (snapshot) => {
+            const subjectsCollection = `artifacts/${appId}/users/${adminUid}/subjects`;
+            onSnapshot(query(collection(db, subjectsCollection)), (snapshot) => {
                 let subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 
                 const searchTerm = uiElements.subjectSearch.value.toLowerCase();
                 if (searchTerm) {
-                    subjects = subjects.filter(s => s.name.toLowerCase().includes(searchTerm) || s.description.toLowerCase().includes(searchTerm));
+                    subjects = subjects.filter(s => s.name.toLowerCase().includes(searchTerm) || (s.description && s.description.toLowerCase().includes(searchTerm)));
                 }
                 
                 displaySubjects(subjects);
@@ -395,11 +477,11 @@
         function displaySubjects(subjects) {
             uiElements.subjectsList.innerHTML = '';
             if (subjects.length === 0) {
-                uiElements.subjectsList.innerHTML = '<p class="text-center text-gray-500">Chưa có đối tượng nào.</p>';
+                uiElements.subjectsList.innerHTML = '<p class="text-center text-slate-500">Chưa có đối tượng nào.</p>';
             }
             subjects.forEach(s => {
                 const item = document.createElement('div');
-                item.className = 'bg-gray-50 rounded-lg p-4 shadow-sm flex items-start justify-between transition-colors duration-200 hover:bg-gray-100 cursor-pointer';
+                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-start justify-between transition-colors duration-200 hover:bg-slate-100 cursor-pointer';
                 item.innerHTML = `
                     <div class="flex-1 space-y-2">
                         <div class="flex items-center space-x-2">
@@ -408,13 +490,13 @@
                             </svg>
                             <span class="text-lg font-medium editable" data-id="${s.id}" data-type="subject" data-field="name">${s.name}</span>
                         </div>
-                        <p class="text-sm text-gray-600 editable" data-id="${s.id}" data-type="subject" data-field="description">${s.description || 'Chưa có mô tả.'}</p>
+                        <p class="text-sm text-slate-600 editable" data-id="${s.id}" data-type="subject" data-field="description">${s.description || 'Chưa có mô tả.'}</p>
                         <div class="space-y-1 mt-2">
-                            <h4 class="text-xs font-semibold text-gray-500">Diễn biến:</h4>
-                            <div class="text-xs text-gray-500 space-y-1" id="events-${s.id}">
-                                ${s.events?.map(event => `<div class="flex justify-between items-center bg-gray-100 p-2 rounded-md"><span>${event.text}</span><button class="delete-event-btn text-red-400 hover:text-red-600" data-subject-id="${s.id}" data-event-text="${event.text}">&times;</button></div>`).join('') || 'Chưa có diễn biến.'}
+                            <h4 class="text-xs font-semibold text-slate-500">Diễn biến:</h4>
+                            <div class="text-xs text-slate-500 space-y-1" id="events-${s.id}">
+                                ${s.events?.map(event => `<div class="flex justify-between items-center bg-slate-100 p-2 rounded-md"><span>${event.text}</span><button class="delete-event-btn text-red-400 hover:text-red-600" data-subject-id="${s.id}" data-event-text="${event.text}">&times;</button></div>`).join('') || 'Chưa có diễn biến.'}
                             </div>
-                            <button class="add-event-btn text-blue-500 hover:text-blue-700 text-xs mt-1" data-id="${s.id}">+ Thêm diễn biến</button>
+                            <button class="add-event-btn text-indigo-500 hover:text-indigo-700 text-xs mt-1" data-id="${s.id}">+ Thêm diễn biến</button>
                         </div>
                     </div>
                     <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${s.id}" data-type="subject">
@@ -430,9 +512,92 @@
             setupDeleteListeners();
         }
 
+        function setupIncidentsListener() {
+            const incidentsCollection = `artifacts/${appId}/users/${adminUid}/incidents`;
+            onSnapshot(query(collection(db, incidentsCollection)), (snapshot) => {
+                const incidents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                displayIncidents(incidents);
+            }, (error) => {
+                console.error("Lỗi khi lắng nghe vụ việc:", error);
+                showModal("Lỗi", "Không thể tải danh sách vụ việc.");
+            });
+        }
+        
+        function displayIncidents(incidents) {
+            uiElements.incidentsTabContent.querySelector('#incidents-list').innerHTML = '';
+            if (incidents.length === 0) {
+                uiElements.incidentsTabContent.querySelector('#incidents-list').innerHTML = '<p class="text-center text-slate-500">Chưa có vụ việc nào.</p>';
+            }
+            incidents.forEach(i => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-start justify-between';
+                item.innerHTML = `
+                    <div class="flex-1 space-y-2">
+                        <div class="flex items-center space-x-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-lg font-medium editable" data-id="${i.id}" data-type="incident" data-field="title">${i.title}</span>
+                        </div>
+                        <p class="text-sm text-slate-600 editable" data-id="${i.id}" data-type="incident" data-field="description">${i.description || 'Chưa có mô tả.'}</p>
+                    </div>
+                    <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${i.id}" data-type="incident">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                uiElements.incidentsTabContent.querySelector('#incidents-list').appendChild(item);
+            });
+            setupEditableFields();
+            setupDeleteListeners();
+        }
+
+        function setupImagesListener() {
+            const imagesCollection = `artifacts/${appId}/users/${adminUid}/images`;
+            onSnapshot(query(collection(db, imagesCollection)), (snapshot) => {
+                const images = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                displayImages(images);
+            }, (error) => {
+                console.error("Lỗi khi lắng nghe hình ảnh:", error);
+                showModal("Lỗi", "Không thể tải danh sách hình ảnh.");
+            });
+        }
+        
+        function displayImages(images) {
+            uiElements.imagesTabContent.querySelector('#images-list').innerHTML = '';
+            if (images.length === 0) {
+                uiElements.imagesTabContent.querySelector('#images-list').innerHTML = '<p class="text-center text-slate-500 col-span-full">Chưa có hình ảnh nào.</p>';
+            }
+            images.forEach(img => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-50 rounded-lg p-2 shadow-sm relative group cursor-pointer';
+                item.innerHTML = `
+                    <img src="${img.url}" alt="${img.caption || 'Hình ảnh khu vực'}" class="w-full h-auto rounded-lg">
+                    <div class="mt-2 text-sm text-slate-700">
+                        <p class="editable" data-id="${img.id}" data-type="image" data-field="caption">${img.caption || 'Chưa có chú thích.'}</p>
+                        ${img.location ? `<p class="text-xs text-slate-500">Vị trí: ${img.location.latitude}, ${img.location.longitude}</p>` : `<p class="text-xs text-slate-500">Vị trí: Không có</p>`}
+                    </div>
+                    <button class="delete-btn absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200" data-id="${img.id}" data-type="image" data-path="${img.storagePath}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                `;
+                uiElements.imagesTabContent.querySelector('#images-list').appendChild(item);
+            });
+            setupEditableFields();
+            setupDeleteListeners();
+        }
+
 
         // --- Chuyển đổi giao diện ---
         function showPrecincts() {
+            uiElements.precinctsTabContent.classList.remove('hidden');
+            uiElements.subjectsTabContent.classList.add('hidden');
+            uiElements.incidentsTabContent.classList.add('hidden');
+            uiElements.imagesTabContent.classList.add('hidden');
+
             uiElements.precinctSection.classList.remove('hidden');
             uiElements.householdSection.classList.add('hidden');
             uiElements.memberSection.classList.add('hidden');
@@ -489,7 +654,7 @@
         
         document.getElementById('add-household-btn').addEventListener('click', () => {
             showAddForm("Thêm Hộ gia đình", (name) => {
-                const householdsCollection = `artifacts/${appId}/precincts/${currentPrecinctId}/households`;
+                const householdsCollection = `artifacts/${appId}/users/${adminUid}/precincts/${currentPrecinctId}/households`;
                 addDoc(collection(db, householdsCollection), { name, creatorId: userId, createdAt: new Date().toISOString() })
                     .then(() => showModal("Thành công", "Đã thêm hộ gia đình thành công."))
                     .catch(error => { console.error("Lỗi thêm hộ gia đình:", error); showModal("Lỗi", "Không thể thêm hộ gia đình."); });
@@ -503,14 +668,22 @@
         document.getElementById('add-subject-btn').addEventListener('click', () => {
             showAddSubjectForm();
         });
+        
+        document.getElementById('add-incident-btn').addEventListener('click', () => {
+            showAddIncidentForm();
+        });
+
+        document.getElementById('add-image-btn').addEventListener('click', () => {
+            showAddImageForm();
+        });
 
         function showAddForm(title, onSubmit) {
             const modalContent = document.getElementById('modal-content-area');
             modalContent.innerHTML = `
                 <form id="add-item-form" class="space-y-4">
                     <input type="text" id="item-name" placeholder="Nhập tên" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200">
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
                         Thêm
                     </button>
                 </form>
@@ -532,10 +705,10 @@
             modalContent.innerHTML = `
                 <form id="add-member-item-form" class="space-y-4">
                     <input type="text" id="member-name" placeholder="Nhập tên thành viên" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
                     <input type="text" id="member-cccd" placeholder="Nhập số căn cước" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200">
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
                         Thêm Thành viên
                     </button>
                 </form>
@@ -549,7 +722,7 @@
                 const cccd = document.getElementById('member-cccd').value;
                 if (!name || !cccd) { showModal("Lỗi", "Vui lòng điền đầy đủ thông tin."); return; }
                 
-                const membersCollection = `artifacts/${appId}/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`;
+                const membersCollection = `artifacts/${appId}/users/${adminUid}/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`;
                 addDoc(collection(db, membersCollection), { name, cccd, creatorId: userId, createdAt: new Date().toISOString() })
                     .then(() => showModal("Thành công", "Đã thêm thành viên thành công."))
                     .catch(error => { console.error("Lỗi thêm thành viên:", error); showModal("Lỗi", "Không thể thêm thành viên."); });
@@ -562,10 +735,10 @@
             modalContent.innerHTML = `
                 <form id="add-subject-item-form" class="space-y-4">
                     <input type="text" id="subject-name" placeholder="Tên đối tượng" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
                     <textarea id="subject-description" rows="3" placeholder="Mô tả"
-                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"></textarea>
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200">
+                          class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"></textarea>
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
                         Thêm Đối tượng
                     </button>
                 </form>
@@ -579,11 +752,113 @@
                 const description = document.getElementById('subject-description').value;
                 if (!name) { showModal("Lỗi", "Vui lòng nhập tên đối tượng."); return; }
                 
-                const subjectsCollection = `artifacts/${appId}/subjects`;
+                const subjectsCollection = `artifacts/${appId}/users/${adminUid}/subjects`;
                 addDoc(collection(db, subjectsCollection), { name, description, creatorId: userId, createdAt: new Date().toISOString(), events: [] })
                     .then(() => showModal("Thành công", "Đã thêm đối tượng thành công."))
                     .catch(error => { console.error("Lỗi thêm đối tượng:", error); showModal("Lỗi", "Không thể thêm đối tượng."); });
                 document.getElementById('modal').style.display = 'none';
+            });
+        }
+        
+        function showAddIncidentForm() {
+            const modalContent = document.getElementById('modal-content-area');
+            modalContent.innerHTML = `
+                <form id="add-incident-form" class="space-y-4">
+                    <input type="text" id="incident-title" placeholder="Tiêu đề vụ việc" required
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                    <textarea id="incident-description" rows="3" placeholder="Mô tả chi tiết"
+                          class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200"></textarea>
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
+                        Thêm Vụ việc
+                    </button>
+                </form>
+            `;
+            document.getElementById('modal-title').textContent = "Thêm Vụ việc mới";
+            document.getElementById('modal').style.display = 'flex';
+            
+            document.getElementById('add-incident-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('incident-title').value;
+                const description = document.getElementById('incident-description').value;
+                if (!title) { showModal("Lỗi", "Vui lòng nhập tiêu đề vụ việc."); return; }
+                
+                const incidentsCollection = `artifacts/${appId}/users/${adminUid}/incidents`;
+                addDoc(collection(db, incidentsCollection), { title, description, creatorId: userId, createdAt: new Date().toISOString() })
+                    .then(() => showModal("Thành công", "Đã thêm vụ việc thành công."))
+                    .catch(error => { console.error("Lỗi thêm vụ việc:", error); showModal("Lỗi", "Không thể thêm vụ việc."); });
+                document.getElementById('modal').style.display = 'none';
+            });
+        }
+        
+        function showAddImageForm() {
+            const modalContent = document.getElementById('modal-content-area');
+            modalContent.innerHTML = `
+                <form id="add-image-form" class="space-y-4">
+                    <input type="file" id="image-file" accept="image/*" required
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                    <input type="text" id="image-caption" placeholder="Chú thích hình ảnh"
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
+                        Thêm Hình ảnh
+                    </button>
+                    <div id="upload-progress" class="hidden text-center mt-2">
+                        <p>Đang tải lên...</p>
+                    </div>
+                </form>
+            `;
+            document.getElementById('modal-title').textContent = "Thêm Hình ảnh mới";
+            document.getElementById('modal').style.display = 'flex';
+            
+            document.getElementById('add-image-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const file = document.getElementById('image-file').files[0];
+                const caption = document.getElementById('image-caption').value;
+                if (!file) return;
+
+                document.getElementById('upload-progress').classList.remove('hidden');
+                
+                const storagePath = `artifacts/${appId}/users/${adminUid}/images/${file.name}_${new Date().getTime()}`;
+                const storageRef = ref(storage, storagePath);
+                
+                // Get geolocation
+                let location = null;
+                if ("geolocation" in navigator) {
+                    try {
+                        const position = await new Promise((resolve, reject) => {
+                            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                                enableHighAccuracy: true,
+                                timeout: 5000,
+                                maximumAge: 0
+                            });
+                        });
+                        location = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        };
+                    } catch (error) {
+                        console.error("Lỗi khi lấy vị trí:", error);
+                    }
+                }
+                
+                try {
+                    await uploadBytes(storageRef, file);
+                    const url = await getDownloadURL(storageRef);
+                    const imagesCollection = `artifacts/${appId}/users/${adminUid}/images`;
+                    await addDoc(collection(db, imagesCollection), {
+                        url,
+                        caption,
+                        storagePath,
+                        creatorId: userId,
+                        createdAt: new Date().toISOString(),
+                        location
+                    });
+                    showModal("Thành công", "Đã thêm hình ảnh thành công.");
+                } catch (error) {
+                    console.error("Lỗi khi tải lên hình ảnh:", error);
+                    showModal("Lỗi", "Không thể thêm hình ảnh.");
+                } finally {
+                    document.getElementById('modal').style.display = 'none';
+                }
             });
         }
         
@@ -604,8 +879,8 @@
             modalContent.innerHTML = `
                 <form id="add-event-form" class="space-y-4">
                     <input type="text" id="event-text" placeholder="Nhập diễn biến" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200">
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
                         Thêm diễn biến
                     </button>
                 </form>
@@ -619,7 +894,7 @@
                 if (!eventText) return;
                 
                 try {
-                    const subjectRef = doc(db, `artifacts/${appId}/subjects`, subjectId);
+                    const subjectRef = doc(db, `artifacts/${appId}/users/${adminUid}/subjects`, subjectId);
                     const subjectDoc = await getDoc(subjectRef);
                     if (subjectDoc.exists()) {
                         const data = subjectDoc.data();
@@ -638,7 +913,7 @@
 
         async function handleDeleteEvent(subjectId, eventText) {
             try {
-                const subjectRef = doc(db, `artifacts/${appId}/subjects`, subjectId);
+                const subjectRef = doc(db, `artifacts/${appId}/users/${adminUid}/subjects`, subjectId);
                 const subjectDoc = await getDoc(subjectRef);
                 if (subjectDoc.exists()) {
                     const data = subjectDoc.data();
@@ -658,24 +933,33 @@
                     event.stopPropagation();
                     const idToDelete = event.currentTarget.getAttribute('data-id');
                     const type = event.currentTarget.getAttribute('data-type');
-                    handleDelete(idToDelete, type);
+                    const storagePath = event.currentTarget.getAttribute('data-path');
+                    handleDelete(idToDelete, type, storagePath);
                 });
             });
         }
         
-        async function handleDelete(idToDelete, type) {
+        async function handleDelete(idToDelete, type, storagePath) {
             let collectionPath;
             if (type === 'precinct') {
-                collectionPath = `artifacts/${appId}/precincts`;
+                collectionPath = `artifacts/${appId}/users/${adminUid}/precincts`;
             } else if (type === 'household') {
-                collectionPath = `artifacts/${appId}/precincts/${currentPrecinctId}/households`;
+                collectionPath = `artifacts/${appId}/users/${adminUid}/precincts/${currentPrecinctId}/households`;
             } else if (type === 'member') {
-                collectionPath = `artifacts/${appId}/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`;
+                collectionPath = `artifacts/${appId}/users/${adminUid}/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`;
             } else if (type === 'subject') {
-                collectionPath = `artifacts/${appId}/subjects`;
+                collectionPath = `artifacts/${appId}/users/${adminUid}/subjects`;
+            } else if (type === 'incident') {
+                collectionPath = `artifacts/${appId}/users/${adminUid}/incidents`;
+            } else if (type === 'image') {
+                collectionPath = `artifacts/${appId}/users/${adminUid}/images`;
             }
             
             try {
+                if (type === 'image' && storagePath) {
+                    const imageRef = ref(storage, storagePath);
+                    await deleteObject(imageRef);
+                }
                 await deleteDoc(doc(db, collectionPath, idToDelete));
                 showModal("Thành công", `Đã xóa ${type} thành công.`);
             } catch (error) {
@@ -710,13 +994,17 @@
                         
                         let docRef;
                         if (type === 'precinct') {
-                            docRef = doc(db, `artifacts/${appId}/precincts`, id);
+                            docRef = doc(db, `artifacts/${appId}/users/${adminUid}/precincts`, id);
                         } else if (type === 'household') {
-                            docRef = doc(db, `artifacts/${appId}/precincts/${currentPrecinctId}/households`, id);
+                            docRef = doc(db, `artifacts/${appId}/users/${adminUid}/precincts/${currentPrecinctId}/households`, id);
                         } else if (type === 'member') {
-                            docRef = doc(db, `artifacts/${appId}/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`, id);
+                            docRef = doc(db, `artifacts/${appId}/users/${adminUid}/precincts/${currentPrecinctId}/households/${currentHouseholdId}/members`, id);
                         } else if (type === 'subject') {
-                             docRef = doc(db, `artifacts/${appId}/subjects`, id);
+                             docRef = doc(db, `artifacts/${appId}/users/${adminUid}/subjects`, id);
+                        } else if (type === 'incident') {
+                             docRef = doc(db, `artifacts/${appId}/users/${adminUid}/incidents`, id);
+                        } else if (type === 'image') {
+                             docRef = doc(db, `artifacts/${appId}/users/${adminUid}/images`, id);
                         }
 
                         try {
@@ -744,13 +1032,32 @@
 
         // --- Tab Navigation ---
         document.getElementById('tab-precincts').addEventListener('click', () => {
-            uiElements.precinctsTab.classList.remove('hidden');
-            uiElements.subjectsTab.classList.add('hidden');
+            document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
+            uiElements.precinctsTabContent.classList.remove('hidden');
+            uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-precincts').classList.add('active');
+            showPrecincts();
         });
         
         document.getElementById('tab-subjects').addEventListener('click', () => {
-            uiElements.precinctsTab.classList.add('hidden');
-            uiElements.subjectsTab.classList.remove('hidden');
+            document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
+            uiElements.subjectsTabContent.classList.remove('hidden');
+            uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-subjects').classList.add('active');
+        });
+
+        document.getElementById('tab-incidents').addEventListener('click', () => {
+            document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
+            uiElements.incidentsTabContent.classList.remove('hidden');
+            uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-incidents').classList.add('active');
+        });
+
+        document.getElementById('tab-images').addEventListener('click', () => {
+            document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
+            uiElements.imagesTabContent.classList.remove('hidden');
+            uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-images').classList.add('active');
         });
         
         uiElements.subjectSearch.addEventListener('input', setupSubjectsListener);
@@ -762,8 +1069,8 @@
         function showModal(title, message) {
             modalTitle.textContent = title;
             const contentArea = document.getElementById('modal-content-area');
-            contentArea.innerHTML = `<p class="text-gray-700 mb-6">${message}</p>
-                                     <button id="modal-close-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition-all duration-200">Đóng</button>`;
+            contentArea.innerHTML = `<p class="text-slate-700 mb-6">${message}</p>
+                                     <button id="modal-close-btn" class="w-full bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition-all duration-200">Đóng</button>`;
             modal.style.display = 'flex';
             document.getElementById('modal-close-btn').addEventListener('click', () => {
                 modal.style.display = 'none';
