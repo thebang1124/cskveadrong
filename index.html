@@ -11,6 +11,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
         .modal {
             display: none;
@@ -31,6 +32,7 @@
             transition: all 0.2s ease-in-out;
             border-bottom-width: 2px;
             border-bottom-color: transparent;
+            position: relative;
         }
         .tab-button:hover {
             color: #4f46e5;
@@ -38,20 +40,79 @@
         .tab-button.active {
             color: #4f46e5;
             border-bottom-color: #4f46e5;
+            font-weight: 600;
         }
+        /* Dark mode styles */
+        body.dark {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .dark .bg-white {
+            background-color: #1e1e1e;
+        }
+        .dark .text-slate-800 {
+            color: #f5f5f5;
+        }
+        .dark .text-slate-600 {
+            color: #b0b0b0;
+        }
+        .dark .text-slate-500 {
+            color: #a0a0a0;
+        }
+        .dark .text-slate-700 {
+            color: #d0d0d0;
+        }
+        .dark .border-slate-200 {
+            border-color: #333;
+        }
+        .dark .bg-slate-50 {
+            background-color: #2a2a2a;
+        }
+        .dark .hover\\:bg-slate-100:hover {
+            background-color: #383838;
+        }
+        .dark input, .dark textarea {
+            background-color: #333;
+            border-color: #555;
+            color: #f5f5f5;
+        }
+        .dark .modal-content {
+            background-color: #1e1e1e;
+        }
+        /* Custom colors for tabs */
+        #political-tab-content .item-card { background-color: #4CAF50; color: white; }
+        #political-tab-content .item-card:hover { background-color: #43A047; }
+        #subject-tab-content .item-card.criminal { background-color: #F44336; color: white; }
+        #subject-tab-content .item-card.political { background-color: #2196F3; color: white; }
+        #incident-tab-content .item-card { background-color: #FF9800; color: white; }
+        #image-tab-content .item-card { background-color: #00BCD4; }
     </style>
 </head>
 <body class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
     <!-- Main Container -->
-    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-4xl mx-auto transition-colors duration-300">
         <h1 class="text-4xl font-bold text-center text-slate-800 mb-2">Hệ Thống Quản Lý Địa Bàn & Đối Tượng</h1>
         <p class="text-center text-slate-600 mb-6">Quản lý các Thôn, Hộ, Thành viên và Đối tượng.</p>
+        
+        <!-- Dark Mode Toggle -->
+        <div class="flex justify-end mb-4">
+            <button id="theme-toggle" class="p-2 rounded-full bg-slate-200 dark:bg-gray-700 text-slate-800 dark:text-gray-300 transition-colors duration-200">
+                <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+        </div>
+
         <!-- Main Content -->
         <div id="main-content">
             
             <!-- Navigation Tabs -->
             <div class="flex border-b border-slate-200 mb-6 space-x-4">
                 <button id="tab-precincts" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600 active">Địa bàn</button>
+                <button id="tab-political" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Hệ thống chính trị</button>
                 <button id="tab-subjects" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Đối tượng</button>
                 <button id="tab-incidents" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Vụ việc</button>
                 <button id="tab-images" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Hình ảnh</button>
@@ -102,20 +163,62 @@
                     </div>
                 </div>
                 
+                <!-- Political System Section -->
+                <div id="political-tab-content" class="hidden">
+                    <h2 class="text-2xl font-semibold text-slate-700 mb-4">Quản Lý Hệ Thống Chính Trị Thôn</h2>
+                    <div class="flex border-b border-slate-200 mb-6 space-x-4">
+                        <button id="tab-party-members" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600 active">Đảng viên</button>
+                        <button id="tab-security-team" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Tổ ANTT Cơ sở</button>
+                    </div>
+                    <div id="political-content">
+                        <!-- Party Members Section -->
+                        <div id="party-members-section">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-semibold text-slate-700">Danh Sách Đảng Viên</h3>
+                                <button id="add-party-member-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
+                                    + Thêm Đảng viên
+                                </button>
+                            </div>
+                            <div id="party-members-list" class="space-y-4">
+                                <p class="text-center text-slate-500">Đang tải danh sách...</p>
+                            </div>
+                        </div>
+                        <!-- Security Team Section -->
+                        <div id="security-team-section" class="hidden">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-semibold text-slate-700">Danh Sách Tổ ANTT Cơ sở</h3>
+                                <button id="add-security-team-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
+                                    + Thêm Thành viên tổ
+                                </button>
+                            </div>
+                            <div id="security-team-list" class="space-y-4">
+                                <p class="text-center text-slate-500">Đang tải danh sách...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Subjects Management Section -->
                 <div id="subjects-tab-content" class="hidden">
                     <h2 class="text-2xl font-semibold text-slate-700 mb-4">Quản Lý Đối Tượng</h2>
-                    <div class="flex items-center justify-between mb-4">
-                        <input type="text" id="subject-search" placeholder="Tìm kiếm đối tượng..."
-                               class="w-full max-w-sm px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
-                        <button id="add-subject-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
-                            + Thêm Đối tượng
-                        </button>
+                    <div class="flex border-b border-slate-200 mb-6 space-x-4">
+                        <button id="tab-criminal" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600 active">Hình sự</button>
+                        <button id="tab-political-subject" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Chính trị</button>
                     </div>
-                    <div id="subjects-list" class="space-y-4">
-                        <p class="text-center text-slate-500">Chưa có đối tượng nào.</p>
+                    <div id="subject-content">
+                        <div class="flex items-center justify-between mb-4">
+                            <input type="text" id="subject-search" placeholder="Tìm kiếm đối tượng..."
+                                class="w-full max-w-sm px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                            <button id="add-subject-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
+                                + Thêm Đối tượng
+                            </button>
+                        </div>
+                        <div id="subjects-list" class="space-y-4">
+                            <p class="text-center text-slate-500">Chưa có đối tượng nào.</p>
+                        </div>
                     </div>
                 </div>
+
                 <!-- Incidents Management Section -->
                 <div id="incidents-tab-content" class="hidden">
                     <h2 class="text-2xl font-semibold text-slate-700 mb-4">Quản Lý Vụ Việc Mâu Thuẫn</h2>
@@ -145,7 +248,7 @@
     </div>
     <!-- Modal for Forms and Messages -->
     <div id="modal" class="modal">
-        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full transition-colors duration-300 modal-content">
             <h3 id="modal-title" class="text-xl font-bold mb-4 text-center"></h3>
             <div id="modal-content-area">
                 <!-- Forms and messages will be dynamically inserted here -->
@@ -168,7 +271,9 @@
             members: 'members',
             subjects: 'subjects',
             incidents: 'incidents',
-            images: 'images'
+            images: 'images',
+            security_team: 'security_team',
+            party_members: 'party_members'
         };
         // ----------------------------------------
         
@@ -177,11 +282,12 @@
         
         const modal = document.getElementById('modal');
         const modalTitle = document.getElementById('modal-title');
+        
+        let currentSubjectType = 'criminal';
 
         // Xử lý xác thực người dùng
         async function authenticateUser() {
             try {
-                // Supabase sử dụng JWT, nhưng để đơn giản, chúng ta sẽ đăng nhập ẩn danh
                 const { data, error } = await supabase.auth.signInAnonymously();
                 if (error) throw error;
                 userId = data.user.id;
@@ -203,13 +309,14 @@
             "Buôn Kmiên", "Buôn Pheo", "Buôn Sǐng A", "Buôn Tung Krăk", "Buôn Trang",
             "Buôn Trăp", "Buôn Tring 4", "Thôn Đông Xuân", "Thôn Ea Kung", "Buôn Klat A",
             "Buôn Klat B", "Buôn Klat C", "Thôn Quyết Thắng", "Thôn Tân Hợp", "Thôn 1A",
-            "Thôn 1B", "Thôn 2A", "Thôn 2B", "Thôn 3", "Thôn 6es", "Thôn 7es", "Thôn 8es"
+            "Thôn 1B", "Thôn 2A", "Thôn 2B", "Thôn 3", "Thôn 6", "Thôn 7", "Thôn 8"
         ];
         
         const uiElements = {
             mainContent: document.getElementById('main-content'),
             tabButtons: document.querySelectorAll('.tab-button'),
             precinctsTabContent: document.getElementById('precincts-tab-content'),
+            politicalTabContent: document.getElementById('political-tab-content'),
             subjectsTabContent: document.getElementById('subjects-tab-content'),
             incidentsTabContent: document.getElementById('incidents-tab-content'),
             imagesTabContent: document.getElementById('images-tab-content'),
@@ -230,14 +337,17 @@
             addIncidentBtn: document.getElementById('add-incident-btn'),
             imagesList: document.getElementById('images-list'),
             addImageBtn: document.getElementById('add-image-btn'),
+            partyMembersList: document.getElementById('party-members-list'),
+            securityTeamList: document.getElementById('security-team-list'),
+            politicalTabButtons: document.querySelectorAll('#political-tab-content .tab-button'),
+            subjectTabButtons: document.querySelectorAll('#subjects-tab-content .tab-button'),
         };
         // --- Supabase Listeners và Render UI ---
         async function initializeData() {
             try {
-                // Kiểm tra xem SUPABASE_URL và SUPABASE_ANON_KEY đã được cung cấp chưa
                 if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL' || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
                     showModal('Lỗi Cấu hình', 'Vui lòng cập nhật SUPABASE_URL và SUPABASE_ANON_KEY trong mã nguồn để kết nối với cơ sở dữ liệu của bạn.');
-                    return; // Dừng lại nếu chưa cấu hình
+                    return;
                 }
                 
                 supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -255,6 +365,13 @@
                             .from(TABLES.precincts)
                             .insert([{ name, creator_id: userId, created_at: new Date().toISOString() }]);
                     }
+                    
+                    const { data: firstPrecinct, error: firstPrecinctError } = await supabase.from(TABLES.precincts).select('id').eq('name', 'Thôn 5').single();
+                    if (!firstPrecinctError) {
+                        await supabase
+                            .from(TABLES.households)
+                            .insert([{ name: "Hộ gia đình mẫu", precinct_id: firstPrecinct.id, creator_id: userId }]);
+                    }
                 }
                 setupSupabaseListeners();
             } catch (error) {
@@ -266,62 +383,68 @@
         function setupSupabaseListeners() {
             if (!supabase || !userId) return;
             setupPrecinctsListener();
+            setupPoliticalListeners();
             setupSubjectsListener();
             setupIncidentsListener();
             setupImagesListener();
         }
-        function setupPrecinctsListener() {
-            supabase
-                .from(TABLES.precincts)
-                .on('ANY', (payload) => {
-                    fetchPrecincts();
-                })
-                .subscribe();
-            fetchPrecincts();
-        }
-
+        
         async function fetchPrecincts() {
-            const { data: precincts, error } = await supabase.from(TABLES.precincts).select('*');
+            const { data: precincts, error } = await supabase.from(TABLES.precincts).select('id, name');
             if (error) {
                 console.error("Lỗi khi tải thôn/buôn:", error);
                 showModal("Lỗi", "Không thể tải danh sách thôn/buôn.");
                 return;
             }
-            displayPrecincts(precincts);
-        }
         
+            const precinctsWithCounts = await Promise.all(precincts.map(async p => {
+                const { count: householdsCount, error: householdsError } = await supabase
+                    .from(TABLES.households)
+                    .select('id', { count: 'exact', head: true })
+                    .eq('precinct_id', p.id);
+                
+                const { data: households, error: householdsDataError } = await supabase
+                    .from(TABLES.households)
+                    .select('id')
+                    .eq('precinct_id', p.id);
+                
+                let membersCount = 0;
+                if (!householdsDataError && households && households.length > 0) {
+                    const { count: totalMembersCount, error: membersError } = await supabase
+                        .from(TABLES.members)
+                        .select('id', { count: 'exact', head: true })
+                        .in('household_id', households.map(h => h.id));
+                    membersCount = totalMembersCount || 0;
+                }
+                
+                return { ...p, householdsCount: householdsCount || 0, membersCount };
+            }));
+            displayPrecincts(precinctsWithCounts);
+        }
+
+        function setupPrecinctsListener() {
+            supabase
+                .from(TABLES.precincts)
+                .on('ANY', (payload) => fetchPrecincts())
+                .subscribe();
+            supabase
+                .from(TABLES.households)
+                .on('ANY', (payload) => fetchPrecincts())
+                .subscribe();
+            supabase
+                .from(TABLES.members)
+                .on('ANY', (payload) => fetchPrecincts())
+                .subscribe();
+            fetchPrecincts();
+        }
+
         async function displayPrecincts(precincts) {
             uiElements.precinctsList.innerHTML = '';
             if (!precincts || precincts.length === 0) {
                 uiElements.precinctsList.innerHTML = '<p class="text-center text-slate-500">Chưa có thôn/buôn nào.</p>';
                 return;
             }
-            
-            const precinctsWithCounts = await Promise.all(precincts.map(async p => {
-                const { count: householdsCount } = await supabase
-                    .from(TABLES.households)
-                    .select('id', { count: 'exact' })
-                    .eq('precinct_id', p.id);
-                
-                const { data: households, error: householdsError } = await supabase
-                    .from(TABLES.households)
-                    .select('id')
-                    .eq('precinct_id', p.id);
-                
-                let membersCount = 0;
-                if (!householdsError && households) {
-                    for (const h of households) {
-                        const { count: currentMembersCount } = await supabase
-                            .from(TABLES.members)
-                            .select('id', { count: 'exact' })
-                            .eq('household_id', h.id);
-                        membersCount += currentMembersCount;
-                    }
-                }
-                
-                return { ...p, householdsCount, membersCount };
-            }));
-            precinctsWithCounts.forEach(p => {
+            precincts.forEach(p => {
                 const item = document.createElement('div');
                 item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-center justify-between transition-colors duration-200 hover:bg-slate-100 cursor-pointer';
                 item.innerHTML = `
@@ -428,6 +551,394 @@
             setupMembersListener();
         }
         
+        function setupMembersListener() {
+            supabase
+                .from(TABLES.members)
+                .on('ANY', payload => {
+                    if (payload.new.household_id === currentHouseholdId || payload.old.household_id === currentHouseholdId) {
+                        fetchMembers();
+                    }
+                })
+                .subscribe();
+            fetchMembers();
+        }
+
+        async function fetchMembers() {
+            const { data: members, error } = await supabase
+                .from(TABLES.members)
+                .select('*')
+                .eq('household_id', currentHouseholdId);
+            if (error) {
+                console.error("Lỗi khi tải thành viên:", error);
+                showModal("Lỗi", "Không thể tải danh sách thành viên.");
+                return;
+            }
+            displayMembers(members);
+        }
+
+        function displayMembers(members) {
+            uiElements.membersList.innerHTML = '';
+            if (members.length === 0) {
+                uiElements.membersList.innerHTML = '<p class="text-center text-slate-500">Chưa có thành viên nào trong hộ này.</p>';
+            }
+            members.forEach(m => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-center justify-between';
+                item.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-6 0H6"/>
+                        </svg>
+                        <div>
+                            <span class="text-lg font-medium editable" data-id="${m.id}" data-type="member" data-field="name">${m.name}</span>
+                            <p class="text-sm text-slate-600">CCCD: <span class="editable" data-id="${m.id}" data-type="member" data-field="cccd">${m.cccd}</span></p>
+                        </div>
+                    </div>
+                    <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${m.id}" data-type="member">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                item.addEventListener('click', (event) => { event.stopPropagation(); });
+                uiElements.membersList.appendChild(item);
+            });
+            setupEditableFields();
+            setupDeleteListeners();
+        }
+        
+        function setupPoliticalListeners() {
+            supabase
+                .from(TABLES.party_members)
+                .on('ANY', (payload) => fetchPartyMembers())
+                .subscribe();
+            supabase
+                .from(TABLES.security_team)
+                .on('ANY', (payload) => fetchSecurityTeam())
+                .subscribe();
+            fetchPartyMembers();
+            fetchSecurityTeam();
+        }
+
+        async function fetchPartyMembers() {
+            const { data: members, error } = await supabase.from(TABLES.party_members).select('*');
+            if (error) {
+                console.error("Lỗi khi tải đảng viên:", error);
+                showModal("Lỗi", "Không thể tải danh sách đảng viên.");
+                return;
+            }
+            displayPartyMembers(members);
+        }
+
+        function displayPartyMembers(members) {
+            uiElements.partyMembersList.innerHTML = '';
+            if (members.length === 0) {
+                uiElements.partyMembersList.innerHTML = '<p class="text-center text-slate-500">Chưa có đảng viên nào.</p>';
+            }
+            members.forEach(m => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-start justify-between item-card';
+                item.innerHTML = `
+                    <div class="flex-1 space-y-2">
+                        <span class="text-lg font-medium editable" data-id="${m.id}" data-type="party_member" data-field="name">${m.name}</span>
+                        <p class="text-sm">Chức vụ: <span class="editable" data-id="${m.id}" data-type="party_member" data-field="position">${m.position || 'Chưa có'}</span></p>
+                    </div>
+                    <button class="delete-btn text-white hover:text-gray-200 transition-all duration-200" data-id="${m.id}" data-type="party_member">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                uiElements.partyMembersList.appendChild(item);
+            });
+            setupEditableFields();
+            setupDeleteListeners();
+        }
+
+        async function fetchSecurityTeam() {
+            const { data: members, error } = await supabase.from(TABLES.security_team).select('*');
+            if (error) {
+                console.error("Lỗi khi tải tổ antt:", error);
+                showModal("Lỗi", "Không thể tải danh sách tổ antt.");
+                return;
+            }
+            displaySecurityTeam(members);
+        }
+
+        function displaySecurityTeam(members) {
+            uiElements.securityTeamList.innerHTML = '';
+            if (members.length === 0) {
+                uiElements.securityTeamList.innerHTML = '<p class="text-center text-slate-500">Chưa có thành viên nào.</p>';
+            }
+            members.forEach(m => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-start justify-between item-card';
+                item.innerHTML = `
+                    <div class="flex-1 space-y-2">
+                        <span class="text-lg font-medium editable" data-id="${m.id}" data-type="security_team" data-field="name">${m.name}</span>
+                        <p class="text-sm">Chức vụ: <span class="editable" data-id="${m.id}" data-type="security_team" data-field="position">${m.position || 'Chưa có'}</span></p>
+                    </div>
+                    <button class="delete-btn text-white hover:text-gray-200 transition-all duration-200" data-id="${m.id}" data-type="security_team">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                uiElements.securityTeamList.appendChild(item);
+            });
+            setupEditableFields();
+            setupDeleteListeners();
+        }
+
+        function setupSubjectsListener() {
+            supabase
+                .from(TABLES.subjects)
+                .on('ANY', (payload) => fetchSubjects())
+                .subscribe();
+            fetchSubjects();
+        }
+        
+        async function fetchSubjects() {
+            const searchTerm = uiElements.subjectSearch.value.toLowerCase();
+            let query = supabase.from(TABLES.subjects).select('*').eq('type', currentSubjectType);
+            
+            if (searchTerm) {
+                const { data: subjects, error } = await query;
+                if (error) {
+                    console.error("Lỗi khi tìm kiếm đối tượng:", error);
+                    showModal("Lỗi", "Không thể tìm kiếm đối tượng.");
+                    return;
+                }
+                const filteredSubjects = subjects.filter(s => 
+                    (s.name && s.name.toLowerCase().includes(searchTerm)) || 
+                    (s.description && s.description.toLowerCase().includes(searchTerm))
+                );
+                displaySubjects(filteredSubjects);
+            } else {
+                const { data: subjects, error } = await query;
+                if (error) {
+                    console.error("Lỗi khi tải đối tượng:", error);
+                    showModal("Lỗi", "Không thể tải danh sách đối tượng.");
+                    return;
+                }
+                displaySubjects(subjects);
+            }
+        }
+        
+        function displaySubjects(subjects) {
+            uiElements.subjectsList.innerHTML = '';
+            if (subjects.length === 0) {
+                uiElements.subjectsList.innerHTML = '<p class="text-center text-slate-500">Chưa có đối tượng nào.</p>';
+            }
+            subjects.forEach(s => {
+                const item = document.createElement('div');
+                item.className = `bg-slate-50 rounded-lg p-4 shadow-sm flex items-start justify-between transition-colors duration-200 hover:bg-slate-100 cursor-pointer item-card ${s.type}`;
+                item.innerHTML = `
+                    <div class="flex-1 space-y-2">
+                        <div class="flex items-center space-x-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span class="text-lg font-medium editable" data-id="${s.id}" data-type="subject" data-field="name">${s.name}</span>
+                        </div>
+                        <p class="text-sm editable" data-id="${s.id}" data-type="subject" data-field="description">${s.description || 'Chưa có mô tả.'}</p>
+                        <div class="space-y-1 mt-2">
+                            <h4 class="text-xs font-semibold text-white">Diễn biến:</h4>
+                            <div class="text-xs space-y-1" id="events-${s.id}">
+                                ${s.events?.map(event => `<div class="flex justify-between items-center bg-slate-100 dark:bg-gray-700 p-2 rounded-md"><span>${event.text}</span><button class="delete-event-btn text-red-400 hover:text-red-600" data-subject-id="${s.id}" data-event-text="${event.text}">&times;</button></div>`).join('') || '<p class="text-slate-500 dark:text-gray-400">Chưa có diễn biến.</p>'}
+                            </div>
+                            <button class="add-event-btn text-white hover:text-gray-200 text-xs mt-1" data-id="${s.id}">+ Thêm diễn biến</button>
+                        </div>
+                    </div>
+                    <button class="delete-btn text-white hover:text-gray-200 transition-all duration-200" data-id="${s.id}" data-type="subject">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                item.addEventListener('click', (event) => { event.stopPropagation(); });
+                uiElements.subjectsList.appendChild(item);
+            });
+            setupEditableFields();
+            setupDeleteListeners();
+        }
+        function setupIncidentsListener() {
+            supabase
+                .from(TABLES.incidents)
+                .on('ANY', (payload) => fetchIncidents())
+                .subscribe();
+            fetchIncidents();
+        }
+        
+        async function fetchIncidents() {
+            const { data: incidents, error } = await supabase
+                .from(TABLES.incidents)
+                .select('*');
+            if (error) {
+                console.error("Lỗi khi tải vụ việc:", error);
+                showModal("Lỗi", "Không thể tải danh sách vụ việc.");
+                return;
+            }
+            displayIncidents(incidents);
+        }
+        
+        function displayIncidents(incidents) {
+            uiElements.incidentsTabContent.querySelector('#incidents-list').innerHTML = '';
+            if (incidents.length === 0) {
+                uiElements.incidentsTabContent.querySelector('#incidents-list').innerHTML = '<p class="text-center text-slate-500">Chưa có vụ việc nào.</p>';
+            }
+            incidents.forEach(i => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-start justify-between item-card';
+                item.innerHTML = `
+                    <div class="flex-1 space-y-2">
+                        <div class="flex items-center space-x-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-lg font-medium editable" data-id="${i.id}" data-type="incident" data-field="title">${i.title}</span>
+                        </div>
+                        <p class="text-sm editable" data-id="${i.id}" data-type="incident" data-field="description">${i.description || 'Chưa có mô tả.'}</p>
+                    </div>
+                    <button class="delete-btn text-white hover:text-gray-200 transition-all duration-200" data-id="${i.id}" data-type="incident">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                uiElements.incidentsTabContent.querySelector('#incidents-list').appendChild(item);
+            });
+            setupEditableFields();
+            setupDeleteListeners();
+        }
+        function setupImagesListener() {
+            supabase
+                .from(TABLES.images)
+                .on('ANY', (payload) => fetchImages())
+                .subscribe();
+            fetchImages();
+        }
+        
+        async function fetchImages() {
+            const { data: images, error } = await supabase
+                .from(TABLES.images)
+                .select('*');
+            if (error) {
+                console.error("Lỗi khi tải hình ảnh:", error);
+                showModal("Lỗi", "Không thể tải danh sách hình ảnh.");
+                return;
+            }
+            displayImages(images);
+        }
+        
+        function displayImages(images) {
+            uiElements.imagesTabContent.querySelector('#images-list').innerHTML = '';
+            if (images.length === 0) {
+                uiElements.imagesTabContent.querySelector('#images-list').innerHTML = '<p class="text-center text-slate-500 col-span-full">Chưa có hình ảnh nào.</p>';
+            }
+            images.forEach(img => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-50 rounded-lg p-2 shadow-sm relative group cursor-pointer item-card';
+                
+                const imageUrl = supabase.storage.from('images').getPublicUrl(img.storage_path).data.publicUrl;
+
+                item.innerHTML = `
+                    <img src="${imageUrl}" alt="${img.caption || 'Hình ảnh khu vực'}" class="w-full h-auto rounded-lg">
+                    <div class="mt-2 text-sm text-slate-700">
+                        <p class="editable" data-id="${img.id}" data-type="image" data-field="caption">${img.caption || 'Chưa có chú thích.'}</p>
+                        ${img.location ? `<p class="text-xs text-slate-500">Vị trí: ${img.location.latitude}, ${img.location.longitude}</p>` : `<p class="text-xs text-slate-500">Vị trí: Không có</p>`}
+                    </div>
+                    <button class="delete-btn absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200" data-id="${img.id}" data-type="image" data-path="${img.storage_path}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                `;
+                uiElements.imagesTabContent.querySelector('#images-list').appendChild(item);
+            });
+            setupEditableFields();
+            setupDeleteListeners();
+        }
+        // --- Chuyển đổi giao diện ---
+        function showPrecincts() {
+            uiElements.precinctsTabContent.classList.remove('hidden');
+            uiElements.politicalTabContent.classList.add('hidden');
+            uiElements.subjectsTabContent.classList.add('hidden');
+            uiElements.incidentsTabContent.classList.add('hidden');
+            uiElements.imagesTabContent.classList.add('hidden');
+            uiElements.precinctSection.classList.remove('hidden');
+            uiElements.householdSection.classList.add('hidden');
+            uiElements.memberSection.classList.add('hidden');
+            document.getElementById('household-crumb').classList.add('hidden');
+            document.getElementById('member-crumb').classList.add('hidden');
+            currentPrecinctId = null;
+            currentPrecinctName = null;
+            currentHouseholdId = null;
+            currentHouseholdName = null;
+        }
+        function showPolitical() {
+            uiElements.politicalTabContent.classList.remove('hidden');
+            uiElements.precinctsTabContent.classList.add('hidden');
+            uiElements.subjectsTabContent.classList.add('hidden');
+            uiElements.incidentsTabContent.classList.add('hidden');
+            uiElements.imagesTabContent.classList.add('hidden');
+        }
+        function showSubjects() {
+            uiElements.subjectsTabContent.classList.remove('hidden');
+            uiElements.politicalTabContent.classList.add('hidden');
+            uiElements.precinctsTabContent.classList.add('hidden');
+            uiElements.incidentsTabContent.classList.add('hidden');
+            uiElements.imagesTabContent.classList.add('hidden');
+        }
+        function showIncidents() {
+            uiElements.incidentsTabContent.classList.remove('hidden');
+            uiElements.politicalTabContent.classList.add('hidden');
+            uiElements.precinctsTabContent.classList.add('hidden');
+            uiElements.subjectsTabContent.classList.add('hidden');
+            uiElements.imagesTabContent.classList.add('hidden');
+        }
+        function showImages() {
+            uiElements.imagesTabContent.classList.remove('hidden');
+            uiElements.politicalTabContent.classList.add('hidden');
+            uiElements.precinctsTabContent.classList.add('hidden');
+            uiElements.subjectsTabContent.classList.add('hidden');
+            uiElements.incidentsTabContent.classList.add('hidden');
+        }
+        function showHouseholds(precinctId, precinctName) {
+            uiElements.precinctSection.classList.add('hidden');
+            uiElements.householdSection.classList.remove('hidden');
+            uiElements.memberSection.classList.add('hidden');
+            
+            uiElements.householdListTitle.textContent = `Hộ gia đình tại Thôn ${precinctName}`;
+            document.getElementById('household-crumb').classList.remove('hidden');
+            document.querySelector('.household-crumb-link').textContent = precinctName;
+            document.getElementById('member-crumb').classList.add('hidden');
+            
+            currentPrecinctId = precinctId;
+            currentPrecinctName = precinctName;
+            currentHouseholdId = null;
+            currentHouseholdName = null;
+            
+            setupHouseholdsListener();
+        }
+        function showMembers(householdId, householdName) {
+            uiElements.precinctsTabContent.classList.remove('hidden');
+            uiElements.subjectsTabContent.classList.add('hidden');
+            uiElements.incidentsTabContent.classList.add('hidden');
+            uiElements.imagesTabContent.classList.add('hidden');
+            uiElements.precinctSection.classList.add('hidden');
+            uiElements.householdSection.classList.add('hidden');
+            uiElements.memberSection.classList.remove('hidden');
+            
+            uiElements.memberListTitle.textContent = `Thành viên Hộ ${householdName}`;
+            document.getElementById('member-crumb').classList.remove('hidden');
+            
+            currentHouseholdId = householdId;
+            currentHouseholdName = householdName;
+            
+            setupMembersListener();
+        }
+        
         // --- Xử lý Đăng nhập, Thêm và Xóa ---
         document.getElementById('precinct-home-link').addEventListener('click', (e) => {
             e.preventDefault();
@@ -460,11 +971,15 @@
         document.getElementById('add-member-btn').addEventListener('click', () => {
             showAddMemberForm();
         });
-        
+        document.getElementById('add-party-member-btn').addEventListener('click', () => {
+            showAddPartyMemberForm();
+        });
+        document.getElementById('add-security-team-btn').addEventListener('click', () => {
+            showAddSecurityTeamForm();
+        });
         document.getElementById('add-subject-btn').addEventListener('click', () => {
             showAddSubjectForm();
         });
-        
         document.getElementById('add-incident-btn').addEventListener('click', () => {
             showAddIncidentForm();
         });
@@ -528,6 +1043,72 @@
             });
         }
         
+        function showAddPartyMemberForm() {
+            const modalContent = document.getElementById('modal-content-area');
+            modalContent.innerHTML = `
+                <form id="add-item-form" class="space-y-4">
+                    <input type="text" id="item-name" placeholder="Nhập tên đảng viên" required
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                    <input type="text" id="item-position" placeholder="Nhập chức vụ"
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
+                        Thêm Đảng viên
+                    </button>
+                </form>
+            `;
+            modalTitle.textContent = "Thêm Đảng viên mới";
+            modal.style.display = 'flex';
+            
+            document.getElementById('add-item-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('item-name').value;
+                const position = document.getElementById('item-position').value;
+                if (!name) return;
+
+                const { data, error } = await supabase.from(TABLES.party_members).insert([{ name, position, creator_id: userId }]);
+                if (error) {
+                    console.error("Lỗi khi thêm đảng viên:", error);
+                    showModal("Lỗi", "Không thể thêm đảng viên.");
+                } else {
+                    showModal("Thành công", "Đã thêm đảng viên thành công.");
+                }
+                modal.style.display = 'none';
+            });
+        }
+
+        function showAddSecurityTeamForm() {
+             const modalContent = document.getElementById('modal-content-area');
+            modalContent.innerHTML = `
+                <form id="add-item-form" class="space-y-4">
+                    <input type="text" id="item-name" placeholder="Nhập tên thành viên" required
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                    <input type="text" id="item-position" placeholder="Nhập chức vụ"
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
+                        Thêm Thành viên
+                    </button>
+                </form>
+            `;
+            modalTitle.textContent = "Thêm Thành viên Tổ ANTT Cơ sở";
+            modal.style.display = 'flex';
+
+            document.getElementById('add-item-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('item-name').value;
+                const position = document.getElementById('item-position').value;
+                if (!name) return;
+
+                const { data, error } = await supabase.from(TABLES.security_team).insert([{ name, position, creator_id: userId }]);
+                if (error) {
+                    console.error("Lỗi khi thêm thành viên tổ antt:", error);
+                    showModal("Lỗi", "Không thể thêm thành viên.");
+                } else {
+                    showModal("Thành công", "Đã thêm thành viên thành công.");
+                }
+                modal.style.display = 'none';
+            });
+        }
+        
         function showAddSubjectForm() {
             const modalContent = document.getElementById('modal-content-area');
             modalContent.innerHTML = `
@@ -552,7 +1133,7 @@
                 
                 supabase
                     .from(TABLES.subjects)
-                    .insert([{ name, description, creator_id: userId, events: [] }])
+                    .insert([{ name, description, creator_id: userId, events: [], type: currentSubjectType }])
                     .then(({ error }) => {
                         if (error) throw error;
                         showModal("Thành công", "Đã thêm đối tượng thành công.");
@@ -790,6 +1371,14 @@
                     table = TABLES.images;
                     eqColumn = 'id';
                     break;
+                case 'party_member':
+                    table = TABLES.party_members;
+                    eqColumn = 'id';
+                    break;
+                case 'security_team':
+                    table = TABLES.security_team;
+                    eqColumn = 'id';
+                    break;
                 default:
                     showModal("Lỗi", `Loại ${type} không hợp lệ.`);
                     return;
@@ -846,6 +1435,8 @@
                             case 'subject': table = TABLES.subjects; break;
                             case 'incident': table = TABLES.incidents; break;
                             case 'image': table = TABLES.images; break;
+                            case 'party_member': table = TABLES.party_members; break;
+                            case 'security_team': table = TABLES.security_team; break;
                             default: return;
                         }
 
@@ -884,32 +1475,100 @@
             showPrecincts();
         });
         
+        document.getElementById('tab-political').addEventListener('click', () => {
+            document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
+            uiElements.politicalTabContent.classList.remove('hidden');
+            uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-political').classList.add('active');
+            showPolitical();
+        });
+
         document.getElementById('tab-subjects').addEventListener('click', () => {
             document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
             uiElements.subjectsTabContent.classList.remove('hidden');
             uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
             document.getElementById('tab-subjects').classList.add('active');
+            showSubjects();
         });
         document.getElementById('tab-incidents').addEventListener('click', () => {
             document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
             uiElements.incidentsTabContent.classList.remove('hidden');
             uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
             document.getElementById('tab-incidents').classList.add('active');
+            showIncidents();
         });
         document.getElementById('tab-images').addEventListener('click', () => {
             document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
             uiElements.imagesTabContent.classList.remove('hidden');
             uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
             document.getElementById('tab-images').classList.add('active');
+            showImages();
+        });
+        
+        // Sub-tab navigation for Political tab
+        document.getElementById('tab-party-members').addEventListener('click', () => {
+            document.getElementById('party-members-section').classList.remove('hidden');
+            document.getElementById('security-team-section').classList.add('hidden');
+            uiElements.politicalTabButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-party-members').classList.add('active');
+        });
+        document.getElementById('tab-security-team').addEventListener('click', () => {
+            document.getElementById('security-team-section').classList.remove('hidden');
+            document.getElementById('party-members-section').classList.add('hidden');
+            uiElements.politicalTabButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-security-team').classList.add('active');
+        });
+
+        // Sub-tab navigation for Subjects tab
+        document.getElementById('tab-criminal').addEventListener('click', () => {
+            currentSubjectType = 'criminal';
+            uiElements.subjectTabButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-criminal').classList.add('active');
+            fetchSubjects();
+        });
+        document.getElementById('tab-political-subject').addEventListener('click', () => {
+            currentSubjectType = 'political';
+            uiElements.subjectTabButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-political-subject').classList.add('active');
+            fetchSubjects();
         });
         
         uiElements.subjectSearch.addEventListener('input', fetchSubjects);
+
+        // --- Theme Toggle ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if (document.body.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        });
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        } else {
+            document.body.classList.remove('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+
         // --- Modal Control ---
         
         function showModal(title, message) {
             modalTitle.textContent = title;
             const contentArea = document.getElementById('modal-content-area');
-            contentArea.innerHTML = `<p class="text-slate-700 mb-6">${message}</p>
+            contentArea.innerHTML = `<p class="text-slate-700 dark:text-gray-200 mb-6">${message}</p>
                                      <button id="modal-close-btn" class="w-full bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition-all duration-200">Đóng</button>`;
             modal.style.display = 'flex';
             document.getElementById('modal-close-btn').addEventListener('click', () => {
