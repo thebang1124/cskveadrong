@@ -1,1584 +1,304 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Địa Bàn & Đối Tượng</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter Font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .hidden {
-            display: none;
-        }
-        .tab-button {
-            transition: all 0.2s ease-in-out;
-            border-bottom-width: 2px;
-            border-bottom-color: transparent;
-            position: relative;
-        }
-        .tab-button:hover {
-            color: #4f46e5;
-        }
-        .tab-button.active {
-            color: #4f46e5;
-            border-bottom-color: #4f46e5;
-            font-weight: 600;
-        }
-        /* Dark mode styles */
-        body.dark {
-            background-color: #121212;
-            color: #e0e0e0;
-        }
-        .dark .bg-white {
-            background-color: #1e1e1e;
-        }
-        .dark .text-slate-800 {
-            color: #f5f5f5;
-        }
-        .dark .text-slate-600 {
-            color: #b0b0b0;
-        }
-        .dark .text-slate-500 {
-            color: #a0a0a0;
-        }
-        .dark .text-slate-700 {
-            color: #d0d0d0;
-        }
-        .dark .border-slate-200 {
-            border-color: #333;
-        }
-        .dark .bg-slate-50 {
-            background-color: #2a2a2a;
-        }
-        .dark .hover\\:bg-slate-100:hover {
-            background-color: #383838;
-        }
-        .dark input, .dark textarea {
-            background-color: #333;
-            border-color: #555;
-            color: #f5f5f5;
-        }
-        .dark .modal-content {
-            background-color: #1e1e1e;
-        }
-        /* Custom colors for tabs */
-        #political-tab-content .item-card { background-color: #4CAF50; color: white; }
-        #political-tab-content .item-card:hover { background-color: #43A047; }
-        #subject-tab-content .item-card.criminal { background-color: #F44336; color: white; }
-        #subject-tab-content .item-card.political { background-color: #2196F3; color: white; }
-        #incident-tab-content .item-card { background-color: #FF9800; color: white; }
-        #image-tab-content .item-card { background-color: #00BCD4; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hệ thống Quản lý Địa bàn & Hộ dân</title>
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}</style>
+  <meta name="theme-color" content="#4f46e5" />
+  <link rel="manifest" href="/manifest.json">
 </head>
-<body class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
-    <!-- Main Container -->
-    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-4xl mx-auto transition-colors duration-300">
-        <h1 class="text-4xl font-bold text-center text-slate-800 mb-2">Hệ Thống Quản Lý Địa Bàn & Đối Tượng</h1>
-        <p class="text-center text-slate-600 mb-6">Quản lý các Thôn, Hộ, Thành viên và Đối tượng.</p>
-        
-        <!-- Dark Mode Toggle -->
-        <div class="flex justify-end mb-4">
-            <button id="theme-toggle" class="p-2 rounded-full bg-slate-200 dark:bg-gray-700 text-slate-800 dark:text-gray-300 transition-colors duration-200">
-                <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-            </button>
+<body class="bg-slate-50 min-h-screen p-6">
+  <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-md overflow-hidden">
+    <header class="flex items-center justify-between p-6 border-b">
+      <div>
+        <h1 class="text-2xl font-bold">Hệ thống Quản lý Địa bàn & Hộ dân</h1>
+        <p class="text-sm text-slate-500">Quản lý thôn/buôn — hộ — thành viên — tổ ANTT</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div id="auth-area" class="flex items-center gap-3">
+          <button id="btn-signin" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Đăng nhập</button>
+          <button id="btn-signout" class="px-4 py-2 border rounded-md hidden">Đăng xuất</button>
         </div>
+        <button id="btn-import" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Nhập Excel / Docx</button>
+        <input id="file-xlsx" type="file" accept=".xlsx,.xls,.csv,.docx" class="hidden">
+        <button id="btn-sync" class="px-4 py-2 border rounded-md bg-white hover:bg-slate-50">Đồng bộ với Supabase</button>
+      </div>
+    </header>
 
-        <!-- Main Content -->
-        <div id="main-content">
-            
-            <!-- Navigation Tabs -->
-            <div class="flex border-b border-slate-200 mb-6 space-x-4">
-                <button id="tab-precincts" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600 active">Địa bàn</button>
-                <button id="tab-political" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Hệ thống chính trị</button>
-                <button id="tab-subjects" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Đối tượng</button>
-                <button id="tab-incidents" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Vụ việc</button>
-                <button id="tab-images" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Hình ảnh</button>
-            </div>
-            
-            <!-- Tab Content -->
-            <div id="tab-content">
-                <!-- Precincts and Households Section -->
-                <div id="precincts-tab-content">
-                    <!-- Breadcrumbs -->
-                    <nav class="flex items-center space-x-2 mb-4 text-sm font-medium text-slate-500">
-                        <a href="#" id="precinct-home-link" class="hover:text-indigo-600">Thôn/Buôn</a>
-                        <span id="household-crumb" class="hidden">/ <a href="#" class="household-crumb-link hover:text-indigo-600"></a></span>
-                        <span id="member-crumb" class="hidden">/ <span class="text-slate-700">Thành viên</span></span>
-                    </nav>
-                    <!-- Precinct List Section -->
-                    <div id="precinct-list-section">
-                        <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-2xl font-semibold text-slate-700">Danh Sách Thôn/Buôn</h2>
-                        </div>
-                        <div id="precincts-list" class="space-y-4">
-                            <p class="text-center text-slate-500">Đang tải danh sách...</p>
-                        </div>
-                    </div>
-                    <!-- Household List Section -->
-                    <div id="household-list-section" class="hidden">
-                        <div class="flex items-center justify-between mb-4">
-                            <h2 id="household-list-title" class="text-2xl font-semibold text-slate-700"></h2>
-                            <button id="add-household-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
-                                + Thêm Hộ gia đình
-                            </button>
-                        </div>
-                        <div id="households-list" class="space-y-4">
-                            <p class="text-center text-slate-500">Đang tải danh sách...</p>
-                        </div>
-                    </div>
-                    <!-- Member List Section -->
-                    <div id="member-list-section" class="hidden">
-                        <div class="flex items-center justify-between mb-4">
-                            <h2 id="member-list-title" class="text-2xl font-semibold text-slate-700"></h2>
-                            <button id="add-member-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
-                                + Thêm Thành viên
-                            </button>
-                        </div>
-                        <div id="members-list" class="space-y-4">
-                            <p class="text-center text-slate-500">Đang tải danh sách...</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Political System Section -->
-                <div id="political-tab-content" class="hidden">
-                    <h2 class="text-2xl font-semibold text-slate-700 mb-4">Quản Lý Hệ Thống Chính Trị Thôn</h2>
-                    <div class="flex border-b border-slate-200 mb-6 space-x-4">
-                        <button id="tab-party-members" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600 active">Đảng viên</button>
-                        <button id="tab-security-team" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Tổ ANTT Cơ sở</button>
-                    </div>
-                    <div id="political-content">
-                        <!-- Party Members Section -->
-                        <div id="party-members-section">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-xl font-semibold text-slate-700">Danh Sách Đảng Viên</h3>
-                                <button id="add-party-member-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
-                                    + Thêm Đảng viên
-                                </button>
-                            </div>
-                            <div id="party-members-list" class="space-y-4">
-                                <p class="text-center text-slate-500">Đang tải danh sách...</p>
-                            </div>
-                        </div>
-                        <!-- Security Team Section -->
-                        <div id="security-team-section" class="hidden">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-xl font-semibold text-slate-700">Danh Sách Tổ ANTT Cơ sở</h3>
-                                <button id="add-security-team-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
-                                    + Thêm Thành viên tổ
-                                </button>
-                            </div>
-                            <div id="security-team-list" class="space-y-4">
-                                <p class="text-center text-slate-500">Đang tải danh sách...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <main class="p-6">
+      <!-- Tabs -->
+      <div class="mb-6">
+        <nav class="flex gap-2">
+          <button data-tab="precincts" class="tab-btn active px-4 py-2 rounded-md bg-indigo-50 text-indigo-700 font-medium">Thôn/Buôn</button>
+          <button data-tab="households" class="tab-btn px-4 py-2 rounded-md hover:bg-slate-100">Hộ gia đình</button>
+          <button data-tab="security" class="tab-btn px-4 py-2 rounded-md hover:bg-slate-100">Tổ ANTT</button>
+          <button data-tab="reports" class="tab-btn px-4 py-2 rounded-md hover:bg-slate-100">Báo cáo</button>
+          <button data-tab="settings" class="tab-btn px-4 py-2 rounded-md hover:bg-slate-100">Cấu hình</button>
+        </nav>
+      </div>
 
-                <!-- Subjects Management Section -->
-                <div id="subjects-tab-content" class="hidden">
-                    <h2 class="text-2xl font-semibold text-slate-700 mb-4">Quản Lý Đối Tượng</h2>
-                    <div class="flex border-b border-slate-200 mb-6 space-x-4">
-                        <button id="tab-criminal" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600 active">Hình sự</button>
-                        <button id="tab-political-subject" class="tab-button py-2 px-4 text-center font-medium text-lg text-slate-600">Chính trị</button>
-                    </div>
-                    <div id="subject-content">
-                        <div class="flex items-center justify-between mb-4">
-                            <input type="text" id="subject-search" placeholder="Tìm kiếm đối tượng..."
-                                class="w-full max-w-sm px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
-                            <button id="add-subject-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
-                                + Thêm Đối tượng
-                            </button>
-                        </div>
-                        <div id="subjects-list" class="space-y-4">
-                            <p class="text-center text-slate-500">Chưa có đối tượng nào.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Incidents Management Section -->
-                <div id="incidents-tab-content" class="hidden">
-                    <h2 class="text-2xl font-semibold text-slate-700 mb-4">Quản Lý Vụ Việc Mâu Thuẫn</h2>
-                    <div class="flex items-center justify-between mb-4">
-                        <button id="add-incident-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
-                            + Thêm Vụ việc
-                        </button>
-                    </div>
-                    <div id="incidents-list" class="space-y-4">
-                        <p class="text-center text-slate-500">Chưa có vụ việc nào.</p>
-                    </div>
-                </div>
-                <!-- Images Management Section -->
-                <div id="images-tab-content" class="hidden">
-                    <h2 class="text-2xl font-semibold text-slate-700 mb-4">Quản Lý Hình Ảnh Khu Vực</h2>
-                    <div class="flex items-center justify-between mb-4">
-                        <button id="add-image-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all duration-200">
-                            + Thêm Hình ảnh
-                        </button>
-                    </div>
-                    <div id="images-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <p class="text-center text-slate-500 col-span-full">Chưa có hình ảnh nào.</p>
-                    </div>
-                </div>
-            </div>
+      <!-- Tab contents -->
+      <section id="precincts" class="tab-content">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold">Danh sách Thôn/Buôn</h2>
+          <div class="flex gap-2">
+            <input id="search-precinct" placeholder="Tìm thôn/buôn..." class="px-3 py-2 border rounded-md" />
+            <button id="add-precinct" class="px-3 py-2 bg-green-600 text-white rounded-md">+ Thêm</button>
+          </div>
         </div>
+        <div id="precincts-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </section>
+
+      <section id="households" class="tab-content hidden">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold">Danh sách Hộ</h2>
+          <div class="flex gap-2">
+            <input id="search-household" placeholder="Tìm theo tên, CCCD, thôn..." class="px-3 py-2 border rounded-md w-80" />
+            <button id="add-household" class="px-3 py-2 bg-green-600 text-white rounded-md">+ Thêm Hộ</button>
+          </div>
+        </div>
+        <div id="households-table" class="overflow-auto border rounded-md bg-white">
+          <table class="min-w-full text-sm">
+            <thead class="bg-slate-100 text-left">
+              <tr>
+                <th class="p-2">#</th>
+                <th class="p-2">Chủ hộ</th>
+                <th class="p-2">CCCD</th>
+                <th class="p-2">Thôn/Buôn</th>
+                <th class="p-2">Số người</th>
+                <th class="p-2">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="households-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="security" class="tab-content hidden">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold">Danh sách Tổ ANTT</h2>
+          <div>
+            <button id="import-security" class="px-3 py-2 bg-indigo-600 text-white rounded-md">Import từ Quyết định (docx/xlsx)</button>
+          </div>
+        </div>
+        <div id="security-table" class="overflow-auto border rounded-md bg-white">
+          <table class="min-w-full text-sm">
+            <thead class="bg-slate-100 text-left">
+              <tr>
+                <th class="p-2">#</th>
+                <th class="p-2">Thôn/Buôn</th>
+                <th class="p-2">Họ tên</th>
+                <th class="p-2">Số CCCD</th>
+                <th class="p-2">Chức danh</th>
+                <th class="p-2">SĐT</th>
+              </tr>
+            </thead>
+            <tbody id="security-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="reports" class="tab-content hidden">
+        <h2 class="text-lg font-semibold mb-4">Báo cáo & Thống kê</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div class="p-4 bg-white border rounded-md">
+            <div class="text-sm text-slate-500">Số hộ</div>
+            <div id="stat-households" class="text-2xl font-bold">0</div>
+          </div>
+          <div class="p-4 bg-white border rounded-md">
+            <div class="text-sm text-slate-500">Tổng nhân khẩu</div>
+            <div id="stat-population" class="text-2xl font-bold">0</div>
+          </div>
+          <div class="p-4 bg-white border rounded-md">
+            <div class="text-sm text-slate-500">Số thành viên Tổ ANTT</div>
+            <div id="stat-security" class="text-2xl font-bold">0</div>
+          </div>
+        </div>
+        <canvas id="chart-pop" class="bg-white border rounded-md p-2"></canvas>
+      </section>
+
+      <section id="settings" class="tab-content hidden">
+        <h2 class="text-lg font-semibold mb-4">Cấu hình</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-white border rounded-md">
+            <label class="block text-sm text-slate-600">Supabase URL</label>
+            <input id="cfg-url" class="mt-2 px-3 py-2 border rounded-md w-full" placeholder="https://xyz.supabase.co" />
+            <label class="block text-sm text-slate-600 mt-3">Supabase anon key</label>
+            <input id="cfg-key" class="mt-2 px-3 py-2 border rounded-md w-full" placeholder="anon key" />
+            <div class="mt-3 flex gap-2">
+              <button id="save-cfg" class="px-3 py-2 bg-indigo-600 text-white rounded-md">Lưu cấu hình</button>
+              <button id="test-conn" class="px-3 py-2 border rounded-md">Kiểm tra kết nối</button>
+            </div>
+            <p class="text-xs text-slate-400 mt-2">Ghi chú: tạo các bảng `precincts`, `households`, `security_team` trong Supabase trước khi đồng bộ (thêm unique key trên `cccd` nếu muốn upsert an toàn).</p>
+          </div>
+          <div class="p-4 bg-white border rounded-md">
+            <h3 class="font-semibold mb-2">PWA & Service Worker</h3>
+            <p class="text-sm text-slate-600">Ứng dụng có thể cài làm PWA trên điện thoại. Service worker sẽ cache shell cơ bản.</p>
+            <button id="install-pwa" class="mt-3 px-3 py-2 bg-green-600 text-white rounded-md">Hướng dẫn cài PWA</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="p-4 text-sm text-slate-500 border-t">Powered by Supabase • Thiết kế cho quản lý địa bàn</footer>
+  </div>
+
+  <!-- Modal (simple) -->
+  <div id="modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center">
+    <div class="bg-white rounded-md p-6 w-full max-w-2xl">
+      <h3 id="modal-title" class="text-lg font-semibold mb-4">Form</h3>
+      <div id="modal-body"></div>
+      <div class="mt-4 flex justify-end gap-2">
+        <button id="modal-cancel" class="px-4 py-2 border rounded-md">Hủy</button>
+        <button id="modal-save" class="px-4 py-2 bg-indigo-600 text-white rounded-md">Lưu</button>
+      </div>
     </div>
-    <!-- Modal for Forms and Messages -->
-    <div id="modal" class="modal">
-        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full transition-colors duration-300 modal-content">
-            <h3 id="modal-title" class="text-xl font-bold mb-4 text-center"></h3>
-            <div id="modal-content-area">
-                <!-- Forms and messages will be dynamically inserted here -->
-            </div>
-        </div>
-    </div>
-    <!-- Supabase Scripts -->
-    <script type="module">
-        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+  </div>
 
-        // Vui lòng thay thế các giá trị dưới đây bằng thông tin Supabase của bạn
-        // Lấy thông tin này từ trang 'Project Settings' -> 'API' trong dashboard Supabase của bạn.
-        // --- Cấu hình Supabase ---
-        const SUPABASE_URL = 'https://skbjeeyisyfifzoiuxeq.supabase.co'; // Ví dụ: 'https://xyzcompany.supabase.co'
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYmplZXlpc3lmaWZ6b2l1eGVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2MTkzNTEsImV4cCI6MjA3NDE5NTM1MX0.6PfosdSP4V6s6e0BgO2PdTZkYlFash5Tl-HCAq0KMY0'; // Khóa anon từ bảng điều khiển của bạn
-        // --- Cấu hình bảng trong Supabase ---
-        const TABLES = {
-            precincts: 'precincts',
-            households: 'households',
-            members: 'members',
-            subjects: 'subjects',
-            incidents: 'incidents',
-            images: 'images',
-            security_team: 'security_team',
-            party_members: 'party_members'
-        };
-        // ----------------------------------------
-        
-        let supabase;
-        let userId = null;
-        
-        const modal = document.getElementById('modal');
-        const modalTitle = document.getElementById('modal-title');
-        
-        let currentSubjectType = 'criminal';
+  <!-- Libraries: Supabase ESM, SheetJS, Chart.js, Mammoth for .docx -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+    // Chart.js ESM
+    import Chart from 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.esm.min.js'
 
-        // Xử lý xác thực người dùng
-        async function authenticateUser() {
-            try {
-                const { data, error } = await supabase.auth.signInAnonymously();
-                if (error) throw error;
-                userId = data.user.id;
-                console.log("Người dùng đã xác thực thành công. UID:", userId);
-            } catch (error) {
-                console.error("Lỗi khi xác thực người dùng:", error);
-                showModal("Lỗi", "Không thể xác thực người dùng. Vui lòng thử lại.");
-            }
-        }
-        
-        // --- Cấu trúc dữ liệu và UI Elements ---
-        let currentPrecinctId = null;
-        let currentPrecinctName = null;
-        let currentHouseholdId = null;
-        let currentHouseholdName = null;
-        const initialPrecincts = [
-            "Thôn 5", "Thôn 6", "Thôn 7", "Thôn 8", "Thôn 9",
-            "Buôn Alê Gŏ", "Buôn Dhu", "Buôn Ea Kjŏh A", "Buôn Ea Kjŏh B", "Buôn Hně",
-            "Buôn Kmiên", "Buôn Pheo", "Buôn Sǐng A", "Buôn Tung Krăk", "Buôn Trang",
-            "Buôn Trăp", "Buôn Tring 4", "Thôn Đông Xuân", "Thôn Ea Kung", "Buôn Klat A",
-            "Buôn Klat B", "Buôn Klat C", "Thôn Quyết Thắng", "Thôn Tân Hợp", "Thôn 1A",
-            "Thôn 1B", "Thôn 2A", "Thôn 2B", "Thôn 3", "Thôn 6", "Thôn 7", "Thôn 8"
-        ];
-        
-        const uiElements = {
-            mainContent: document.getElementById('main-content'),
-            tabButtons: document.querySelectorAll('.tab-button'),
-            precinctsTabContent: document.getElementById('precincts-tab-content'),
-            politicalTabContent: document.getElementById('political-tab-content'),
-            subjectsTabContent: document.getElementById('subjects-tab-content'),
-            incidentsTabContent: document.getElementById('incidents-tab-content'),
-            imagesTabContent: document.getElementById('images-tab-content'),
-            precinctsList: document.getElementById('precincts-list'),
-            householdsList: document.getElementById('households-list'),
-            membersList: document.getElementById('members-list'),
-            precinctSection: document.getElementById('precinct-list-section'),
-            householdSection: document.getElementById('household-list-section'),
-            memberSection: document.getElementById('member-list-section'),
-            householdListTitle: document.getElementById('household-list-title'),
-            memberListTitle: document.getElementById('member-list-title'),
-            addHouseholdBtn: document.getElementById('add-household-btn'),
-            addMemberBtn: document.getElementById('add-member-btn'),
-            subjectsList: document.getElementById('subjects-list'),
-            addSubjectBtn: document.getElementById('add-subject-btn'),
-            subjectSearch: document.getElementById('subject-search'),
-            incidentsList: document.getElementById('incidents-list'),
-            addIncidentBtn: document.getElementById('add-incident-btn'),
-            imagesList: document.getElementById('images-list'),
-            addImageBtn: document.getElementById('add-image-btn'),
-            partyMembersList: document.getElementById('party-members-list'),
-            securityTeamList: document.getElementById('security-team-list'),
-            politicalTabButtons: document.querySelectorAll('#political-tab-content .tab-button'),
-            subjectTabButtons: document.querySelectorAll('#subjects-tab-content .tab-button'),
-        };
-        // --- Supabase Listeners và Render UI ---
-        async function initializeData() {
-            try {
-                if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL' || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
-                    showModal('Lỗi Cấu hình', 'Vui lòng cập nhật SUPABASE_URL và SUPABASE_ANON_KEY trong mã nguồn để kết nối với cơ sở dữ liệu của bạn.');
-                    return;
-                }
-                
-                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                await authenticateUser();
-                
-                const { data: precincts, error } = await supabase
-                    .from(TABLES.precincts)
-                    .select('*');
-                
-                if (error) throw error;
+    // App state
+    let supabase = null;
+    let CONFIG = { SUPABASE_URL: '', SUPABASE_ANON_KEY: '' };
+    let state = { precincts: [], households: [], security: [] };
 
-                if (precincts.length === 0) {
-                    for (const name of initialPrecincts) {
-                        await supabase
-                            .from(TABLES.precincts)
-                            .insert([{ name, creator_id: userId, created_at: new Date().toISOString() }]);
-                    }
-                    
-                    const { data: firstPrecinct, error: firstPrecinctError } = await supabase.from(TABLES.precincts).select('id').eq('name', 'Thôn 5').single();
-                    if (!firstPrecinctError) {
-                        await supabase
-                            .from(TABLES.households)
-                            .insert([{ name: "Hộ gia đình mẫu", precinct_id: firstPrecinct.id, creator_id: userId }]);
-                    }
-                }
-                setupSupabaseListeners();
-            } catch (error) {
-                console.error("Lỗi khi khởi tạo dữ liệu:", error);
-                showModal("Lỗi", "Không thể kết nối đến hệ thống. Vui lòng thử lại sau. " + error.message);
-            }
-        }
-        
-        function setupSupabaseListeners() {
-            if (!supabase || !userId) return;
-            setupPrecinctsListener();
-            setupPoliticalListeners();
-            setupSubjectsListener();
-            setupIncidentsListener();
-            setupImagesListener();
-        }
-        
-        async function fetchPrecincts() {
-            const { data: precincts, error } = await supabase.from(TABLES.precincts).select('id, name');
-            if (error) {
-                console.error("Lỗi khi tải thôn/buôn:", error);
-                showModal("Lỗi", "Không thể tải danh sách thôn/buôn.");
-                return;
-            }
-        
-            const precinctsWithCounts = await Promise.all(precincts.map(async p => {
-                const { count: householdsCount, error: householdsError } = await supabase
-                    .from(TABLES.households)
-                    .select('id', { count: 'exact', head: true })
-                    .eq('precinct_id', p.id);
-                
-                const { data: households, error: householdsDataError } = await supabase
-                    .from(TABLES.households)
-                    .select('id')
-                    .eq('precinct_id', p.id);
-                
-                let membersCount = 0;
-                if (!householdsDataError && households && households.length > 0) {
-                    const { count: totalMembersCount, error: membersError } = await supabase
-                        .from(TABLES.members)
-                        .select('id', { count: 'exact', head: true })
-                        .in('household_id', households.map(h => h.id));
-                    membersCount = totalMembersCount || 0;
-                }
-                
-                return { ...p, householdsCount: householdsCount || 0, membersCount };
-            }));
-            displayPrecincts(precinctsWithCounts);
-        }
+    // DOM refs
+    const tabs = document.querySelectorAll('.tab-btn');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
+    const modalSave = document.getElementById('modal-save');
+    const modalCancel = document.getElementById('modal-cancel');
 
-        function setupPrecinctsListener() {
-            supabase
-                .from(TABLES.precincts)
-                .on('ANY', (payload) => fetchPrecincts())
-                .subscribe();
-            supabase
-                .from(TABLES.households)
-                .on('ANY', (payload) => fetchPrecincts())
-                .subscribe();
-            supabase
-                .from(TABLES.members)
-                .on('ANY', (payload) => fetchPrecincts())
-                .subscribe();
-            fetchPrecincts();
-        }
+    function showModal(title, html, onSave){ modalTitle.textContent = title; modalBody.innerHTML = html; modal.classList.remove('hidden'); modalSave.onclick = ()=>{ onSave(); modal.classList.add('hidden'); }; }
+    modalCancel.onclick = ()=> modal.classList.add('hidden');
 
-        async function displayPrecincts(precincts) {
-            uiElements.precinctsList.innerHTML = '';
-            if (!precincts || precincts.length === 0) {
-                uiElements.precinctsList.innerHTML = '<p class="text-center text-slate-500">Chưa có thôn/buôn nào.</p>';
-                return;
-            }
-            precincts.forEach(p => {
-                const item = document.createElement('div');
-                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-center justify-between transition-colors duration-200 hover:bg-slate-100 cursor-pointer';
-                item.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                        </svg>
-                        <span class="text-lg font-medium editable" data-id="${p.id}" data-type="precinct">${p.name}</span>
-                    </div>
-                    <div class="text-sm text-slate-500 text-right">
-                        <span>Hộ: ${p.householdsCount} | Thành viên: ${p.membersCount}</span>
-                    </div>
-                    <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${p.id}" data-type="precinct">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                `;
-                item.querySelector('.flex').addEventListener('click', () => showHouseholds(p.id, p.name));
-                uiElements.precinctsList.appendChild(item);
-            });
-            setupEditableFields();
-            setupDeleteListeners();
-        }
-        function setupHouseholdsListener() {
-            supabase
-                .from(TABLES.households)
-                .on('ANY', payload => {
-                    if (payload.new.precinct_id === currentPrecinctId || payload.old.precinct_id === currentPrecinctId) {
-                        fetchHouseholds();
-                    }
-                })
-                .subscribe();
-            fetchHouseholds();
-        }
+    tabs.forEach(b=>b.addEventListener('click', ()=>{ tabs.forEach(x=>x.classList.remove('active','bg-indigo-50','text-indigo-700')); b.classList.add('active','bg-indigo-50','text-indigo-700'); document.querySelectorAll('.tab-content').forEach(s=>s.classList.add('hidden')); document.getElementById(b.dataset.tab).classList.remove('hidden'); }));
 
-        async function fetchHouseholds() {
-            const { data: households, error } = await supabase
-                .from(TABLES.households)
-                .select('*')
-                .eq('precinct_id', currentPrecinctId);
-            if (error) {
-                console.error("Lỗi khi tải hộ gia đình:", error);
-                showModal("Lỗi", "Không thể tải danh sách hộ gia đình.");
-                return;
-            }
-            displayHouseholds(households);
-        }
-        
-        async function displayHouseholds(households) {
-            uiElements.householdsList.innerHTML = '';
-            if (!households || households.length === 0) {
-                uiElements.householdsList.innerHTML = '<p class="text-center text-slate-500">Chưa có hộ gia đình nào trong thôn này.</p>';
-                return;
-            }
-            
-            const householdsWithCounts = await Promise.all(households.map(async h => {
-                const { count: membersCount } = await supabase
-                    .from(TABLES.members)
-                    .select('id', { count: 'exact' })
-                    .eq('household_id', h.id);
-                return { ...h, membersCount };
-            }));
-            householdsWithCounts.forEach(h => {
-                const item = document.createElement('div');
-                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-center justify-between transition-colors duration-200 hover:bg-slate-100 cursor-pointer';
-                item.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2m14 0V9a2 2 0 00-2-2H7a2 2 0 00-2 2v2m14 0a2 2 0 01-2 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2m14 0V9a2 2 0 00-2-2H7a2 2 0 00-2 2v2" />
-                        </svg>
-                        <span class="text-lg font-medium editable" data-id="${h.id}" data-type="household">${h.name}</span>
-                    </div>
-                    <div class="text-sm text-slate-500 text-right">
-                        <span>Thành viên: ${h.membersCount}</span>
-                    </div>
-                    <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${h.id}" data-type="household">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                `;
-                item.querySelector('.flex').addEventListener('click', () => showMembers(h.id, h.name));
-                uiElements.householdsList.appendChild(item);
-            });
-            setupEditableFields();
-            setupDeleteListeners();
-        }
-        function showMembers(householdId, householdName) {
-            uiElements.precinctsTabContent.classList.remove('hidden');
-            uiElements.subjectsTabContent.classList.add('hidden');
-            uiElements.incidentsTabContent.classList.add('hidden');
-            uiElements.imagesTabContent.classList.add('hidden');
-            uiElements.precinctSection.classList.add('hidden');
-            uiElements.householdSection.classList.add('hidden');
-            uiElements.memberSection.classList.remove('hidden');
-            
-            uiElements.memberListTitle.textContent = `Thành viên Hộ ${householdName}`;
-            document.getElementById('member-crumb').classList.remove('hidden');
-            
-            currentHouseholdId = householdId;
-            currentHouseholdName = householdName;
-            
-            setupMembersListener();
-        }
-        
-        function setupMembersListener() {
-            supabase
-                .from(TABLES.members)
-                .on('ANY', payload => {
-                    if (payload.new.household_id === currentHouseholdId || payload.old.household_id === currentHouseholdId) {
-                        fetchMembers();
-                    }
-                })
-                .subscribe();
-            fetchMembers();
-        }
+    // Render helpers (same as before with minor improvements)
+    function renderPrecincts(){ const el = document.getElementById('precincts-list'); el.innerHTML = ''; state.precincts.forEach((p,idx)=>{ const card = document.createElement('div'); card.className = 'p-4 border rounded-md bg-white'; card.innerHTML = `<div class="flex justify-between items-start"><div><div class="font-semibold">${p.name}</div><div class="text-sm text-slate-500">ID: ${p.id || idx+1}</div></div><div class="flex gap-2"><button data-id="${p.id || idx}" class="open-household px-3 py-1 border rounded-md text-sm">Xem hộ</button><button data-id="${p.id || idx}" class="edit-precinct px-3 py-1 border rounded-md text-sm">Sửa</button></div></div>`; el.appendChild(card); }); document.querySelectorAll('.open-household').forEach(btn=>btn.addEventListener('click', (ev)=>{ const id = ev.target.dataset.id; showHouseholdsForPrecinct(id); document.querySelector('[data-tab="households"]').click(); })); }
+    function renderHouseholds(){ const tbody = document.getElementById('households-tbody'); tbody.innerHTML = ''; state.households.forEach((h, i)=>{ const tr = document.createElement('tr'); tr.innerHTML = `<td class="p-2 align-top">${i+1}</td><td class="p-2 align-top">${h.name}</td><td class="p-2 align-top">${h.cccd || ''}</td><td class="p-2 align-top">${h.precinct || ''}</td><td class="p-2 align-top">${h.count || ''}</td><td class="p-2 align-top"><button data-i="${i}" class="edit-household px-2 py-1 border rounded-md text-sm">Sửa</button> <button data-i="${i}" class="del-household px-2 py-1 border rounded-md text-sm">Xóa</button></td>`; tbody.appendChild(tr); }); document.querySelectorAll('.edit-household').forEach(btn=>btn.addEventListener('click',(e)=>{ const idx = e.target.dataset.i; editHouseholdForm(idx); })); document.querySelectorAll('.del-household').forEach(btn=>btn.addEventListener('click',(e)=>{ const idx = e.target.dataset.i; if(confirm('Xóa hộ này?')){ state.households.splice(idx,1); renderHouseholds(); updateStats(); } })); }
+    function renderSecurity(){ const tbody = document.getElementById('security-tbody'); tbody.innerHTML = ''; state.security.forEach((s,i)=>{ const tr = document.createElement('tr'); tr.innerHTML = `<td class="p-2">${i+1}</td><td class="p-2">${s.precinct || ''}</td><td class="p-2">${s.name}</td><td class="p-2">${s.cccd || ''}</td><td class="p-2">${s.role || ''}</td><td class="p-2">${s.phone || ''}</td>`; tbody.appendChild(tr); }); }
+    function updateStats(){ document.getElementById('stat-households').textContent = state.households.length; const pop = state.households.reduce((s,h)=>s+Number(h.count||0),0); document.getElementById('stat-population').textContent = pop; document.getElementById('stat-security').textContent = state.security.length; renderChart(); }
 
-        async function fetchMembers() {
-            const { data: members, error } = await supabase
-                .from(TABLES.members)
-                .select('*')
-                .eq('household_id', currentHouseholdId);
-            if (error) {
-                console.error("Lỗi khi tải thành viên:", error);
-                showModal("Lỗi", "Không thể tải danh sách thành viên.");
-                return;
-            }
-            displayMembers(members);
-        }
+    function editHouseholdForm(idx){ const h = state.households[idx]; showModal('Sửa Hộ', `<div class="grid gap-2"><label>Chủ hộ</label><input id="f-house-name" value="${h.name}" class="px-3 py-2 border rounded-md" /><label>Số CCCD</label><input id="f-house-cccd" value="${h.cccd||''}" class="px-3 py-2 border rounded-md" /><label>Thôn/Buôn</label><input id="f-house-precinct" value="${h.precinct||''}" class="px-3 py-2 border rounded-md" /><label>Số người</label><input id="f-house-count" type="number" value="${h.count||0}" class="px-3 py-2 border rounded-md" /></div>`, ()=>{ h.name = document.getElementById('f-house-name').value.trim(); h.cccd = document.getElementById('f-house-cccd').value.trim(); h.precinct = document.getElementById('f-house-precinct').value.trim(); h.count = Number(document.getElementById('f-house-count').value||0); renderHouseholds(); updateStats(); }); }
 
-        function displayMembers(members) {
-            uiElements.membersList.innerHTML = '';
-            if (members.length === 0) {
-                uiElements.membersList.innerHTML = '<p class="text-center text-slate-500">Chưa có thành viên nào trong hộ này.</p>';
-            }
-            members.forEach(m => {
-                const item = document.createElement('div');
-                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-center justify-between';
-                item.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-6 0H6"/>
-                        </svg>
-                        <div>
-                            <span class="text-lg font-medium editable" data-id="${m.id}" data-type="member" data-field="name">${m.name}</span>
-                            <p class="text-sm text-slate-600">CCCD: <span class="editable" data-id="${m.id}" data-type="member" data-field="cccd">${m.cccd}</span></p>
-                        </div>
-                    </div>
-                    <button class="delete-btn text-red-500 hover:text-red-700 transition-all duration-200" data-id="${m.id}" data-type="member">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                `;
-                item.addEventListener('click', (event) => { event.stopPropagation(); });
-                uiElements.membersList.appendChild(item);
-            });
-            setupEditableFields();
-            setupDeleteListeners();
-        }
-        
-        function setupPoliticalListeners() {
-            supabase
-                .from(TABLES.party_members)
-                .on('ANY', (payload) => fetchPartyMembers())
-                .subscribe();
-            supabase
-                .from(TABLES.security_team)
-                .on('ANY', (payload) => fetchSecurityTeam())
-                .subscribe();
-            fetchPartyMembers();
-            fetchSecurityTeam();
-        }
+    // Add forms
+    document.getElementById('add-precinct').addEventListener('click', ()=>{ showModal('Thêm Thôn/Buôn', `<div class="grid gap-2"><label>Tên</label><input id="f-precinct-name" class="px-3 py-2 border rounded-md" /></div>`, ()=>{ const name = document.getElementById('f-precinct-name').value.trim(); if(!name) return alert('Nhập tên'); state.precincts.push({id:Date.now(), name}); renderPrecincts(); }); });
+    document.getElementById('add-household').addEventListener('click', ()=>{ showModal('Thêm Hộ', `<div class="grid gap-2"><label>Chủ hộ</label><input id="f-house-name" class="px-3 py-2 border rounded-md" /><label>Số CCCD</label><input id="f-house-cccd" class="px-3 py-2 border rounded-md" /><label>Thôn/Buôn</label><input id="f-house-precinct" class="px-3 py-2 border rounded-md" /><label>Số người</label><input id="f-house-count" type="number" class="px-3 py-2 border rounded-md" /></div>`, ()=>{ const h = { name: document.getElementById('f-house-name').value.trim(), cccd: document.getElementById('f-house-cccd').value.trim(), precinct: document.getElementById('f-house-precinct').value.trim(), count: Number(document.getElementById('f-house-count').value||0) }; if(!h.name) return alert('Nhập tên chủ hộ'); state.households.push(h); renderHouseholds(); updateStats(); }); });
 
-        async function fetchPartyMembers() {
-            const { data: members, error } = await supabase.from(TABLES.party_members).select('*');
-            if (error) {
-                console.error("Lỗi khi tải đảng viên:", error);
-                showModal("Lỗi", "Không thể tải danh sách đảng viên.");
-                return;
-            }
-            displayPartyMembers(members);
-        }
+    // File import (SheetJS + mammoth for docx)
+    const fileInput = document.getElementById('file-xlsx');
+    document.getElementById('btn-import').addEventListener('click', ()=> fileInput.click());
+    fileInput.addEventListener('change', async (e)=>{
+      const f = e.target.files[0]; if(!f) return;
+      const name = f.name || '';
+      if(name.endsWith('.docx')){
+        // Use mammoth to extract text and try to parse table-like content
+        const arrayBuffer = await f.arrayBuffer();
+        // dynamic import mammoth from CDN
+        const mammoth = await import('https://unpkg.com/mammoth/mammoth.browser.min.js');
+        const result = await mammoth.convertToHtml({arrayBuffer});
+        // Basic heuristic: extract rows from HTML tables
+        const div = document.createElement('div'); div.innerHTML = result.value;
+        const tables = div.querySelectorAll('table');
+        if(tables.length===0) return alert('Không tìm thấy bảng trong file .docx');
+        // We'll try to parse first table as security team if headers match
+        const rows = Array.from(tables[0].querySelectorAll('tr')).map(tr=>Array.from(tr.children).map(td=>td.textContent.trim()));
+        // Heuristic mapping: find columns like Thôn/Buôn, Họ và tên, Số CCCD, Chức Danh, SĐT
+        const header = rows[0].map(h=>h.toLowerCase());
+        const colIdx = (colNames)=>{ for(const name of colNames){ const idx = header.findIndex(h=>h.includes(name)); if(idx>=0) return idx; } return -1 };
+        const idxPrec = colIdx(['thôn','buôn','thôn,','thôn/buôn']);
+        const idxName = colIdx(['họ','tên','họ và tên']);
+        const idxCccd = colIdx(['cccd','số cccd','số căn']);
+        const idxRole = colIdx(['chức','chức danh']);
+        const idxPhone = colIdx(['sđt','điện thoại']);
+        for(let i=1;i<rows.length;i++){ const r = rows[i]; state.security.push({ precinct: r[idxPrec]||'', name: r[idxName]||'', cccd: r[idxCccd]||'', role: r[idxRole]||'', phone: r[idxPhone]||'' }); }
+        renderSecurity(); updateStats(); alert('Đã import Quyết định (một bảng). Kiểm tra danh sách Tổ ANTT.');
+        return;
+      }
+      // For Excel/CSV
+      const data = await f.arrayBuffer();
+      const XLSX = await import('https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js');
+      const wb = XLSX.read(data);
+      if(wb.SheetNames.includes('Households')){
+        const ws = wb.Sheets['Households'];
+        const json = XLSX.utils.sheet_to_json(ws, {defval: ''});
+        json.forEach(r=>{ state.households.push({ name: r['Họ tên chủ hộ'] || r['Tên Chủ Hộ'] || r['Tên Chủ Hộ'] || r['Tên'] || r['name'] || r['Họ và tên'] , cccd: r['Số CCCD'] || r['Số căn cước'] || r['CCCD'], precinct: r['Thôn/Buôn'] || r['Thôn'] || r['precinct'], count: Number(r['Số người']||r['Số Người']||r['Số người trong hộ']||0) }); });
+      }
+      if(wb.SheetNames.includes('Precincts')){
+        const ws = wb.Sheets['Precincts'];
+        const json = XLSX.utils.sheet_to_json(ws, {defval: ''});
+        json.forEach(r=> state.precincts.push({ id: r['ID']||Date.now()+Math.random(), name: r['Tên Thôn/Buôn']||r['Tên']||r['name'] }));
+      }
+      if(wb.SheetNames.includes('Security_Team')||wb.SheetNames.includes('Security')){
+        const ws = wb.Sheets[wb.SheetNames.includes('Security_Team')? 'Security_Team' : 'Security'];
+        const json = XLSX.utils.sheet_to_json(ws, {defval: ''});
+        json.forEach(r=> state.security.push({ precinct: r['Thôn/Buôn']||r['Thôn']||r['precinct'], name: r['Họ Tên']||r['Họ và tên']||r['name'], cccd: r['Số CCCD']||r['CCCD'], role: r['Chức Danh']||r['Chức danh']||r['role'], phone: r['SĐT']||r['Số điện thoại']||r['phone'] }));
+      }
+      renderPrecincts(); renderHouseholds(); renderSecurity(); updateStats(); alert('Import xong — kiểm tra dữ liệu.');
+    });
 
-        function displayPartyMembers(members) {
-            uiElements.partyMembersList.innerHTML = '';
-            if (members.length === 0) {
-                uiElements.partyMembersList.innerHTML = '<p class="text-center text-slate-500">Chưa có đảng viên nào.</p>';
-            }
-            members.forEach(m => {
-                const item = document.createElement('div');
-                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-start justify-between item-card';
-                item.innerHTML = `
-                    <div class="flex-1 space-y-2">
-                        <span class="text-lg font-medium editable" data-id="${m.id}" data-type="party_member" data-field="name">${m.name}</span>
-                        <p class="text-sm">Chức vụ: <span class="editable" data-id="${m.id}" data-type="party_member" data-field="position">${m.position || 'Chưa có'}</span></p>
-                    </div>
-                    <button class="delete-btn text-white hover:text-gray-200 transition-all duration-200" data-id="${m.id}" data-type="party_member">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                `;
-                uiElements.partyMembersList.appendChild(item);
-            });
-            setupEditableFields();
-            setupDeleteListeners();
-        }
+    // Simple search
+    document.getElementById('search-household').addEventListener('input', (e)=>{ const q = e.target.value.toLowerCase(); const tbody = document.getElementById('households-tbody'); Array.from(tbody.children).forEach(tr=>{ const text = tr.textContent.toLowerCase(); tr.style.display = text.includes(q) ? '' : 'none'; }); });
+    document.getElementById('search-precinct').addEventListener('input', (e)=>{ const q = e.target.value.toLowerCase(); document.querySelectorAll('#precincts-list > div').forEach(card=>{ const txt = card.textContent.toLowerCase(); card.style.display = txt.includes(q) ? '' : 'none'; }); });
 
-        async function fetchSecurityTeam() {
-            const { data: members, error } = await supabase.from(TABLES.security_team).select('*');
-            if (error) {
-                console.error("Lỗi khi tải tổ antt:", error);
-                showModal("Lỗi", "Không thể tải danh sách tổ antt.");
-                return;
-            }
-            displaySecurityTeam(members);
-        }
+    function showHouseholdsForPrecinct(id){ const p = state.precincts.find(x=>String(x.id)===String(id)) || state.precincts[id] || {name: id}; document.querySelector('[data-tab="households"]').click(); document.getElementById('search-household').value = p.name; renderHouseholds(); const tbody = document.getElementById('households-tbody'); Array.from(tbody.children).forEach(tr=>{ const precinct = tr.children[3].textContent || ''; tr.style.display = precinct.includes(p.name) ? '' : 'none'; }); }
 
-        function displaySecurityTeam(members) {
-            uiElements.securityTeamList.innerHTML = '';
-            if (members.length === 0) {
-                uiElements.securityTeamList.innerHTML = '<p class="text-center text-slate-500">Chưa có thành viên nào.</p>';
-            }
-            members.forEach(m => {
-                const item = document.createElement('div');
-                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-start justify-between item-card';
-                item.innerHTML = `
-                    <div class="flex-1 space-y-2">
-                        <span class="text-lg font-medium editable" data-id="${m.id}" data-type="security_team" data-field="name">${m.name}</span>
-                        <p class="text-sm">Chức vụ: <span class="editable" data-id="${m.id}" data-type="security_team" data-field="position">${m.position || 'Chưa có'}</span></p>
-                    </div>
-                    <button class="delete-btn text-white hover:text-gray-200 transition-all duration-200" data-id="${m.id}" data-type="security_team">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                `;
-                uiElements.securityTeamList.appendChild(item);
-            });
-            setupEditableFields();
-            setupDeleteListeners();
-        }
+    // Supabase config UI
+    document.getElementById('save-cfg').addEventListener('click', ()=>{ CONFIG.SUPABASE_URL = document.getElementById('cfg-url').value.trim(); CONFIG.SUPABASE_ANON_KEY = document.getElementById('cfg-key').value.trim(); if(!CONFIG.SUPABASE_URL||!CONFIG.SUPABASE_ANON_KEY) return alert('Nhập đầy đủ cấu hình'); supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY); localStorage.setItem('supabase_cfg', JSON.stringify(CONFIG)); alert('Lưu cấu hình xong. Bấm Kiểm tra kết nối.'); });
+    document.getElementById('test-conn').addEventListener('click', async ()=>{ if(!supabase) return alert('Chưa lưu cấu hình Supabase'); try{ const { data, error } = await supabase.from('households').select('id').limit(1); if(error) throw error; alert('Kết nối thành công (bảng households tồn tại và có ' + (data? data.length:0) + ' mẫu).'); }catch(err){ console.error(err); alert('Lỗi kết nối hoặc bảng không tồn tại: '+err.message); } });
 
-        function setupSubjectsListener() {
-            supabase
-                .from(TABLES.subjects)
-                .on('ANY', (payload) => fetchSubjects())
-                .subscribe();
-            fetchSubjects();
-        }
-        
-        async function fetchSubjects() {
-            const searchTerm = uiElements.subjectSearch.value.toLowerCase();
-            let query = supabase.from(TABLES.subjects).select('*').eq('type', currentSubjectType);
-            
-            if (searchTerm) {
-                const { data: subjects, error } = await query;
-                if (error) {
-                    console.error("Lỗi khi tìm kiếm đối tượng:", error);
-                    showModal("Lỗi", "Không thể tìm kiếm đối tượng.");
-                    return;
-                }
-                const filteredSubjects = subjects.filter(s => 
-                    (s.name && s.name.toLowerCase().includes(searchTerm)) || 
-                    (s.description && s.description.toLowerCase().includes(searchTerm))
-                );
-                displaySubjects(filteredSubjects);
-            } else {
-                const { data: subjects, error } = await query;
-                if (error) {
-                    console.error("Lỗi khi tải đối tượng:", error);
-                    showModal("Lỗi", "Không thể tải danh sách đối tượng.");
-                    return;
-                }
-                displaySubjects(subjects);
-            }
-        }
-        
-        function displaySubjects(subjects) {
-            uiElements.subjectsList.innerHTML = '';
-            if (subjects.length === 0) {
-                uiElements.subjectsList.innerHTML = '<p class="text-center text-slate-500">Chưa có đối tượng nào.</p>';
-            }
-            subjects.forEach(s => {
-                const item = document.createElement('div');
-                item.className = `bg-slate-50 rounded-lg p-4 shadow-sm flex items-start justify-between transition-colors duration-200 hover:bg-slate-100 cursor-pointer item-card ${s.type}`;
-                item.innerHTML = `
-                    <div class="flex-1 space-y-2">
-                        <div class="flex items-center space-x-2">
-                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                            <span class="text-lg font-medium editable" data-id="${s.id}" data-type="subject" data-field="name">${s.name}</span>
-                        </div>
-                        <p class="text-sm editable" data-id="${s.id}" data-type="subject" data-field="description">${s.description || 'Chưa có mô tả.'}</p>
-                        <div class="space-y-1 mt-2">
-                            <h4 class="text-xs font-semibold text-white">Diễn biến:</h4>
-                            <div class="text-xs space-y-1" id="events-${s.id}">
-                                ${s.events?.map(event => `<div class="flex justify-between items-center bg-slate-100 dark:bg-gray-700 p-2 rounded-md"><span>${event.text}</span><button class="delete-event-btn text-red-400 hover:text-red-600" data-subject-id="${s.id}" data-event-text="${event.text}">&times;</button></div>`).join('') || '<p class="text-slate-500 dark:text-gray-400">Chưa có diễn biến.</p>'}
-                            </div>
-                            <button class="add-event-btn text-white hover:text-gray-200 text-xs mt-1" data-id="${s.id}">+ Thêm diễn biến</button>
-                        </div>
-                    </div>
-                    <button class="delete-btn text-white hover:text-gray-200 transition-all duration-200" data-id="${s.id}" data-type="subject">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                `;
-                item.addEventListener('click', (event) => { event.stopPropagation(); });
-                uiElements.subjectsList.appendChild(item);
-            });
-            setupEditableFields();
-            setupDeleteListeners();
-        }
-        function setupIncidentsListener() {
-            supabase
-                .from(TABLES.incidents)
-                .on('ANY', (payload) => fetchIncidents())
-                .subscribe();
-            fetchIncidents();
-        }
-        
-        async function fetchIncidents() {
-            const { data: incidents, error } = await supabase
-                .from(TABLES.incidents)
-                .select('*');
-            if (error) {
-                console.error("Lỗi khi tải vụ việc:", error);
-                showModal("Lỗi", "Không thể tải danh sách vụ việc.");
-                return;
-            }
-            displayIncidents(incidents);
-        }
-        
-        function displayIncidents(incidents) {
-            uiElements.incidentsTabContent.querySelector('#incidents-list').innerHTML = '';
-            if (incidents.length === 0) {
-                uiElements.incidentsTabContent.querySelector('#incidents-list').innerHTML = '<p class="text-center text-slate-500">Chưa có vụ việc nào.</p>';
-            }
-            incidents.forEach(i => {
-                const item = document.createElement('div');
-                item.className = 'bg-slate-50 rounded-lg p-4 shadow-sm flex items-start justify-between item-card';
-                item.innerHTML = `
-                    <div class="flex-1 space-y-2">
-                        <div class="flex items-center space-x-2">
-                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span class="text-lg font-medium editable" data-id="${i.id}" data-type="incident" data-field="title">${i.title}</span>
-                        </div>
-                        <p class="text-sm editable" data-id="${i.id}" data-type="incident" data-field="description">${i.description || 'Chưa có mô tả.'}</p>
-                    </div>
-                    <button class="delete-btn text-white hover:text-gray-200 transition-all duration-200" data-id="${i.id}" data-type="incident">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                `;
-                uiElements.incidentsTabContent.querySelector('#incidents-list').appendChild(item);
-            });
-            setupEditableFields();
-            setupDeleteListeners();
-        }
-        function setupImagesListener() {
-            supabase
-                .from(TABLES.images)
-                .on('ANY', (payload) => fetchImages())
-                .subscribe();
-            fetchImages();
-        }
-        
-        async function fetchImages() {
-            const { data: images, error } = await supabase
-                .from(TABLES.images)
-                .select('*');
-            if (error) {
-                console.error("Lỗi khi tải hình ảnh:", error);
-                showModal("Lỗi", "Không thể tải danh sách hình ảnh.");
-                return;
-            }
-            displayImages(images);
-        }
-        
-        function displayImages(images) {
-            uiElements.imagesTabContent.querySelector('#images-list').innerHTML = '';
-            if (images.length === 0) {
-                uiElements.imagesTabContent.querySelector('#images-list').innerHTML = '<p class="text-center text-slate-500 col-span-full">Chưa có hình ảnh nào.</p>';
-            }
-            images.forEach(img => {
-                const item = document.createElement('div');
-                item.className = 'bg-slate-50 rounded-lg p-2 shadow-sm relative group cursor-pointer item-card';
-                
-                const imageUrl = supabase.storage.from('images').getPublicUrl(img.storage_path).data.publicUrl;
+    // Auth: simple email sign-in (magic link) + signout
+    document.getElementById('btn-signin').addEventListener('click', ()=>{ if(!supabase) return alert('Lưu cấu hình Supabase trước'); showModal('Đăng nhập', `<div class="grid gap-2"><label>Email</label><input id="auth-email" class="px-3 py-2 border rounded-md" placeholder="email@domain" /></div>`, async ()=>{ const email = document.getElementById('auth-email').value.trim(); if(!email) return alert('Nhập email'); const { error } = await supabase.auth.signInWithOtp({ email }); if(error) return alert('Lỗi gửi mail: '+error.message); alert('Đã gửi email đăng nhập (magic link). Kiểm tra hộp thư.'); }); });
+    document.getElementById('btn-signout').addEventListener('click', async ()=>{ if(!supabase) return; await supabase.auth.signOut(); document.getElementById('btn-signout').classList.add('hidden'); document.getElementById('btn-signin').classList.remove('hidden'); alert('Đã đăng xuất'); });
 
-                item.innerHTML = `
-                    <img src="${imageUrl}" alt="${img.caption || 'Hình ảnh khu vực'}" class="w-full h-auto rounded-lg">
-                    <div class="mt-2 text-sm text-slate-700">
-                        <p class="editable" data-id="${img.id}" data-type="image" data-field="caption">${img.caption || 'Chưa có chú thích.'}</p>
-                        ${img.location ? `<p class="text-xs text-slate-500">Vị trí: ${img.location.latitude}, ${img.location.longitude}</p>` : `<p class="text-xs text-slate-500">Vị trí: Không có</p>`}
-                    </div>
-                    <button class="delete-btn absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200" data-id="${img.id}" data-type="image" data-path="${img.storage_path}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                `;
-                uiElements.imagesTabContent.querySelector('#images-list').appendChild(item);
-            });
-            setupEditableFields();
-            setupDeleteListeners();
+    // Sync to Supabase: upsert households & security
+    document.getElementById('btn-sync').addEventListener('click', async ()=>{
+      if(!supabase) return alert('Lưu cấu hình Supabase trước'); if(!confirm('Gửi dữ liệu hiện tại lên Supabase (upsert theo cccd nếu có)?')) return;
+      try{
+        // Prepare households upsert (requires unique key on cccd or id)
+        const hh = state.households.map(h=>({ owner: h.name, cccd: h.cccd||null, precinct: h.precinct, count: h.count||0 }));
+        // Upsert (if table has unique constraint on cccd)
+        if(hh.length) {
+          const { error: err1 } = await supabase.from('households').upsert(hh, { onConflict: ['cccd'] });
+          if(err1) throw err1;
         }
-        // --- Chuyển đổi giao diện ---
-        function showPrecincts() {
-            uiElements.precinctsTabContent.classList.remove('hidden');
-            uiElements.politicalTabContent.classList.add('hidden');
-            uiElements.subjectsTabContent.classList.add('hidden');
-            uiElements.incidentsTabContent.classList.add('hidden');
-            uiElements.imagesTabContent.classList.add('hidden');
-            uiElements.precinctSection.classList.remove('hidden');
-            uiElements.householdSection.classList.add('hidden');
-            uiElements.memberSection.classList.add('hidden');
-            document.getElementById('household-crumb').classList.add('hidden');
-            document.getElementById('member-crumb').classList.add('hidden');
-            currentPrecinctId = null;
-            currentPrecinctName = null;
-            currentHouseholdId = null;
-            currentHouseholdName = null;
-        }
-        function showPolitical() {
-            uiElements.politicalTabContent.classList.remove('hidden');
-            uiElements.precinctsTabContent.classList.add('hidden');
-            uiElements.subjectsTabContent.classList.add('hidden');
-            uiElements.incidentsTabContent.classList.add('hidden');
-            uiElements.imagesTabContent.classList.add('hidden');
-        }
-        function showSubjects() {
-            uiElements.subjectsTabContent.classList.remove('hidden');
-            uiElements.politicalTabContent.classList.add('hidden');
-            uiElements.precinctsTabContent.classList.add('hidden');
-            uiElements.incidentsTabContent.classList.add('hidden');
-            uiElements.imagesTabContent.classList.add('hidden');
-        }
-        function showIncidents() {
-            uiElements.incidentsTabContent.classList.remove('hidden');
-            uiElements.politicalTabContent.classList.add('hidden');
-            uiElements.precinctsTabContent.classList.add('hidden');
-            uiElements.subjectsTabContent.classList.add('hidden');
-            uiElements.imagesTabContent.classList.add('hidden');
-        }
-        function showImages() {
-            uiElements.imagesTabContent.classList.remove('hidden');
-            uiElements.politicalTabContent.classList.add('hidden');
-            uiElements.precinctsTabContent.classList.add('hidden');
-            uiElements.subjectsTabContent.classList.add('hidden');
-            uiElements.incidentsTabContent.classList.add('hidden');
-        }
-        function showHouseholds(precinctId, precinctName) {
-            uiElements.precinctSection.classList.add('hidden');
-            uiElements.householdSection.classList.remove('hidden');
-            uiElements.memberSection.classList.add('hidden');
-            
-            uiElements.householdListTitle.textContent = `Hộ gia đình tại Thôn ${precinctName}`;
-            document.getElementById('household-crumb').classList.remove('hidden');
-            document.querySelector('.household-crumb-link').textContent = precinctName;
-            document.getElementById('member-crumb').classList.add('hidden');
-            
-            currentPrecinctId = precinctId;
-            currentPrecinctName = precinctName;
-            currentHouseholdId = null;
-            currentHouseholdName = null;
-            
-            setupHouseholdsListener();
-        }
-        function showMembers(householdId, householdName) {
-            uiElements.precinctsTabContent.classList.remove('hidden');
-            uiElements.subjectsTabContent.classList.add('hidden');
-            uiElements.incidentsTabContent.classList.add('hidden');
-            uiElements.imagesTabContent.classList.add('hidden');
-            uiElements.precinctSection.classList.add('hidden');
-            uiElements.householdSection.classList.add('hidden');
-            uiElements.memberSection.classList.remove('hidden');
-            
-            uiElements.memberListTitle.textContent = `Thành viên Hộ ${householdName}`;
-            document.getElementById('member-crumb').classList.remove('hidden');
-            
-            currentHouseholdId = householdId;
-            currentHouseholdName = householdName;
-            
-            setupMembersListener();
-        }
-        
-        // --- Xử lý Đăng nhập, Thêm và Xóa ---
-        document.getElementById('precinct-home-link').addEventListener('click', (e) => {
-            e.preventDefault();
-            showPrecincts();
-        });
-        document.querySelector('.household-crumb-link').addEventListener('click', (e) => {
-            e.preventDefault();
-            showHouseholds(currentPrecinctId, currentPrecinctName);
-        });
-        
-        document.getElementById('add-household-btn').addEventListener('click', () => {
-            showAddForm("Thêm Hộ gia đình", async (name) => {
-                const { data, error } = await supabase
-                    .from(TABLES.households)
-                    .insert([{ 
-                        name: name,
-                        precinct_id: currentPrecinctId,
-                        creator_id: userId
-                    }]);
-                
-                if (error) {
-                    console.error('Lỗi khi thêm hộ gia đình:', error);
-                    showModal("Lỗi", "Không thể thêm hộ gia đình.");
-                } else {
-                    console.log('Đã thêm hộ gia đình thành công:', data);
-                    showModal("Thành công", "Đã thêm hộ gia đình thành công.");
-                }
-            });
-        });
-        document.getElementById('add-member-btn').addEventListener('click', () => {
-            showAddMemberForm();
-        });
-        document.getElementById('add-party-member-btn').addEventListener('click', () => {
-            showAddPartyMemberForm();
-        });
-        document.getElementById('add-security-team-btn').addEventListener('click', () => {
-            showAddSecurityTeamForm();
-        });
-        document.getElementById('add-subject-btn').addEventListener('click', () => {
-            showAddSubjectForm();
-        });
-        document.getElementById('add-incident-btn').addEventListener('click', () => {
-            showAddIncidentForm();
-        });
-        document.getElementById('add-image-btn').addEventListener('click', () => {
-            showAddImageForm();
-        });
-        function showAddForm(title, onSubmit) {
-            const modalContent = document.getElementById('modal-content-area');
-            modalContent.innerHTML = `
-                <form id="add-item-form" class="space-y-4">
-                    <input type="text" id="item-name" placeholder="Nhập tên" required
-                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
-                        Thêm
-                    </button>
-                </form>
-            `;
-            modalTitle.textContent = title;
-            modal.style.display = 'flex';
-            
-            document.getElementById('add-item-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = document.getElementById('item-name').value;
-                if (!name) return;
-                onSubmit(name);
-                modal.style.display = 'none';
-            });
-        }
-        
-        function showAddMemberForm() {
-            const modalContent = document.getElementById('modal-content-area');
-            modalContent.innerHTML = `
-                <form id="add-member-item-form" class="space-y-4">
-                    <input type="text" id="member-name" placeholder="Nhập tên thành viên" required
-                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
-                    <input type="text" id="member-cccd" placeholder="Nhập số căn cước" required
-                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
-                        Thêm Thành viên
-                    </button>
-                </form>
-            `;
-            modalTitle.textContent = "Thêm Thành viên mới";
-            modal.style.display = 'flex';
-            
-            document.getElementById('add-member-item-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = document.getElementById('member-name').value;
-                const cccd = document.getElementById('member-cccd').value;
-                if (!name || !cccd) { showModal("Lỗi", "Vui lòng điền đầy đủ thông tin."); return; }
-                
-                supabase
-                    .from(TABLES.members)
-                    .insert([{ name, cccd, household_id: currentHouseholdId, creator_id: userId }])
-                    .then(({ error }) => {
-                        if (error) throw error;
-                        showModal("Thành công", "Đã thêm thành viên thành công.");
-                    })
-                    .catch(error => { console.error("Lỗi thêm thành viên:", error); showModal("Lỗi", "Không thể thêm thành viên."); });
-                modal.style.display = 'none';
-            });
-        }
-        
-        function showAddPartyMemberForm() {
-            const modalContent = document.getElementById('modal-content-area');
-            modalContent.innerHTML = `
-                <form id="add-item-form" class="space-y-4">
-                    <input type="text" id="item-name" placeholder="Nhập tên đảng viên" required
-                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
-                    <input type="text" id="item-position" placeholder="Nhập chức vụ"
-                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
-                        Thêm Đảng viên
-                    </button>
-                </form>
-            `;
-            modalTitle.textContent = "Thêm Đảng viên mới";
-            modal.style.display = 'flex';
-            
-            document.getElementById('add-item-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('item-name').value;
-                const position = document.getElementById('item-position').value;
-                if (!name) return;
+        const st = state.security.map(s=>({ precinct: s.precinct, name: s.name, cccd: s.cccd||null, role: s.role, phone: s.phone }));
+        if(st.length){ const { error: err2 } = await supabase.from('security_team').upsert(st, { onConflict: ['cccd'] }); if(err2) throw err2; }
+        alert('Đồng bộ xong. Kiểm tra bảng trong Supabase.');
+      }catch(err){ console.error(err); alert('Lỗi khi đồng bộ: '+err.message); }
+    });
 
-                const { data, error } = await supabase.from(TABLES.party_members).insert([{ name, position, creator_id: userId }]);
-                if (error) {
-                    console.error("Lỗi khi thêm đảng viên:", error);
-                    showModal("Lỗi", "Không thể thêm đảng viên.");
-                } else {
-                    showModal("Thành công", "Đã thêm đảng viên thành công.");
-                }
-                modal.style.display = 'none';
-            });
-        }
+    // Seed small sample (can be removed)
+    (function seedSample(){ state.precincts = [{id:1,name:'Buôn Alê Gŏ'},{id:2,name:'Buôn Dhu'},{id:3,name:'Thôn 1A'}]; state.households = [{name:'Y ÑUT NIÊ', cccd:'064065002998', precinct:'Buôn Alê Gŏ', count:7},{name:'Y BLUM NIÊ', cccd:'066038002395', precinct:'Buôn Alê Gŏ', count:3},{name:'DƯƠNG ĐÌNH HÀ', cccd:'027093007243', precinct:'Buôn Dhu', count:4}]; state.security = [{precinct:'Thôn 5', name:'Bùi Quang Trung', cccd:'066067006242', role:'Tổ trưởng', phone:'0382260632'}]; renderPrecincts(); renderHouseholds(); renderSecurity(); updateStats(); })();
 
-        function showAddSecurityTeamForm() {
-             const modalContent = document.getElementById('modal-content-area');
-            modalContent.innerHTML = `
-                <form id="add-item-form" class="space-y-4">
-                    <input type="text" id="item-name" placeholder="Nhập tên thành viên" required
-                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
-                    <input type="text" id="item-position" placeholder="Nhập chức vụ"
-                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
-                        Thêm Thành viên
-                    </button>
-                </form>
-            `;
-            modalTitle.textContent = "Thêm Thành viên Tổ ANTT Cơ sở";
-            modal.style.display = 'flex';
+    /* Chart */
+    let chart = null;
+    function renderChart(){ const ctx = document.getElementById('chart-pop'); if(!ctx) return; const byPrec = {}; state.households.forEach(h=>{ const key = h.precinct||'Khác'; byPrec[key] = (byPrec[key]||0) + (Number(h.count)||0); }); const labels = Object.keys(byPrec).slice(0,10); const values = labels.map(l=>byPrec[l]); if(chart) chart.destroy(); chart = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Số nhân khẩu theo thôn/buôn (top 10)', data: values }] }, options: { responsive:true } }); }
 
-            document.getElementById('add-item-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('item-name').value;
-                const position = document.getElementById('item-position').value;
-                if (!name) return;
+    // PWA: register service worker (simple)
+    if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js').then(()=>console.log('SW registered')).catch(()=>console.log('SW failed')); }
 
-                const { data, error } = await supabase.from(TABLES.security_team).insert([{ name, position, creator_id: userId }]);
-                if (error) {
-                    console.error("Lỗi khi thêm thành viên tổ antt:", error);
-                    showModal("Lỗi", "Không thể thêm thành viên.");
-                } else {
-                    showModal("Thành công", "Đã thêm thành viên thành công.");
-                }
-                modal.style.display = 'none';
-            });
-        }
-        
-        function showAddSubjectForm() {
-            const modalContent = document.getElementById('modal-content-area');
-            modalContent.innerHTML = `
-                <form id="add-subject-item-form" class="space-y-4">
-                    <input type="text" id="subject-name" placeholder="Tên đối tượng" required
-                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
-                    <textarea id="subject-description" rows="3" placeholder="Mô tả"
-                          class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"></textarea>
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
-                        Thêm Đối tượng
-                    </button>
-                </form>
-            `;
-            modalTitle.textContent = "Thêm Đối tượng mới";
-            modal.style.display = 'flex';
-            
-            document.getElementById('add-subject-item-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = document.getElementById('subject-name').value;
-                const description = document.getElementById('subject-description').value;
-                if (!name) { showModal("Lỗi", "Vui lòng nhập tên đối tượng."); return; }
-                
-                supabase
-                    .from(TABLES.subjects)
-                    .insert([{ name, description, creator_id: userId, events: [], type: currentSubjectType }])
-                    .then(({ error }) => {
-                        if (error) throw error;
-                        showModal("Thành công", "Đã thêm đối tượng thành công.");
-                    })
-                    .catch(error => { console.error("Lỗi thêm đối tượng:", error); showModal("Lỗi", "Không thể thêm đối tượng."); });
-                modal.style.display = 'none';
-            });
-        }
-        
-        function showAddIncidentForm() {
-            const modalContent = document.getElementById('modal-content-area');
-            modalContent.innerHTML = `
-                <form id="add-incident-form" class="space-y-4">
-                    <input type="text" id="incident-title" placeholder="Tiêu đề vụ việc" required
-                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
-                    <textarea id="incident-description" rows="3" placeholder="Mô tả chi tiết"
-                          class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200"></textarea>
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
-                        Thêm Vụ việc
-                    </button>
-                </form>
-            `;
-            modalTitle.textContent = "Thêm Vụ việc mới";
-            modal.style.display = 'flex';
-            
-            document.getElementById('add-incident-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const title = document.getElementById('incident-title').value;
-                const description = document.getElementById('incident-description').value;
-                if (!title) { showModal("Lỗi", "Vui lòng nhập tiêu đề vụ việc."); return; }
-                
-                supabase
-                    .from(TABLES.incidents)
-                    .insert([{ title, description, creator_id: userId }])
-                    .then(({ error }) => {
-                        if (error) throw error;
-                        showModal("Thành công", "Đã thêm vụ việc thành công.");
-                    })
-                    .catch(error => { console.error("Lỗi thêm vụ việc:", error); showModal("Lỗi", "Không thể thêm vụ việc."); });
-                modal.style.display = 'none';
-            });
-        }
-        
-        function showAddImageForm() {
-            const modalContent = document.getElementById('modal-content-area');
-            modalContent.innerHTML = `
-                <form id="add-image-form" class="space-y-4">
-                    <input type="file" id="image-file" accept="image/*" required
-                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
-                    <input type="text" id="image-caption" placeholder="Chú thích hình ảnh"
-                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all duration-200"></textarea>
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
-                        Thêm Hình ảnh
-                    </button>
-                    <div id="upload-progress" class="hidden text-center mt-2">
-                        <p>Đang tải lên...</p>
-                    </div>
-                </form>
-            `;
-            modalTitle.textContent = "Thêm Hình ảnh mới";
-            modal.style.display = 'flex';
-            
-            document.getElementById('add-image-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const file = document.getElementById('image-file').files[0];
-                const caption = document.getElementById('image-caption').value;
-                if (!file) return;
-                document.getElementById('upload-progress').classList.remove('hidden');
-                
-                const filePath = `${userId}/${Date.now()}_${file.name}`;
-                
-                let location = null;
-                if ("geolocation" in navigator) {
-                    try {
-                        const position = await new Promise((resolve, reject) => {
-                            navigator.geolocation.getCurrentPosition(resolve, reject, {
-                                enableHighAccuracy: true,
-                                timeout: 5000,
-                                maximumAge: 0
-                            });
-                        });
-                        location = {
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude
-                        };
-                    } catch (error) {
-                        console.error("Lỗi khi lấy vị trí:", error);
-                    }
-                }
-                
-                try {
-                    const { data: uploadData, error: uploadError } = await supabase.storage
-                        .from('images')
-                        .upload(filePath, file);
+    // Load saved config
+    (function loadCfg(){ try{ const c = JSON.parse(localStorage.getItem('supabase_cfg')||'{}'); if(c.SUPABASE_URL) document.getElementById('cfg-url').value = c.SUPABASE_URL; if(c.SUPABASE_ANON_KEY) document.getElementById('cfg-key').value = c.SUPABASE_ANON_KEY; if(c.SUPABASE_URL && c.SUPABASE_ANON_KEY){ CONFIG = c; supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY); } }catch(e){console.warn('No cfg');} })();
 
-                    if (uploadError) throw uploadError;
+    // Install PWA guidance
+    document.getElementById('install-pwa').addEventListener('click', ()=>{ alert('Để cài PWA: mở menu trình duyệt -> Thêm vào màn hình chính (Android) hoặc vào biểu tượng chia sẻ -> Add to Home Screen.'); });
 
-                    const { error: insertError } = await supabase
-                        .from(TABLES.images)
-                        .insert([{
-                            caption,
-                            storage_path: filePath,
-                            creator_id: userId,
-                            location,
-                        }]);
+  </script>
 
-                    if (insertError) throw insertError;
+  <!-- Fallback libs for non-module features: SheetJS & mammoth (only used via dynamic import above) -->
 
-                    showModal("Thành công", "Đã thêm hình ảnh thành công.");
-                } catch (error) {
-                    console.error("Lỗi khi tải lên hình ảnh:", error);
-                    showModal("Lỗi", "Không thể thêm hình ảnh.");
-                } finally {
-                    document.getElementById('modal').style.display = 'none';
-                }
-            });
-        }
-        
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('add-event-btn')) {
-                const subjectId = e.target.getAttribute('data-id');
-                showAddEventForm(subjectId);
-            }
-            if (e.target.classList.contains('delete-event-btn')) {
-                const subjectId = e.target.getAttribute('data-subject-id');
-                const eventText = e.target.getAttribute('data-event-text');
-                handleDeleteEvent(subjectId, eventText);
-            }
-        });
-        
-        function showAddEventForm(subjectId) {
-            const modalContent = document.getElementById('modal-content-area');
-            modalContent.innerHTML = `
-                <form id="add-event-form" class="space-y-4">
-                    <input type="text" id="event-text" placeholder="Nhập diễn biến" required
-                           class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200">
-                        Thêm diễn biến
-                    </button>
-                </form>
-            `;
-            modalTitle.textContent = "Thêm Diễn biến mới";
-            modal.style.display = 'flex';
-            
-            document.getElementById('add-event-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const eventText = document.getElementById('event-text').value;
-                if (!eventText) return;
-                
-                try {
-                    const { data, error } = await supabase
-                        .from(TABLES.subjects)
-                        .select('events')
-                        .eq('id', subjectId)
-                        .single();
-                    if (error) throw error;
-                    
-                    const newEvents = data.events || [];
-                    newEvents.push({ text: eventText, timestamp: new Date().toISOString() });
-                    
-                    const { error: updateError } = await supabase
-                        .from(TABLES.subjects)
-                        .update({ events: newEvents })
-                        .eq('id', subjectId);
-                    if (updateError) throw updateError;
-                    
-                    showModal("Thành công", "Đã thêm diễn biến thành công.");
-                } catch (error) {
-                    console.error("Lỗi khi thêm diễn biến:", error);
-                    showModal("Lỗi", "Không thể thêm diễn biến.");
-                }
-                modal.style.display = 'none';
-            });
-        }
-        async function handleDeleteEvent(subjectId, eventText) {
-            try {
-                const { data, error } = await supabase
-                    .from(TABLES.subjects)
-                    .select('events')
-                    .eq('id', subjectId)
-                    .single();
-                if (error) throw error;
-                
-                const newEvents = data.events.filter(event => event.text !== eventText);
-                
-                const { error: updateError } = await supabase
-                    .from(TABLES.subjects)
-                    .update({ events: newEvents })
-                    .eq('id', subjectId);
-                if (updateError) throw updateError;
-                
-                showModal("Thành công", "Đã xóa diễn biến thành công.");
-            } catch (error) {
-                console.error("Lỗi khi xóa diễn biến:", error);
-                showModal("Lỗi", "Không thể xóa diễn biến.");
-            }
-        }
-        
-        function setupDeleteListeners() {
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    const idToDelete = event.currentTarget.getAttribute('data-id');
-                    const type = event.currentTarget.getAttribute('data-type');
-                    const storagePath = event.currentTarget.getAttribute('data-path');
-                    handleDelete(idToDelete, type, storagePath);
-                });
-            });
-        }
-        
-        async function handleDelete(idToDelete, type, storagePath) {
-            let table, eqColumn;
-            switch(type) {
-                case 'precinct':
-                    table = TABLES.precincts;
-                    eqColumn = 'id';
-                    break;
-                case 'household':
-                    table = TABLES.households;
-                    eqColumn = 'id';
-                    break;
-                case 'member':
-                    table = TABLES.members;
-                    eqColumn = 'id';
-                    break;
-                case 'subject':
-                    table = TABLES.subjects;
-                    eqColumn = 'id';
-                    break;
-                case 'incident':
-                    table = TABLES.incidents;
-                    eqColumn = 'id';
-                    break;
-                case 'image':
-                    table = TABLES.images;
-                    eqColumn = 'id';
-                    break;
-                case 'party_member':
-                    table = TABLES.party_members;
-                    eqColumn = 'id';
-                    break;
-                case 'security_team':
-                    table = TABLES.security_team;
-                    eqColumn = 'id';
-                    break;
-                default:
-                    showModal("Lỗi", `Loại ${type} không hợp lệ.`);
-                    return;
-            }
-            
-            try {
-                if (type === 'image' && storagePath) {
-                    const { error: storageError } = await supabase.storage.from('images').remove([storagePath]);
-                    if (storageError) throw storageError;
-                }
-                
-                const { error } = await supabase
-                    .from(table)
-                    .delete()
-                    .eq(eqColumn, idToDelete);
-                
-                if (error) throw error;
-                showModal("Thành công", `Đã xóa ${type} thành công.`);
-            } catch (error) {
-                console.error("Lỗi khi xóa:", error);
-                showModal("Lỗi", `Không thể xóa ${type}. Vui lòng thử lại.`);
-            }
-        }
-        
-        function setupEditableFields() {
-            document.querySelectorAll('.editable').forEach(el => {
-                el.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const originalText = e.target.textContent;
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.value = originalText;
-                    input.className = 'w-full px-2 py-1 border rounded';
-                    
-                    e.target.replaceWith(input);
-                    input.focus();
-                    
-                    const updateData = async () => {
-                        const newValue = input.value;
-                        if (newValue === originalText || !newValue.trim()) {
-                            input.replaceWith(e.target);
-                            return;
-                        }
-                        
-                        const id = e.target.getAttribute('data-id');
-                        const type = e.target.getAttribute('data-type');
-                        const field = e.target.getAttribute('data-field') || 'name';
-                        
-                        let table;
-                        switch(type) {
-                            case 'precinct': table = TABLES.precincts; break;
-                            case 'household': table = TABLES.households; break;
-                            case 'member': table = TABLES.members; break;
-                            case 'subject': table = TABLES.subjects; break;
-                            case 'incident': table = TABLES.incidents; break;
-                            case 'image': table = TABLES.images; break;
-                            case 'party_member': table = TABLES.party_members; break;
-                            case 'security_team': table = TABLES.security_team; break;
-                            default: return;
-                        }
-
-                        try {
-                            const { error } = await supabase
-                                .from(table)
-                                .update({ [field]: newValue })
-                                .eq('id', id);
-                            if (error) throw error;
-                            
-                            e.target.textContent = newValue;
-                            showModal("Thành công", "Đã cập nhật thành công.");
-                        } catch (error) {
-                            console.log("Lỗi cập nhật:", error);
-                            showModal("Lỗi", "Không thể cập nhật. Vui lòng thử lại.");
-                            e.target.textContent = originalText;
-                        }
-                        input.replaceWith(e.target);
-                    };
-                    
-                    input.addEventListener('blur', updateData);
-                    input.addEventListener('keydown', (event) => {
-                        if (event.key === 'Enter') {
-                            input.blur();
-                        }
-                    });
-                });
-            });
-        }
-        // --- Tab Navigation ---
-        document.getElementById('tab-precincts').addEventListener('click', () => {
-            document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
-            uiElements.precinctsTabContent.classList.remove('hidden');
-            uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-precincts').classList.add('active');
-            showPrecincts();
-        });
-        
-        document.getElementById('tab-political').addEventListener('click', () => {
-            document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
-            uiElements.politicalTabContent.classList.remove('hidden');
-            uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-political').classList.add('active');
-            showPolitical();
-        });
-
-        document.getElementById('tab-subjects').addEventListener('click', () => {
-            document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
-            uiElements.subjectsTabContent.classList.remove('hidden');
-            uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-subjects').classList.add('active');
-            showSubjects();
-        });
-        document.getElementById('tab-incidents').addEventListener('click', () => {
-            document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
-            uiElements.incidentsTabContent.classList.remove('hidden');
-            uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-incidents').classList.add('active');
-            showIncidents();
-        });
-        document.getElementById('tab-images').addEventListener('click', () => {
-            document.querySelectorAll('#tab-content > div').forEach(tab => tab.classList.add('hidden'));
-            uiElements.imagesTabContent.classList.remove('hidden');
-            uiElements.tabButtons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-images').classList.add('active');
-            showImages();
-        });
-        
-        // Sub-tab navigation for Political tab
-        document.getElementById('tab-party-members').addEventListener('click', () => {
-            document.getElementById('party-members-section').classList.remove('hidden');
-            document.getElementById('security-team-section').classList.add('hidden');
-            uiElements.politicalTabButtons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-party-members').classList.add('active');
-        });
-        document.getElementById('tab-security-team').addEventListener('click', () => {
-            document.getElementById('security-team-section').classList.remove('hidden');
-            document.getElementById('party-members-section').classList.add('hidden');
-            uiElements.politicalTabButtons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-security-team').classList.add('active');
-        });
-
-        // Sub-tab navigation for Subjects tab
-        document.getElementById('tab-criminal').addEventListener('click', () => {
-            currentSubjectType = 'criminal';
-            uiElements.subjectTabButtons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-criminal').classList.add('active');
-            fetchSubjects();
-        });
-        document.getElementById('tab-political-subject').addEventListener('click', () => {
-            currentSubjectType = 'political';
-            uiElements.subjectTabButtons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-political-subject').classList.add('active');
-            fetchSubjects();
-        });
-        
-        uiElements.subjectSearch.addEventListener('input', fetchSubjects);
-
-        // --- Theme Toggle ---
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const sunIcon = document.getElementById('sun-icon');
-        const moonIcon = document.getElementById('moon-icon');
-
-        themeToggleBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark');
-            if (document.body.classList.contains('dark')) {
-                localStorage.setItem('theme', 'dark');
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
-            } else {
-                localStorage.setItem('theme', 'light');
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
-            }
-        });
-
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark');
-            sunIcon.classList.add('hidden');
-            moonIcon.classList.remove('hidden');
-        } else {
-            document.body.classList.remove('dark');
-            sunIcon.classList.remove('hidden');
-            moonIcon.classList.add('hidden');
-        }
-
-        // --- Modal Control ---
-        
-        function showModal(title, message) {
-            modalTitle.textContent = title;
-            const contentArea = document.getElementById('modal-content-area');
-            contentArea.innerHTML = `<p class="text-slate-700 dark:text-gray-200 mb-6">${message}</p>
-                                     <button id="modal-close-btn" class="w-full bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition-all duration-200">Đóng</button>`;
-            modal.style.display = 'flex';
-            document.getElementById('modal-close-btn').addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-        }
-        
-        // Khởi tạo dữ liệu khi ứng dụng khởi chạy
-        window.onload = initializeData;
-        
-    </script>
 </body>
 </html>
