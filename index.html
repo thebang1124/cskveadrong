@@ -1,148 +1,383 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Hệ Thống Quản Lý Địa Bàn & Đối Tượng (Bản hoàn chỉnh đã sửa)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-  <style>
-    body { font-family: 'Inter', sans-serif; transition: background-color .3s, color .3s }
-    .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,.5); justify-content:center; align-items:center }
-    .hidden{display:none}
-    .tab-button{transition:all .2s ease-in-out; border-bottom-width:2px; border-bottom-color:transparent}
-    .tab-button.active{color:#4f46e5; border-bottom-color:#4f46e5; font-weight:600}
-    body.dark{background:#121212; color:#e0e0e0}
-    .dark .bg-white{background:#1e1e1e}
-    /* (giữ nguyên phần style mở rộng từ file gốc: dark mode, màu tab, v.v.) */
-  </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Hệ Thống Quản Lý Địa Bàn & Đối Tượng (Đầy đủ)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <style>
+        body { font-family: 'Inter', sans-serif; transition: background-color .3s, color .3s }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,.5); justify-content: center; align-items: center; }
+        .hidden { display: none; }
+        .tab-button { transition: all .2s ease-in-out; border-bottom-width: 2px; border-bottom-color: transparent; }
+        .tab-button.active { color: #4f46e5; border-bottom-color: #4f46e5; font-weight: 600; }
+        body.dark { background: #121212; color: #e0e0e0; }
+        .dark .bg-white { background: #1e1e1e; }
+        .dark .text-slate-800 { color: #e0e0e0; }
+        .dark .text-slate-600 { color: #c0c0c0; }
+        .dark .border-slate-200 { border-color: #333; }
+        .dark .bg-slate-200 { background: #4a4a4a; }
+        .dark .text-slate-700 { color: #b0b0b0; }
+        .dark .bg-gray-100 { background: #2a2a2a; }
+        .dark .bg-gray-800 { background: #333; }
+    </style>
 </head>
-<body class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
+<body class="bg-slate-50 flex items-center justify-center min-h-screen p-4 transition-colors duration-300">
+    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-5xl mx-auto transition-colors duration-300">
+        <h1 class="text-4xl font-bold text-center text-slate-800 mb-2">Hệ Thống Quản Lý Địa Bàn & Đối Tượng</h1>
+        <p class="text-center text-slate-600 mb-6">Quản lý các Thôn, Buôn, Hộ, Thành viên và Đối tượng.</p>
+        <div class="flex justify-end mb-4">
+            <button id="theme-toggle" class="p-2 rounded-full bg-slate-200 dark:bg-gray-700 text-slate-800 dark:text-gray-300 transition-colors duration-200">🌞/🌙</button>
+        </div>
+        <div class="flex border-b border-slate-200 mb-6 space-x-4">
+            <button id="tab-precincts" class="tab-button py-2 px-4 text-lg text-slate-600 active">Địa bàn</button>
+            <button id="tab-political" class="tab-button py-2 px-4 text-lg text-slate-600">Hệ thống chính trị</button>
+            <button id="tab-subjects" class="tab-button py-2 px-4 text-lg text-slate-600">Đối tượng</button>
+            <button id="tab-incidents" class="tab-button py-2 px-4 text-lg text-slate-600">Vụ việc</button>
+            <button id="tab-images" class="tab-button py-2 px-4 text-lg text-slate-600">Hình ảnh</button>
+        </div>
+        <div id="tab-content">
+            <!-- Precincts Section -->
+            <div id="precincts-tab-content" class="tab-panel">
+                <h2 class="text-2xl font-semibold mb-4">Danh sách Thôn, Buôn</h2>
+                <div class="flex space-x-2 mb-4">
+                    <input id="new-precinct-name" type="text" placeholder="Tên thôn/buôn mới" class="flex-1 border rounded px-2 py-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white" />
+                    <button id="add-precinct-btn" class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700 transition-colors">Thêm</button>
+                </div>
+                <ul id="precincts-list" class="list-disc pl-6 space-y-2 text-slate-700"></ul>
+            </div>
+            <!-- Political System Section -->
+            <div id="political-tab-content" class="tab-panel hidden">
+                <h2 class="text-2xl font-semibold mb-4">Đội An ninh</h2>
+                <div class="flex space-x-2 mb-4">
+                    <input id="new-security-member-name" type="text" placeholder="Họ tên" class="flex-1 border rounded px-2 py-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white" />
+                    <input id="new-security-member-precinct" type="text" placeholder="Thôn/Buôn" class="flex-1 border rounded px-2 py-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white" />
+                    <button id="add-security-member-btn" class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700 transition-colors">Thêm</button>
+                </div>
+                <ul id="security-team-list" class="list-disc pl-6 space-y-2 text-slate-700"></ul>
 
-  <!-- Main Container (UI gốc giữ nguyên) -->
-  <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-4xl mx-auto transition-colors duration-300">
-    <h1 class="text-4xl font-bold text-center text-slate-800 mb-2">Hệ Thống Quản Lý Địa Bàn & Đối Tượng</h1>
-    <p class="text-center text-slate-600 mb-6">Quản lý các Thôn, Hộ, Thành viên và Đối tượng.</p>
-
-    <!-- Dark Mode Toggle -->
-    <div class="flex justify-end mb-4">
-      <button id="theme-toggle" class="p-2 rounded-full bg-slate-200 dark:bg-gray-700 text-slate-800 dark:text-gray-300 transition-colors duration-200">🌞/🌙</button>
+                <h2 class="text-2xl font-semibold mb-4 mt-8">Danh sách Hộ gia đình</h2>
+                <div class="flex space-x-2 mb-4">
+                    <input id="new-household-name" type="text" placeholder="Tên chủ hộ" class="flex-1 border rounded px-2 py-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white" />
+                    <input id="new-household-precinct" type="text" placeholder="Thôn/Buôn" class="flex-1 border rounded px-2 py-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white" />
+                    <button id="add-household-btn" class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700 transition-colors">Thêm</button>
+                </div>
+                <ul id="households-list" class="list-disc pl-6 space-y-2 text-slate-700"></ul>
+            </div>
+            <!-- Other Sections -->
+            <div id="subjects-tab-content" class="tab-panel hidden">
+                <h2 class="text-2xl font-semibold mb-4">Quản lý Đối tượng</h2>
+                <p class="text-slate-600">Tính năng này sẽ được bổ sung trong các bản cập nhật sau.</p>
+            </div>
+            <div id="incidents-tab-content" class="tab-panel hidden">
+                <h2 class="text-2xl font-semibold mb-4">Quản lý Vụ việc</h2>
+                <p class="text-slate-600">Tính năng này sẽ được bổ sung trong các bản cập nhật sau.</p>
+            </div>
+            <div id="images-tab-content" class="tab-panel hidden">
+                <h2 class="text-2xl font-semibold mb-4">Quản lý Hình ảnh</h2>
+                <p class="text-slate-600">Tính năng này sẽ được bổ sung trong các bản cập nhật sau.</p>
+            </div>
+        </div>
     </div>
-
-    <!-- Navigation Tabs -->
-    <div class="flex border-b border-slate-200 mb-6 space-x-4">
-      <button id="tab-precincts" class="tab-button py-2 px-4 text-lg text-slate-600 active">Địa bàn</button>
-      <button id="tab-political" class="tab-button py-2 px-4 text-lg text-slate-600">Hệ thống chính trị</button>
-      <button id="tab-subjects" class="tab-button py-2 px-4 text-lg text-slate-600">Đối tượng</button>
-      <button id="tab-incidents" class="tab-button py-2 px-4 text-lg text-slate-600">Vụ việc</button>
-      <button id="tab-images" class="tab-button py-2 px-4 text-lg text-slate-600">Hình ảnh</button>
+    <div id="modal" class="modal">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full modal-content dark:bg-gray-800 dark:text-white">
+            <h3 id="modal-title" class="text-xl font-bold mb-4 text-center"></h3>
+            <div id="modal-content-area"></div>
+        </div>
     </div>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        
+        const SUPABASE_URL = 'https://skbjeeyisyfifzoiuxeq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYmplZXlpc3lpZml6b2l1eGVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjExNzE4NzcsImV4cCI6MTczNjc2NTg3N30.C3005p_rVdFjBfT4X1K7FqJ0w0iC5N9tqA4Mv1I0a5I';
 
-    <!-- Nội dung Tab (UI gốc giữ nguyên: precincts, households, members, political, subjects, incidents, images) -->
-    <div id="tab-content">
-      <!-- Precincts Section -->
-      <div id="precincts-tab-content">...</div>
-      <!-- Political Section -->
-      <div id="political-tab-content" class="hidden">...</div>
-      <!-- Subjects Section -->
-      <div id="subjects-tab-content" class="hidden">...</div>
-      <!-- Incidents Section -->
-      <div id="incidents-tab-content" class="hidden">...</div>
-      <!-- Images Section -->
-      <div id="images-tab-content" class="hidden">...</div>
-    </div>
-  </div>
+        const TABLES = {
+          precincts: 'precincts',
+          households: 'households',
+          securityTeam: 'security_team'
+        }
 
-  <!-- Modal -->
-  <div id="modal" class="modal">
-    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full modal-content">
-      <h3 id="modal-title" class="text-xl font-bold mb-4 text-center"></h3>
-      <div id="modal-content-area"></div>
-    </div>
-  </div>
+        let supabase = null;
+        let userId = 'anonymous_' + Date.now();
+        
+        function showCustomAlert(message) {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content-area');
+            
+            modalTitle.textContent = 'Thông báo';
+            modalContent.innerHTML = `<p class="text-center">${message}</p><div class="flex justify-center mt-4"><button id="close-modal" class="bg-blue-600 text-white px-4 py-2 rounded">Đóng</button></div>`;
+            modal.style.display = 'flex';
+            
+            document.getElementById('close-modal').onclick = () => {
+                modal.style.display = 'none';
+            };
+        }
+        
+        function showCustomConfirm(message, onConfirm, onCancel) {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content-area');
+            
+            modalTitle.textContent = 'Xác nhận';
+            modalContent.innerHTML = `<p class="text-center">${message}</p><div class="flex justify-center space-x-4 mt-4"><button id="confirm-yes" class="bg-green-600 text-white px-4 py-2 rounded">Đồng ý</button><button id="confirm-no" class="bg-red-600 text-white px-4 py-2 rounded">Hủy bỏ</button></div>`;
+            modal.style.display = 'flex';
+            
+            document.getElementById('confirm-yes').onclick = () => {
+                modal.style.display = 'none';
+                if (onConfirm) onConfirm();
+            };
+            document.getElementById('confirm-no').onclick = () => {
+                modal.style.display = 'none';
+                if (onCancel) onCancel();
+            };
+        }
 
-  <!-- Supabase Scripts -->
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+        const initialPrecincts = [
+          "Thôn 5", "Thôn 6", "Thôn 7", "Thôn 8", "Thôn 9",
+          "Buôn Alê Gŏ", "Buôn Dhu", "Buôn Ea Kjŏh A", "Buôn Ea Kjŏh B", "Buôn Hně",
+          "Buôn Kmiên", "Buôn Pheo", "Buôn Sǐng A", "Buôn Tung Krăk", "Buôn Trang",
+          "Buôn Trăp", "Buôn Tring 4", "Thôn Đông Xuân", "Thôn Ea Kung", "Buôn Klat A",
+          "Buôn Klat B", "Buôn Klat C", "Thôn Quyết Thắng", "Thôn Tân Hợp", "Thôn 1A",
+          "Thôn 1B", "Thôn 2A", "Thôn 2B", "Thôn 3", "Thôn 6", "Thôn 7", "Thôn 8"
+        ];
+        
+        const initialHouseholds = [
+          { name: "Y ÑUT NIÊ", precinct: "buôn alê gŏ", members: 7 },
+          { name: "Y BLUM NIÊ", precinct: "buôn alê gŏ", members: 3 },
+          { name: "Y BLƠR MLÔ", precinct: "buôn alê gŏ", members: 7 },
+          { name: "Y KŬT KRIÊNG", precinct: "buôn alê gŏ", members: 5 },
+          { name: "Y TAM KBUÔR", precinct: "buôn alê gŏ", members: 8 },
+          { name: "Y BLIAH NIÊ", precinct: "buôn alê gŏ", members: 10 },
+          { name: "Y BIĂI MLÔ", precinct: "buôn alê gŏ", members: 2 },
+          { name: "Y SUÔM MLÔ", precinct: "buôn alê gŏ", members: 7 },
+          { name: "Y KHÔN KNUL", precinct: "buôn alê gŏ", members: 3 },
+          { name: "Y DHIĂ NIÊ", precinct: "buôn alê gŏ", members: 6 },
+        ];
+        
+        const initialSecurityTeam = [
+          { name: "Bùi Quang Trung", precinct: "Thôn 5", title: "Tổ trưởng" },
+          { name: "Lê Quang Trường", precinct: "Thôn 5", title: "Tổ phó" },
+          { name: "Nguyễn Phú Nhơn", precinct: "Thôn 5", title: "Tổ viên" },
+          { name: "Hoàng Anh Định", precinct: "Thôn 6", title: "Tổ trưởng" },
+          { name: "Lê Trung Kiên", precinct: "Thôn 6", title: "Tổ phó" },
+          { name: "Phạm Công", precinct: "Thôn 6", title: "Tổ viên" },
+        ];
 
-    // === CONFIG ===
-    const SUPABASE_URL = 'https://skbjeeyisyfifzoiuxeq.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
-
-    const TABLES = {
-      precincts: 'precincts',
-      households: 'households',
-      members: 'members',
-      subjects: 'subjects',
-      incidents: 'incidents',
-      images: 'images',
-      security_team: 'security_team',
-      party_members: 'party_members'
-    }
-
-    let supabase = null;
-    let userId = 'anonymous_' + Date.now();
-
-    // Dữ liệu mẫu
-    const initialPrecincts = ["Thôn 5","Thôn 6","Thôn 7"]
-
-    // ===== Init =====
-    async function initializeData(){
-      supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      // Upsert precincts tránh trùng
-      for (const name of initialPrecincts){
-        await supabase.from(TABLES.precincts).upsert({ name, creator_id: userId, created_at: new Date().toISOString() }, { onConflict:'name' });
-      }
-
-      setupRealtime();
-      fetchPrecincts();
-      fetchSubjects();
-      fetchIncidents();
-      fetchImages();
-      fetchPartyMembers();
-      fetchSecurityTeam();
-    }
-
-    // ===== Realtime mới =====
-    function setupRealtime(){
-      const channel = supabase.channel('public-changes');
-      for (const table of Object.values(TABLES)){
-        channel.on('postgres_changes',{event:'*',schema:'public',table}, payload=>{
-          switch(table){
-            case TABLES.precincts: fetchPrecincts(); break;
-            case TABLES.households: fetchHouseholds(); break;
-            case TABLES.members: fetchMembers(); break;
-            case TABLES.subjects: fetchSubjects(); break;
-            case TABLES.incidents: fetchIncidents(); break;
-            case TABLES.images: fetchImages(); break;
-            case TABLES.party_members: fetchPartyMembers(); break;
-            case TABLES.security_team: fetchSecurityTeam(); break;
+        async function initializeData() {
+          supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+          
+          // Seed initial data for precincts
+          for (const item of initialPrecincts) {
+            await supabase.from(TABLES.precincts).upsert({ name: item, creator_id: userId, created_at: new Date().toISOString() }, { onConflict: 'name' });
           }
-        })
-      }
-      channel.subscribe();
-    }
+          
+          // Seed initial data for households
+          for (const item of initialHouseholds) {
+            await supabase.from(TABLES.households).upsert({ 
+                name: item.name, 
+                precinct: item.precinct, 
+                members: item.members,
+                creator_id: userId, 
+                created_at: new Date().toISOString() 
+            }, { onConflict: 'name' });
+          }
+          
+          // Seed initial data for security team
+          for (const item of initialSecurityTeam) {
+            await supabase.from(TABLES.securityTeam).upsert({ 
+                name: item.name, 
+                precinct: item.precinct, 
+                title: item.title,
+                creator_id: userId, 
+                created_at: new Date().toISOString() 
+            }, { onConflict: 'name' });
+          }
 
-    // ===== Fetch funcs (giữ logic gốc, rút gọn ở đây) =====
-    async function fetchPrecincts(){
-      const { data } = await supabase.from(TABLES.precincts).select('*');
-      console.log('Precincts:',data);
-    }
-    async function fetchHouseholds(){ /* ... */ }
-    async function fetchMembers(){ /* ... */ }
-    async function fetchSubjects(){ /* ... */ }
-    async function fetchIncidents(){ /* ... */ }
-    async function fetchImages(){ /* ... */ }
-    async function fetchPartyMembers(){ /* ... */ }
-    async function fetchSecurityTeam(){ /* ... */ }
+          setupRealtime();
+          fetchPrecincts();
+        }
 
-    // ===== UI: sự kiện tab, thêm/sửa/xóa, modal, editable... (giữ nguyên từ file gốc) =====
-    // (toàn bộ phần UI, showAddForm, showAddMemberForm, setupEditableFields, setupDeleteListeners... copy từ file gốc và hoạt động không đổi)
+        function setupRealtime() {
+          const precinctChannel = supabase.channel('precinct-changes');
+          precinctChannel.on('postgres_changes', { event: '*', schema: 'public', table: TABLES.precincts }, () => fetchPrecincts()).subscribe();
+          
+          const householdChannel = supabase.channel('household-changes');
+          householdChannel.on('postgres_changes', { event: '*', schema: 'public', table: TABLES.households }, () => fetchHouseholds()).subscribe();
 
-    // ===== Khởi chạy =====
-    initializeData();
+          const securityChannel = supabase.channel('security-changes');
+          securityChannel.on('postgres_changes', { event: '*', schema: 'public', table: TABLES.securityTeam }, () => fetchSecurityTeam()).subscribe();
+        }
 
-  </script>
+        // Precincts functions
+        async function fetchPrecincts() {
+          const { data, error } = await supabase.from(TABLES.precincts).select('*').order('name');
+          const list = document.getElementById('precincts-list');
+          list.innerHTML = '';
+          if (data) {
+            data.forEach(item => {
+              const li = document.createElement('li');
+              li.className = 'flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-2 rounded-lg mb-2';
+              li.innerHTML = `<span class="text-base">${item.name}</span><button class="delete-btn text-red-600 dark:text-red-400 text-sm p-1 rounded hover:bg-red-100 dark:hover:bg-red-900 transition-colors" data-id="${item.id}" data-table="${TABLES.precincts}">Xóa</button>`;
+              list.appendChild(li);
+            });
+          } else if (error) {
+            console.error('Error fetching precincts:', error);
+            showCustomAlert('Lỗi khi lấy dữ liệu địa bàn.');
+          }
+          attachDeleteListeners();
+        }
+
+        async function addPrecinct(name) {
+          if (!name) return;
+          const { error } = await supabase.from(TABLES.precincts).insert({ name, creator_id: userId, created_at: new Date().toISOString() });
+          if (error) {
+            console.error('Error adding precinct:', error);
+            showCustomAlert('Không thể thêm địa bàn. Tên có thể đã tồn tại.');
+          }
+        }
+
+        // Households functions
+        async function fetchHouseholds() {
+          const { data, error } = await supabase.from(TABLES.households).select('*').order('name');
+          const list = document.getElementById('households-list');
+          list.innerHTML = '';
+          if (data) {
+            data.forEach(item => {
+              const li = document.createElement('li');
+              li.className = 'flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-2 rounded-lg mb-2';
+              li.innerHTML = `<span class="text-base">${item.name} (${item.precinct})</span><button class="delete-btn text-red-600 dark:text-red-400 text-sm p-1 rounded hover:bg-red-100 dark:hover:bg-red-900 transition-colors" data-id="${item.id}" data-table="${TABLES.households}">Xóa</button>`;
+              list.appendChild(li);
+            });
+          } else if (error) {
+            console.error('Error fetching households:', error);
+            showCustomAlert('Lỗi khi lấy dữ liệu hộ gia đình.');
+          }
+          attachDeleteListeners();
+        }
+
+        async function addHousehold(name, precinct) {
+          if (!name || !precinct) return;
+          const { error } = await supabase.from(TABLES.households).insert({ name, precinct, creator_id: userId, created_at: new Date().toISOString() });
+          if (error) {
+            console.error('Error adding household:', error);
+            showCustomAlert('Không thể thêm hộ gia đình. Tên có thể đã tồn tại.');
+          }
+        }
+        
+        // Security Team functions
+        async function fetchSecurityTeam() {
+          const { data, error } = await supabase.from(TABLES.securityTeam).select('*').order('name');
+          const list = document.getElementById('security-team-list');
+          list.innerHTML = '';
+          if (data) {
+            data.forEach(item => {
+              const li = document.createElement('li');
+              li.className = 'flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-2 rounded-lg mb-2';
+              li.innerHTML = `<span class="text-base">${item.name} (${item.title} - ${item.precinct})</span><button class="delete-btn text-red-600 dark:text-red-400 text-sm p-1 rounded hover:bg-red-100 dark:hover:bg-red-900 transition-colors" data-id="${item.id}" data-table="${TABLES.securityTeam}">Xóa</button>`;
+              list.appendChild(li);
+            });
+          } else if (error) {
+            console.error('Error fetching security team:', error);
+            showCustomAlert('Lỗi khi lấy dữ liệu đội an ninh.');
+          }
+          attachDeleteListeners();
+        }
+
+        async function addSecurityTeamMember(name, precinct) {
+          if (!name || !precinct) return;
+          const { error } = await supabase.from(TABLES.securityTeam).insert({ name, precinct, creator_id: userId, created_at: new Date().toISOString() });
+          if (error) {
+            console.error('Error adding security member:', error);
+            showCustomAlert('Không thể thêm thành viên. Tên có thể đã tồn tại.');
+          }
+        }
+
+        // Universal delete function
+        async function deleteItem(id, table) {
+          const { error } = await supabase.from(table).delete().eq('id', id);
+          if (error) {
+            console.error(`Error deleting from ${table}:`, error);
+            showCustomAlert('Không thể xóa mục này.');
+          }
+        }
+
+        function attachDeleteListeners() {
+          document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const id = btn.getAttribute('data-id');
+              const table = btn.getAttribute('data-table');
+              showCustomConfirm('Bạn có chắc chắn muốn xóa mục này?', () => {
+                deleteItem(id, table);
+              });
+            });
+          });
+        }
+
+        function setupTabSwitching() {
+          const tabButtons = document.querySelectorAll('.tab-button');
+          const tabPanels = document.querySelectorAll('.tab-panel');
+
+          tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+              tabButtons.forEach(btn => btn.classList.remove('active'));
+              tabPanels.forEach(panel => panel.classList.add('hidden'));
+              button.classList.add('active');
+              const targetPanelId = button.id.replace('tab-', '') + '-tab-content';
+              document.getElementById(targetPanelId).classList.remove('hidden');
+
+              // Fetch data for the selected tab
+              if (button.id === 'tab-precincts') {
+                fetchPrecincts();
+              } else if (button.id === 'tab-political') {
+                fetchHouseholds();
+                fetchSecurityTeam();
+              }
+            });
+          });
+        }
+
+        // Add event listeners for new buttons
+        document.getElementById('add-precinct-btn').addEventListener('click', () => {
+          const nameInput = document.getElementById('new-precinct-name');
+          const name = nameInput.value.trim();
+          if (name) {
+            addPrecinct(name);
+            nameInput.value = '';
+          }
+        });
+        
+        document.getElementById('add-security-member-btn').addEventListener('click', () => {
+            const nameInput = document.getElementById('new-security-member-name');
+            const precinctInput = document.getElementById('new-security-member-precinct');
+            const name = nameInput.value.trim();
+            const precinct = precinctInput.value.trim();
+            if (name && precinct) {
+                addSecurityTeamMember(name, precinct);
+                nameInput.value = '';
+                precinctInput.value = '';
+            }
+        });
+        
+        document.getElementById('add-household-btn').addEventListener('click', () => {
+            const nameInput = document.getElementById('new-household-name');
+            const precinctInput = document.getElementById('new-household-precinct');
+            const name = nameInput.value.trim();
+            const precinct = precinctInput.value.trim();
+            if (name && precinct) {
+                addHousehold(name, precinct);
+                nameInput.value = '';
+                precinctInput.value = '';
+            }
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+        });
+
+        initializeData();
+        setupTabSwitching();
+    </script>
 </body>
 </html>
