@@ -3,36 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Hệ Thống Quản Lý Địa Bàn & Đối Tượng (Đầy đủ)</title>
+  <title>Hệ Thống Quản Lý Địa Bàn</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <style>
-    body { font-family: 'Inter', sans-serif; transition: background-color .3s, color .3s }
-    .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,.5); justify-content:center; align-items:center }
-    .hidden{display:none}
+    body { font-family: 'Inter', sans-serif; }
     .tab-button{transition:all .2s ease-in-out; border-bottom-width:2px; border-bottom-color:transparent}
     .tab-button.active{color:#4f46e5; border-bottom-color:#4f46e5; font-weight:600}
-    body.dark{background:#121212; color:#e0e0e0}
-    .dark .bg-white{background:#1e1e1e}
   </style>
 </head>
 <body class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
 
-  <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-5xl mx-auto transition-colors duration-300">
-    <h1 class="text-4xl font-bold text-center text-slate-800 mb-2">Hệ Thống Quản Lý Địa Bàn & Đối Tượng</h1>
-    <p class="text-center text-slate-600 mb-6">Quản lý các Thôn, Buôn, Hộ, Thành viên và Đối tượng.</p>
-
-    <div class="flex justify-end mb-4">
-      <button id="theme-toggle" class="p-2 rounded-full bg-slate-200 dark:bg-gray-700 text-slate-800 dark:text-gray-300 transition-colors duration-200">🌞/🌙</button>
-    </div>
-
-    <div class="flex border-b border-slate-200 mb-6 space-x-4">
-      <button id="tab-precincts" class="tab-button py-2 px-4 text-lg text-slate-600 active">Địa bàn</button>
-      <button id="tab-political" class="tab-button py-2 px-4 text-lg text-slate-600">Hệ thống chính trị</button>
-      <button id="tab-subjects" class="tab-button py-2 px-4 text-lg text-slate-600">Đối tượng</button>
-      <button id="tab-incidents" class="tab-button py-2 px-4 text-lg text-slate-600">Vụ việc</button>
-      <button id="tab-images" class="tab-button py-2 px-4 text-lg text-slate-600">Hình ảnh</button>
-    </div>
+  <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-3xl mx-auto">
+    <h1 class="text-3xl font-bold text-center text-slate-800 mb-6">Hệ Thống Quản Lý Địa Bàn</h1>
 
     <div id="tab-content">
       <!-- Precincts Section -->
@@ -44,17 +27,6 @@
         </div>
         <ul id="precincts-list" class="list-disc pl-6 space-y-1 text-slate-700"></ul>
       </div>
-      <div id="political-tab-content" class="hidden">...</div>
-      <div id="subjects-tab-content" class="hidden">...</div>
-      <div id="incidents-tab-content" class="hidden">...</div>
-      <div id="images-tab-content" class="hidden">...</div>
-    </div>
-  </div>
-
-  <div id="modal" class="modal">
-    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full modal-content">
-      <h3 id="modal-title" class="text-xl font-bold mb-4 text-center"></h3>
-      <div id="modal-content-area"></div>
     </div>
   </div>
 
@@ -64,9 +36,7 @@
     const SUPABASE_URL = 'https://skbjeeyisyfifzoiuxeq.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
 
-    const TABLES = {
-      precincts: 'precincts'
-    }
+    const TABLES = { precincts: 'precincts' };
 
     let supabase = null;
     let userId = 'anonymous_' + Date.now();
@@ -84,27 +54,17 @@
       supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
       // Xóa toàn bộ dữ liệu cũ
-      await supabase.from(TABLES.precincts).delete().neq('id', 0);
+      await supabase.from(TABLES.precincts).delete().gt('id', 0);
 
-      // Chèn lại 32 thôn/buôn
-      for (const name of initialPrecincts){
-        await supabase.from(TABLES.precincts).insert({
-          name,
-          creator_id: userId,
-          created_at: new Date().toISOString()
-        });
-      }
+      // Chèn lại 32 thôn/buôn trong một lần
+      const rows = initialPrecincts.map(name => ({
+        name,
+        creator_id: userId,
+        created_at: new Date().toISOString()
+      }));
+      await supabase.from(TABLES.precincts).insert(rows);
 
-      setupRealtime();
       fetchPrecincts();
-    }
-
-    function setupRealtime(){
-      const channel = supabase.channel('public-changes');
-      channel.on('postgres_changes',{event:'*',schema:'public',table:TABLES.precincts}, payload=>{
-        fetchPrecincts();
-      });
-      channel.subscribe();
     }
 
     async function fetchPrecincts(){
@@ -126,10 +86,12 @@
     async function addPrecinct(name){
       if(!name) return;
       await supabase.from(TABLES.precincts).insert({ name, creator_id: userId, created_at: new Date().toISOString() });
+      fetchPrecincts();
     }
 
     async function deletePrecinct(id){
       await supabase.from(TABLES.precincts).delete().eq('id',id);
+      fetchPrecincts();
     }
 
     function attachDeleteListeners(){
